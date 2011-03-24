@@ -29,6 +29,8 @@ Example:
 
 License
 -------
+Copyright 2011, Olivine Labs, LLC.
+
 LGPL
 
                    GNU LESSER GENERAL PUBLIC LICENSE
