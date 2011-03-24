@@ -8,6 +8,8 @@ You can download the compiled binary (any cpu) at [alchemyws](https://sourceforg
 
 You can download the client javascript library at [alchemy-websockets-client-library](https://github.com/Olivine-Labs/Alchemy-Websockets-Client-Library)
 
+Documentation: [docs.alchemywebsockets.net](http://docs.alchemywebsockets.net/)
+
 Usage
 -------
 After compilation, include the dll as a reference. Starting a server is as simple 
