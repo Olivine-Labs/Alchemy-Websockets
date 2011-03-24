@@ -14,11 +14,18 @@ An example application can be seen on [alchemy-websockets-example](https://githu
 Example:
 
 >WSServer AServer = new WSServer(81, IPAddress.Any);
+>
 >AServer.DefaultOnReceive = new OnEventDelegate(OnReceive);
+>
 >AServer.DefaultOnSend = new OnEventDelegate(OnSend);
+>
 >AServer.DefaultOnConnect = new OnEventDelegate(OnConnect);
+>
 >AServer.DefaultOnDisconnect = new OnEventDelegate(OnDisconnect);
+>
 >AServer.TimeOut = new TimeSpan(0, 5, 0);
+>
+>
 >
 >AServer.Start();
 
