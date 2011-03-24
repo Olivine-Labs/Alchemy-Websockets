@@ -4,6 +4,8 @@ Alchemy Websockets
 A websocket server built in C# to be extremely efficient and scalable over high 
 numbers of connections.
 
+You can download the compiled binary (any cpu) at [alchemyws](https://sourceforge.net/projects/alchemyws/) on SourceForge.
+
 Usage
 -------
 After compilation, include the dll as a reference. Starting a server is as simple 
