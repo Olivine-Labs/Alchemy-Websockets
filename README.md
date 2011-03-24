@@ -6,6 +6,8 @@ numbers of connections.
 
 You can download the compiled binary (any cpu) at [alchemyws](https://sourceforge.net/projects/alchemyws/) on SourceForge.
 
+You can download the client javascript library at [alchemy-websockets-client-library](https://github.com/Olivine-Labs/Alchemy-Websockets-Client-Library)
+
 Usage
 -------
 After compilation, include the dll as a reference. Starting a server is as simple 
@@ -15,21 +17,14 @@ An example application can be seen on [alchemy-websockets-example](https://githu
 
 Example:
 
->WSServer AServer = new WSServer(81, IPAddress.Any);
->
->AServer.DefaultOnReceive = new OnEventDelegate(OnReceive);
->
->AServer.DefaultOnSend = new OnEventDelegate(OnSend);
->
->AServer.DefaultOnConnect = new OnEventDelegate(OnConnect);
->
->AServer.DefaultOnDisconnect = new OnEventDelegate(OnDisconnect);
->
->AServer.TimeOut = new TimeSpan(0, 5, 0);
->
->
->
->AServer.Start();
+	WSServer AServer = new WSServer(81, IPAddress.Any);
+	
+	AServer.DefaultOnReceive = new OnEventDelegate(OnReceive);
+	AServer.DefaultOnSend = new OnEventDelegate(OnSend);
+	AServer.DefaultOnConnect = new OnEventDelegate(OnConnect);
+	AServer.DefaultOnDisconnect = new OnEventDelegate(OnDisconnect);
+	AServer.TimeOut = new TimeSpan(0, 5, 0);
+	AServer.Start();
 
 
 License
