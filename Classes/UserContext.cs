@@ -73,6 +73,8 @@ namespace Alchemy.Server.Classes
         protected OnEventDelegate _OnReceive = (x) => { };
         protected OnEventDelegate _OnSend = (x) => { };
 
+        public readonly Header Header;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UserContext"/> class.
         /// </summary>
@@ -80,6 +82,7 @@ namespace Alchemy.Server.Classes
         public UserContext(Context AContext)
         {
             this.Context = AContext;
+            this.Header = this.Context.Header;
         }
 
         /// <summary>
