@@ -28,9 +28,9 @@ using System.Net;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
-using System.Security.Cryptography;
 using System.Web;
 using Alchemy.Server.Classes;
+using System.Security.Cryptography;
 
 namespace Alchemy.Server.Handlers.WebSocket
 {
@@ -46,7 +46,7 @@ namespace Alchemy.Server.Handlers.WebSocket
         {
             if(AContext.ReceivedByteCount > 8)
             {
-                ClientHandshake AHandshake = new ClientHandshake(new ArraySegment<byte>(AContext.Buffer, AContext.ReceivedByteCount-8, 8), AContext.Header);
+                ClientHandshake AHandshake = new ClientHandshake(AContext.Header);
                 // See if our header had the required information
                 if (AHandshake.IsValid())
                 {
@@ -58,7 +58,8 @@ namespace Alchemy.Server.Handlers.WebSocket
                         if (AHandshake.Host != Location + ":" + AContext.Server.Port.ToString())
                             return false;
                     // Generate response handshake for the client
-                    ServerHandshake ServerShake = GenerateResponseHandshake(AHandshake);
+                    ServerHandshake ServerShake = GenerateResponseHandshake(AHandshake, AContext);
+                    ServerShake.SubProtocol = AHandshake.SubProtocol;
                     // Send the response handshake
                     SendServerHandshake(ServerShake, AContext);
                     return true;
@@ -67,57 +68,28 @@ namespace Alchemy.Server.Handlers.WebSocket
             return false;
         }
 
-        private static ServerHandshake GenerateResponseHandshake(ClientHandshake AHandshake)
+        private static ServerHandshake GenerateResponseHandshake(ClientHandshake AHandshake, Context AContext)
         {
             ServerHandshake AResponseHandshake = new ServerHandshake();
-            AResponseHandshake.Location = "ws://" + AHandshake.Host + AHandshake.ResourcePath;
-            AResponseHandshake.Origin = AHandshake.Origin;
-            AResponseHandshake.SubProtocol = AHandshake.SubProtocol;
-            AResponseHandshake.AnswerBytes = GenerateAnswerBytes(AHandshake.Key1, AHandshake.Key2, AHandshake.ChallengeBytes);
-
+            AResponseHandshake.Accept = GenerateAccept(AHandshake.Key, AContext);
             return AResponseHandshake;
         }
         
         private static void SendServerHandshake(ServerHandshake AHandshake, Context AContext)
         {
             // generate a byte array representation of the handshake including the answer to the challenge
-            byte[] HandshakeBytes = AContext.UserContext.Encoding.GetBytes(AHandshake.ToString());
-            Array.Copy(AHandshake.AnswerBytes, 0, HandshakeBytes, HandshakeBytes.Length-16, 16);
-
+            string temp = AHandshake.ToString();
+            byte[] HandshakeBytes = AContext.UserContext.Encoding.GetBytes(temp);
             AContext.UserContext.SendRaw(HandshakeBytes);
         }
 
-        private static byte[] TranslateKey(string AKey)
+        private static string GenerateAccept(string Key, Context AContext)
         {
-            //  Count total spaces in the keys
-            int KeySpaceCount = AKey.Count(x => x == ' ');
-
-            // Get a number which is a concatenation of all digits in the keys.
-            string KeyNumberString = new String(AKey.Where(x => Char.IsDigit(x)).ToArray());
-
-            // Divide the number with the number of spaces
-            Int32 KeyResult = (Int32)(Int64.Parse(KeyNumberString) / KeySpaceCount);
-
-            // convert the results to 32 bit big endian byte arrays
-            byte[] KeyResultBytes = BitConverter.GetBytes(KeyResult);
-            if (BitConverter.IsLittleEndian)
-            {
-                Array.Reverse(KeyResultBytes);
-            }
-            return KeyResultBytes;
-        }
-        
-        private static byte[] GenerateAnswerBytes(string Key1, string Key2, ArraySegment<byte> AChallenge)
-        {
-            // Translate the two keys, concatenate them and the 8 challenge bytes from the client
-            byte[] RawAnswer = new byte[16];
-            Array.Copy(TranslateKey(Key1), 0, RawAnswer, 0, 4);
-            Array.Copy(TranslateKey(Key2), 0, RawAnswer, 4, 4);
-            Array.Copy(AChallenge.Array, AChallenge.Offset, RawAnswer, 8, 8);
+            string RawAnswer = Key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
             // Create a hash of the RawAnswer and return it
-            MD5 Hasher = MD5.Create();
-            return Hasher.ComputeHash(RawAnswer);
+            SHA1 Hasher = SHA1.Create();
+            return Convert.ToBase64String(Hasher.ComputeHash(AContext.UserContext.Encoding.GetBytes(RawAnswer)));
         }
     }
 }
