@@ -90,6 +90,10 @@ namespace Alchemy.Server.Handlers
                             break;
                     }
                 }
+                else if (AContext.UserContext.DataFrame.State == DataFrame.DataState.Closed)
+                {
+                    AContext.UserContext.Send(new byte[0], true);
+                }
             }
             else
             {

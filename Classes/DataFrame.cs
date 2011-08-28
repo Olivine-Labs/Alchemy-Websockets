@@ -42,17 +42,28 @@ namespace Alchemy.Server.Classes
         {
             Empty = -1,
             Receiving = 0,
-            Complete = 1
+            Complete = 1,
+            Closed = 2
         }
+
+        public enum OpCode
+        {
+            Continue    = 0x0,
+            Text        = 0x1,
+            Binary      = 0x2,
+            Close       = 0x8,
+            Ping        = 0x9,
+            Pong        = 0xA
+        }
+
+        private const byte ContinueBit  = 0x0;
+        private const byte EndBit       = 0x80;
 
         /// <summary>
         /// The internal byte buffer used to store received data until the entire frame comes through.
         /// </summary>
         private byte[] RawFrame = null;
         private DataState _State = DataState.Empty;
-
-        public const byte StartByte = 0;
-        public const byte EndByte = 255;
 
         /// <summary>
         /// Gets the current length of the received frame.
@@ -96,11 +107,52 @@ namespace Alchemy.Server.Classes
         /// <returns>The Data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
         public static byte[] Wrap(byte[] Data)
         {
-            // wrap the array with the wrapper bytes
-            byte[] WrappedBytes = new byte[Data.Length + 2];
-            WrappedBytes[0] = StartByte;
-            WrappedBytes[WrappedBytes.Length - 1] = EndByte;
-            Array.Copy(Data, 0, WrappedBytes, 1, Data.Length);
+            byte[] WrappedBytes = null;
+
+            if (Data.Length > 0)
+            {
+                // wrap the array with the wrapper bytes
+                int StartIndex = 2;
+                byte[] HeaderBytes = new byte[14];
+                HeaderBytes[0] = 0x81;
+                if (Data.Length <= 125)
+                {
+                    HeaderBytes[1] = (byte)Data.Length;
+                }
+                else
+                {
+                    if (Data.Length <= ushort.MaxValue)
+                    {
+                        HeaderBytes[1] = 126;
+                        Array.Copy(BitConverter.GetBytes((UInt16)Data.Length), 0, HeaderBytes, StartIndex, 2);
+                        StartIndex = 4;
+                    }
+                    else
+                    {
+                        HeaderBytes[1] = 127;
+                        Array.Copy(BitConverter.GetBytes((UInt64)Data.Length), 0, HeaderBytes, StartIndex, 8);
+                        StartIndex = 10;
+                    }
+                }
+                HeaderBytes[1] = (byte)(HeaderBytes[1] | 0x80);
+
+                Random ARandom = new Random();
+                int Key = ARandom.Next(Int32.MaxValue);
+                Array.Copy(BitConverter.GetBytes(Key), 0, HeaderBytes, StartIndex, 4);
+                StartIndex += 4;
+
+                Mask(ref Data, Key);
+
+                WrappedBytes = new byte[Data.Length + 6];
+                Array.Copy(HeaderBytes, 0, WrappedBytes, 0, StartIndex);
+                Array.Copy(Data, 0, WrappedBytes, StartIndex, Data.Length);
+                Console.WriteLine(Encoding.UTF8.GetString(WrappedBytes));
+            }
+            else
+            {
+                WrappedBytes = new byte[1];
+                WrappedBytes[0] = 0x0;
+            }
             return WrappedBytes;
         }
 
@@ -112,28 +164,53 @@ namespace Alchemy.Server.Classes
         {
             if (Data.Length > 0)
             {
-                int End = Array.IndexOf(Data, EndByte);
-                if (End != -1)
-                {
+                byte Nibble1 = (byte) (Data[0] & 0x0F);
+                byte Nibble2 = (byte)((Data[0] & 0xF0) >> 4);
+
+                if ((Nibble1 & EndBit) == EndBit)
                     _State = DataState.Complete;
-                }
-                else //If no match found, default.
+
+
+                //Combine bytes to form one large number
+                int StartIndex = 2;
+                Int64 DataLength = 0;
+                DataLength = (byte)(Data[1] & 0x7F);
+                if (DataLength == 126)
                 {
-                    End = Data.Length;
-                    _State = DataState.Receiving;
+                    BitConverter.ToInt16(Data, StartIndex);
+                    StartIndex = 4;
+                }
+                else if (DataLength == 127)
+                {
+                    BitConverter.ToInt64(Data, StartIndex);
+                    StartIndex = 10;
                 }
 
-                int Start = Array.IndexOf(Data, StartByte);
-                if ((Start != -1) && (Start < End)) // Make sure the start is before the end and that we actually found a match.
+                bool Masked = Convert.ToBoolean((Data[1] & 0x80) >> 7);
+                int MaskingKey = 0;
+                if (Masked)
                 {
-                    Start++; // Do not include the Start Byte
-                }
-                else //If no match found, default.
-                {
-                    Start = 0;
+                    MaskingKey = BitConverter.ToInt32(Data, StartIndex);
+                    StartIndex = StartIndex + 4;
                 }
 
-                AppendDataToFrame(Data, Start, End);
+                byte[] Payload = new byte[DataLength];
+                Array.Copy(Data, (int)StartIndex, Payload, 0, (int)DataLength);
+                if(Masked)
+                    Mask(ref Payload, MaskingKey);
+
+                OpCode CurrentFrameOpcode = (OpCode)Nibble2;
+                switch (CurrentFrameOpcode)
+                {
+                    case OpCode.Continue:
+                    case OpCode.Binary:
+                    case OpCode.Text:
+                        AppendDataToFrame(Payload);
+                        break;
+                    case OpCode.Close:
+                        _State = DataState.Closed;
+                        break;
+                }
             }
         }
 
@@ -143,15 +220,15 @@ namespace Alchemy.Server.Classes
         /// <param name="SomeBytes">Some bytes.</param>
         /// <param name="Start">The start index.</param>
         /// <param name="End">The end index.</param>
-        private void AppendDataToFrame(byte[] SomeBytes, int Start, int End)
+        private void AppendDataToFrame(byte[] SomeBytes)
         {
             int CurrentFrameLength = 0;
             if (RawFrame != null)
                 CurrentFrameLength = RawFrame.Length;
-            byte[] NewFrame = new byte[CurrentFrameLength + (End - Start)];
+            byte[] NewFrame = new byte[CurrentFrameLength + SomeBytes.Length];
             if(CurrentFrameLength > 0)
                 Array.Copy(RawFrame, 0, NewFrame, 0, CurrentFrameLength);
-            Array.Copy(SomeBytes, Start, NewFrame, CurrentFrameLength, End - Start);
+            Array.Copy(SomeBytes, 0, NewFrame, CurrentFrameLength, SomeBytes.Length);
             RawFrame = NewFrame;
         }
 
@@ -192,5 +269,14 @@ namespace Alchemy.Server.Classes
             _State = DataState.Empty;
         }
 
+        private static void Mask(ref byte[] SomeBytes, Int32 Key)
+        {
+            byte[] ByteKeys = BitConverter.GetBytes(Key);
+            for(int Index = 0; Index < SomeBytes.Length; Index++)
+            {
+                int KeyIndex = Index % 4;
+                SomeBytes[Index] = (byte)(SomeBytes[Index]^ByteKeys[KeyIndex]);
+            }
+        }
     }
 }
