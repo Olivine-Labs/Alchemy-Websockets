@@ -143,7 +143,7 @@ namespace Alchemy.Server.Classes
 
                 Mask(ref Data, Key);
 
-                WrappedBytes = new byte[Data.Length + 6];
+                WrappedBytes = new byte[Data.Length + StartIndex];
                 Array.Copy(HeaderBytes, 0, WrappedBytes, 0, StartIndex);
                 Array.Copy(Data, 0, WrappedBytes, StartIndex, Data.Length);
                 Console.WriteLine(Encoding.UTF8.GetString(WrappedBytes));
