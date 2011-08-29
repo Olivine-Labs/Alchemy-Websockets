@@ -113,8 +113,8 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         {
             if (Data.Length > 0)
             {
-                byte Nibble1 = (byte)(Data[0] & 0x0F);
-                byte Nibble2 = (byte)(Data[0] & 0xF0);
+                byte Nibble2 = (byte)(Data[0] & 0x0F);
+                byte Nibble1 = (byte)(Data[0] & 0xF0);
 
                 if ((Nibble1 & EndBit) == EndBit)
                     _State = DataState.Complete;
