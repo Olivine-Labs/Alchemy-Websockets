@@ -44,7 +44,7 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// The Data Frame that this client is currently processing.
         /// </summary>
-        public DataFrame DataFrame = new DataFrame();
+        public DataFrame DataFrame = null;
         /// <summary>
         /// What character encoding to use.
         /// </summary>
@@ -308,6 +308,7 @@ namespace Alchemy.Server.Classes
         /// </summary>
         public void Reset()
         {
+            if(UserContext.DataFrame != null)
             if (UserContext.DataFrame.State == DataFrame.DataState.Complete)
                 UserContext.DataFrame.Clear();
             ReceivedByteCount = 0;

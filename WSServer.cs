@@ -30,7 +30,6 @@ using System.Threading;
 using Alchemy.Server.Classes;
 using log4net;
 using System.IO;
-using Alchemy.Server.Handlers.WebSocket;
 
 namespace Alchemy.Server
 {
@@ -169,7 +168,7 @@ namespace Alchemy.Server
             set
             {
                 _OriginHost = value;
-                WebSocketAuthentication.Origin = _OriginHost;
+                Alchemy.Server.Handlers.WebSocket.hybi10.WebSocketAuthentication.Origin = value;
             }
         }
 
@@ -188,7 +187,7 @@ namespace Alchemy.Server
             set
             {
                 _DestinationHost = value;
-                WebSocketAuthentication.Location = _DestinationHost;
+                Alchemy.Server.Handlers.WebSocket.hybi10.WebSocketAuthentication.Location = value;
             }
         }
 

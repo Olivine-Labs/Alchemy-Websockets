@@ -94,11 +94,17 @@ namespace Alchemy.Server.Handlers
                 AContext.Header = new Header(Data);
                 switch (AContext.Header.Protocol)
                 {
-                    case Protocol.WebSocket:
-                        AContext.Handler = WebSocketHandler.Instance;
+                    case Protocol.WebSocketHybi00:
+                        AContext.Handler = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketHandler.Instance;
+                        AContext.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi00.DataFrame();
+                        break;
+                    case Protocol.WebSocketHybi10:
+                        AContext.Handler = Alchemy.Server.Handlers.WebSocket.hybi10.WebSocketHandler.Instance;
+                        AContext.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi10.DataFrame();
                         break;
                     case Protocol.FlashSocket:
-                        AContext.Handler = WebSocketHandler.Instance;
+                        AContext.Handler = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketHandler.Instance;
+                        AContext.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi00.DataFrame();
                         break;
                     default:
                         AContext.Header.Protocol = Protocol.None;

@@ -6,7 +6,7 @@
     <ProductVersion>8.0.30703</ProductVersion>
     <SchemaVersion>2.0</SchemaVersion>
     <ProjectGuid>{45486CDE-86A3-4769-952F-E0821BF79493}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Alchemy.Server</RootNamespace>
     <AssemblyName>Alchemy</AssemblyName>
@@ -30,9 +30,15 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject />
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="log4net">
       <HintPath>Libraries\log4net.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\Alchemy-WebSockets-Example\Server\src\Libraries\Newtonsoft.Json.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -46,14 +52,21 @@
   <ItemGroup>
     <Compile Include="APServer.cs" />
     <Compile Include="Classes\DataFrame.cs" />
+    <Compile Include="Handlers\WebSocket\hybi00\DataFrame.cs" />
+    <Compile Include="Handlers\WebSocket\hybi10\DataFrame.cs" />
     <Compile Include="Classes\Header.cs" />
     <Compile Include="Classes\Response.cs" />
     <Compile Include="Classes\UserContext.cs" />
     <Compile Include="Handlers\DefaultHandler.cs" />
     <Compile Include="Handlers\Handler.cs" />
-    <Compile Include="Handlers\WebSocketHandler.cs" />
+    <Compile Include="Handlers\WebSocket\hybi00\WebSocketHandler.cs" />
+    <Compile Include="Handlers\WebSocket\hybi00\Handshakes.cs" />
+    <Compile Include="Handlers\WebSocket\hybi00\WebSocketAuthentication.cs" />
+    <Compile Include="Handlers\WebSocket\hybi10\WebSocketAuthentication.cs" />
+    <Compile Include="Handlers\WebSocket\hybi10\Handshakes.cs" />
+    <Compile Include="Handlers\WebSocket\hybi10\WebSocketHandler.cs" />
     <Compile Include="Handlers\WebSocket\WebSocketAuthentication.cs" />
-    <Compile Include="Handlers\WebSocket\Handshakes.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="WSServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -63,6 +76,7 @@
       <SubType>Designer</SubType>
     </None>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

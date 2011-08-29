@@ -26,6 +26,7 @@ using System.Linq;
 using System.Text;
 using Alchemy.Server.Classes;
 using System.Threading;
+using Alchemy.Server.Handlers.WebSocket;
 
 namespace Alchemy.Server.Handlers
 {
@@ -35,6 +36,7 @@ namespace Alchemy.Server.Handlers
     /// </summary>
     public abstract class Handler
     {
+        public WebSocketAuthentication Authentication = null;
         protected static SemaphoreSlim CreateLock = new SemaphoreSlim(1);
         public abstract void HandleRequest(Context Request);
         public abstract void Send(byte[] Data, Context AContext, bool Close = false);

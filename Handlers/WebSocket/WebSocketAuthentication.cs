@@ -37,59 +37,11 @@ namespace Alchemy.Server.Handlers.WebSocket
     /// <summary>
     /// Handles the handshaking between the client and the host, when a new connection is created
     /// </summary>
-    static class WebSocketAuthentication
+    public interface WebSocketAuthentication
     {
-        public static string Origin = string.Empty;
-        public static string Location = string.Empty;
+        void SetOrigin(string origin);
+        void SetLocation(string location);
 
-        public static bool CheckHandshake(Context AContext)
-        {
-            if(AContext.ReceivedByteCount > 8)
-            {
-                ClientHandshake AHandshake = new ClientHandshake(AContext.Header);
-                // See if our header had the required information
-                if (AHandshake.IsValid())
-                {
-                    // Optionally check Origin and Location if they're set.
-                    if (Origin != string.Empty)
-                        if (AHandshake.Origin != "http://" + Origin)
-                            return false;
-                    if (Location != string.Empty)
-                        if (AHandshake.Host != Location + ":" + AContext.Server.Port.ToString())
-                            return false;
-                    // Generate response handshake for the client
-                    ServerHandshake ServerShake = GenerateResponseHandshake(AHandshake, AContext);
-                    ServerShake.SubProtocol = AHandshake.SubProtocol;
-                    // Send the response handshake
-                    SendServerHandshake(ServerShake, AContext);
-                    return true;
-                }
-            }
-            return false;
-        }
-
-        private static ServerHandshake GenerateResponseHandshake(ClientHandshake AHandshake, Context AContext)
-        {
-            ServerHandshake AResponseHandshake = new ServerHandshake();
-            AResponseHandshake.Accept = GenerateAccept(AHandshake.Key, AContext);
-            return AResponseHandshake;
-        }
-        
-        private static void SendServerHandshake(ServerHandshake AHandshake, Context AContext)
-        {
-            // generate a byte array representation of the handshake including the answer to the challenge
-            string temp = AHandshake.ToString();
-            byte[] HandshakeBytes = AContext.UserContext.Encoding.GetBytes(temp);
-            AContext.UserContext.SendRaw(HandshakeBytes);
-        }
-
-        private static string GenerateAccept(string Key, Context AContext)
-        {
-            string RawAnswer = Key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
-
-            // Create a hash of the RawAnswer and return it
-            SHA1 Hasher = SHA1.Create();
-            return Convert.ToBase64String(Hasher.ComputeHash(AContext.UserContext.Encoding.GetBytes(RawAnswer)));
-        }
+        bool CheckHandshake(Context AContext);
     }
 }

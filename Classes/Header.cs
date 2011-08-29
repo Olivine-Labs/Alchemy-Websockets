@@ -36,8 +36,9 @@ namespace Alchemy.Server.Classes
     public enum Protocol
     {
         None = -1,
-        WebSocket = 0,
-        FlashSocket = 1
+        WebSocketHybi10 = 0,
+        WebSocketHybi00 = 1,
+        FlashSocket = 2
     }
 
     /// <summary>
@@ -135,21 +136,28 @@ namespace Alchemy.Server.Classes
                 RequestPath = SomeFields["path"].Captures[0].Value.Trim();
                 Method = SomeFields["connect"].Captures[0].Value.Trim();
 
-                string[] PathExplode = RequestPath.Split('/');
-                string ProtocolString = string.Empty;
-                if (PathExplode.Length > 0)
-                    ProtocolString = PathExplode[PathExplode.Length - 1].ToLower().Trim();
-                switch (ProtocolString)
+                if (Fields["sec-websocket-version"] != "8")
                 {
-                    case "websocket":
-                        this.Protocol = Protocol.WebSocket;
-                        break;
-                    case "flashsocket":
-                        this.Protocol = Protocol.FlashSocket;
-                        break;
-                    default:
-                        this.Protocol = Protocol.None;
-                        break;
+                    string[] PathExplode = RequestPath.Split('/');
+                    string ProtocolString = string.Empty;
+                    if (PathExplode.Length > 0)
+                        ProtocolString = PathExplode[PathExplode.Length - 1].ToLower().Trim();
+                    switch (ProtocolString)
+                    {
+                        case "websocket":
+                            this.Protocol = Protocol.WebSocketHybi00;
+                            break;
+                        case "flashsocket":
+                            this.Protocol = Protocol.FlashSocket;
+                            break;
+                        default:
+                            this.Protocol = Protocol.None;
+                            break;
+                    }
+                }
+                else
+                {
+                    this.Protocol = Protocol.WebSocketHybi10;
                 }
             }
             catch{ /* Ignore bad header */ }
