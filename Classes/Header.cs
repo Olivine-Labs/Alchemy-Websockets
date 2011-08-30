@@ -136,7 +136,13 @@ namespace Alchemy.Server.Classes
                 RequestPath = SomeFields["path"].Captures[0].Value.Trim();
                 Method = SomeFields["connect"].Captures[0].Value.Trim();
 
-                if (Fields["sec-websocket-version"] != "8")
+                string Version = string.Empty;
+                try
+                {
+                    Version = Fields["sec-websocket-version"];
+                }
+                catch (Exception){}
+                if (Version != "8")
                 {
                     string[] PathExplode = RequestPath.Split('/');
                     string ProtocolString = string.Empty;
