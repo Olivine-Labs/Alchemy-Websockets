@@ -73,13 +73,23 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                     if (Data.Length <= ushort.MaxValue)
                     {
                         HeaderBytes[1] = 126;
-                        Array.Copy(BitConverter.GetBytes((UInt16)Data.Length), 0, HeaderBytes, StartIndex, 2);
+                        byte[] extendedLength = BitConverter.GetBytes((UInt16)Data.Length);
+                        HeaderBytes[2] = extendedLength[1];
+                        HeaderBytes[3] = extendedLength[0];
                         StartIndex = 4;
                     }
                     else
                     {
                         HeaderBytes[1] = 127;
-                        Array.Copy(BitConverter.GetBytes((UInt64)Data.Length), 0, HeaderBytes, StartIndex, 8);
+                        byte[] extendedLength = BitConverter.GetBytes((UInt64)Data.Length);
+                        HeaderBytes[2] = extendedLength[7];
+                        HeaderBytes[3] = extendedLength[6];
+                        HeaderBytes[4] = extendedLength[5];
+                        HeaderBytes[5] = extendedLength[4];
+                        HeaderBytes[6] = extendedLength[3];
+                        HeaderBytes[7] = extendedLength[2];
+                        HeaderBytes[8] = extendedLength[1];
+                        HeaderBytes[9] = extendedLength[0];
                         StartIndex = 10;
                     }
                 }
