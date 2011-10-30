@@ -36,7 +36,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// <summary>
         /// The preformatted handshake as a string.
         /// </summary>
-        private const String Handshake = 
+        private const String _handshake = 
             "GET {0} HTTP/1.1\r\n" +
             "Host: {2}\r\n" +
             "Upgrade: websocket\r\n" +
@@ -60,16 +60,16 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// Initializes a new instance of the <see cref="ClientHandshake"/> class.
         /// </summary>
         /// <param name="ChallengeBytes">The challenge bytes.</param>
-        /// <param name="AHeader">The header.</param>
-        public ClientHandshake(Header AHeader)
+        /// <param name="header">The header.</param>
+        public ClientHandshake(Header header)
         {
-            ResourcePath= AHeader.RequestPath;
-            Key         = AHeader["sec-websocket-key"];
-            SubProtocol = AHeader["sec-websocket-protocol"];
-            Origin      = AHeader["sec-websocket-origin"];
-            Host        = AHeader["host"];
-            Version     = AHeader["sec-websocket-version"];
-            Cookies     = AHeader.Cookies;
+            ResourcePath= header.RequestPath;
+            Key         = header["sec-websocket-key"];
+            SubProtocol = header["sec-websocket-protocol"];
+            Origin      = header["sec-websocket-origin"];
+            Host        = header["host"];
+            Version     = header["sec-websocket-version"];
+            Cookies     = header.Cookies;
         }
 
         /// <summary>
@@ -97,23 +97,23 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// </returns>
         public override string ToString()
         {
-            string AdditionalFields = String.Empty;
+            string additionalFields = String.Empty;
 
             if (Cookies != null)
             {
-                AdditionalFields += "Cookie: " + Cookies.ToString() + "\r\n";
+                additionalFields += "Cookie: " + Cookies.ToString() + "\r\n";
             }
 
-            if (AdditionalFields != null)
+            if (additionalFields != null)
             {
                 foreach (KeyValuePair<string, string> field in this.AdditionalFields)
                 {
-                    AdditionalFields += field.Key + ": " + field.Value + "\r\n";
+                    additionalFields += field.Key + ": " + field.Value + "\r\n";
                 }
             }
-            AdditionalFields += "\r\n";
+            additionalFields += "\r\n";
 
-            return String.Format(Handshake, ResourcePath, Origin, Host, SubProtocol, Key, AdditionalFields);
+            return String.Format(_handshake, ResourcePath, Origin, Host, SubProtocol, Key, additionalFields);
         }
     }
 
@@ -126,7 +126,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// <summary>
         /// The preformatted handshake string.
         /// </summary>
-        private const string Handshake =
+        private const string _handshake =
             "HTTP/1.1 101 Switching Protocols\r\n" +
             "Upgrade: websocket\r\n" +
             "Connection: Upgrade\r\n" +
@@ -146,13 +146,13 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// </returns>
         public override string ToString()
         {
-            string AdditionalFields = String.Empty;
+            string additionalFields = String.Empty;
             if (SubProtocol != null)
             {
-                AdditionalFields += "Sec-WebSocket-Protocol: " + SubProtocol + "\r\n";
+                additionalFields += "Sec-WebSocket-Protocol: " + SubProtocol + "\r\n";
             }
-            AdditionalFields += "\r\n";
-            return String.Format(Handshake, Accept, AdditionalFields);
+            additionalFields += "\r\n";
+            return String.Format(_handshake, Accept, additionalFields);
         }
     }
 }

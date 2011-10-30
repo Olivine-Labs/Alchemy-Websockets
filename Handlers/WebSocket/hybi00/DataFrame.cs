@@ -26,7 +26,7 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 namespace Alchemy.Server.Handlers.WebSocket.hybi00
 {
     /// <summary>
-    /// Simple WebSocket Data Frame implementation. 
+    /// Simple WebSocket data Frame implementation. 
     /// Automatically manages adding received data to an existing frame and checking whether or not we've received the entire frame yet.
     /// See http://www.whatwg.org/specs/web-socket-protocol/ for more details on the WebSocket Protocol.
     /// </summary>
@@ -39,8 +39,8 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// Wraps the specified data in WebSocket Start/End Bytes.
         /// Accepts a byte array.
         /// </summary>
-        /// <param name="Data">The data.</param>
-        /// <returns>The Data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
+        /// <param name="data">The data.</param>
+        /// <returns>The data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
         public override byte[] Wrap(byte[] data)
         {
             // wrap the array with the wrapper bytes
@@ -54,7 +54,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
         /// </summary>
-        /// <param name="Data">The data.</param>
+        /// <param name="data">The data.</param>
         public override void Append(byte[] data)
         {
             if (data.Length > 0)

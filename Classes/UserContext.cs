@@ -39,7 +39,7 @@ namespace Alchemy.Server.Classes
         /// </summary>
         private Context Context = null;
         /// <summary>
-        /// The Data Frame that this client is currently processing.
+        /// The data Frame that this client is currently processing.
         /// </summary>
         public DataFrame DataFrame = null;
         /// <summary>
@@ -75,7 +75,7 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// Initializes a new instance of the <see cref="UserContext"/> class.
         /// </summary>
-        /// <param name="AContext">The user context.</param>
+        /// <param name="context">The user context.</param>
         public UserContext(Context AContext)
         {
             this.Context = AContext;
@@ -170,8 +170,8 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="Data">The data.</param>
-        /// <param name="Close">if set to <c>true</c> [close].</param>
+        /// <param name="data">The data.</param>
+        /// <param name="close">if set to <c>true</c> [close].</param>
         public void Send(string Data, bool Close = false)
         {
             Send(Encoding.GetBytes(Data), Close);
@@ -180,8 +180,8 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="Data">The data.</param>
-        /// <param name="Close">if set to <c>true</c> [close].</param>
+        /// <param name="data">The data.</param>
+        /// <param name="close">if set to <c>true</c> [close].</param>
         public void Send(byte[] Data, bool Close = false)
         {
             Context.Handler.Send(Data, Context, Close);
@@ -190,10 +190,10 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// Sends raw data.
         /// </summary>
-        /// <param name="Data">The data.</param>
+        /// <param name="data">The data.</param>
         public void SendRaw(byte[] Data)
         {
-            DefaultHandler.Instance.Send(Data, Context);
+            _defaultHandler.Instance.Send(Data, Context);
         }
     }
 
@@ -233,7 +233,7 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// The current connection handler.
         /// </summary>
-        public Handler Handler = DefaultHandler.Instance;
+        public Handler Handler = _defaultHandler.Instance;
         /// <summary>
         /// Semaphores that limit sends and receives to 1 and a time.
         /// </summary>

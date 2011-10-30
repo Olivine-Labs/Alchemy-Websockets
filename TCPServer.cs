@@ -144,7 +144,7 @@ namespace Alchemy.Server
         /// Executes in it's own thread.
         /// Utilizes a semaphore(ReceiveReady) to limit the number of receive events active for this client to 1 at a time.
         /// </summary>
-        /// <param name="AResult">The A result.</param>
+        /// <param name="result">The A result.</param>
         private void RunClient(IAsyncResult result)
         {
             TcpClient connection = null;

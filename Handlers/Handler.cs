@@ -34,7 +34,7 @@ namespace Alchemy.Server.Handlers
     public abstract class Handler
     {
         public WebSocketAuthentication Authentication = null;
-        protected static SemaphoreSlim CreateLock = new SemaphoreSlim(1);
+        protected static SemaphoreSlim _createLock = new SemaphoreSlim(1);
         public abstract void HandleRequest(Context Request);
         public abstract void Send(byte[] Data, Context AContext, bool Close = false);
         public abstract void EndSend(IAsyncResult AResult);

@@ -27,7 +27,7 @@ using System.Text;
 namespace Alchemy.Server.Classes
 {
     /// <summary>
-    /// Simple WebSocket Data Frame implementation. 
+    /// Simple WebSocket data Frame implementation. 
     /// Automatically manages adding received data to an existing frame and checking whether or not we've received the entire frame yet.
     /// See http://www.whatwg.org/specs/web-socket-protocol/ for more details on the WebSocket Protocol.
     /// </summary>
@@ -78,7 +78,7 @@ namespace Alchemy.Server.Classes
         /// Wraps the specified data.
         /// Accepts a string, converts to bytes, sends to the real wrap function.
         /// </summary>
-        /// <param name="Data">The data.</param>
+        /// <param name="data">The data.</param>
         /// <returns></returns>
         public byte[] Wrap(string data)
         {
@@ -90,21 +90,21 @@ namespace Alchemy.Server.Classes
         /// Wraps the specified data in WebSocket Start/End Bytes.
         /// Accepts a byte array.
         /// </summary>
-        /// <param name="Data">The data.</param>
-        /// <returns>The Data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
+        /// <param name="data">The data.</param>
+        /// <returns>The data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
         public abstract byte[] Wrap(byte[] data);
 
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
         /// </summary>
-        /// <param name="Data">The data.</param>
+        /// <param name="data">The data.</param>
         public abstract void Append(byte[] data);
 
         /// <summary>
-        /// Returns a <see cref="System.String"/> that represents this Data Frame.
+        /// Returns a <see cref="System.String"/> that represents this data Frame.
         /// </summary>
         /// <returns>
-        /// A <see cref="System.String"/> that represents this Data Frame.
+        /// A <see cref="System.String"/> that represents this data Frame.
         /// </returns>
         public override string ToString()
         {
@@ -115,10 +115,10 @@ namespace Alchemy.Server.Classes
         }
 
         /// <summary>
-        /// Returns a Byte Array that represents this Data Frame.
+        /// Returns a Byte Array that represents this data Frame.
         /// </summary>
         /// <returns>
-        /// A Byte Array that represents this Data Frame.
+        /// A Byte Array that represents this data Frame.
         /// </returns>
         public byte[] ToBytes()
         {

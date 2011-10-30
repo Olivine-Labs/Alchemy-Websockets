@@ -234,7 +234,7 @@ namespace Alchemy.Server
         /// <summary>
         /// The root receive event for each client. Executes in it's own thread.
         /// </summary>
-        /// <param name="AResult">The Async result.</param>
+        /// <param name="result">The Async result.</param>
         private void DoReceive(IAsyncResult result)
         {
             Context context = (Context)result.AsyncState;

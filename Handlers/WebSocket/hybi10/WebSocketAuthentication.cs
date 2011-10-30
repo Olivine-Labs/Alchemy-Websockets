@@ -34,7 +34,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
     {
         public static string Origin = string.Empty;
         public static string Location = string.Empty;
-        private static SemaphoreSlim CreateLock = new SemaphoreSlim(1);
+        private static SemaphoreSlim _createLock = new SemaphoreSlim(1);
         private static WebSocketAuthentication _instance = null;
 
         private WebSocketAuthentication()
@@ -46,12 +46,12 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         {
             get
             {
-                CreateLock.Wait();
+                _createLock.Wait();
                 if (_instance == null)
                 {
                     _instance = new WebSocketAuthentication();
                 }
-                CreateLock.Release();
+                _createLock.Release();
                 return _instance;
             }
         }
@@ -66,54 +66,54 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             Location = location;
         }
 
-        public bool CheckHandshake(Context AContext)
+        public bool CheckHandshake(Context context)
         {
-            if(AContext.ReceivedByteCount > 8)
+            if(context.ReceivedByteCount > 8)
             {
-                ClientHandshake AHandshake = new ClientHandshake(AContext.Header);
+                ClientHandshake handshake = new ClientHandshake(context.Header);
                 // See if our header had the required information
-                if (AHandshake.IsValid())
+                if (handshake.IsValid())
                 {
                     // Optionally check Origin and Location if they're set.
                     if (Origin != string.Empty)
-                        if (AHandshake.Origin != "http://" + Origin)
+                        if (handshake.Origin != "http://" + Origin)
                             return false;
                     if (Location != string.Empty)
-                        if (AHandshake.Host != Location + ":" + AContext.Server.Port.ToString())
+                        if (handshake.Host != Location + ":" + context.Server.Port.ToString())
                             return false;
                     // Generate response handshake for the client
-                    ServerHandshake ServerShake = GenerateResponseHandshake(AHandshake, AContext);
-                    ServerShake.SubProtocol = AHandshake.SubProtocol;
+                    ServerHandshake serverShake = GenerateResponseHandshake(handshake, context);
+                    serverShake.SubProtocol = handshake.SubProtocol;
                     // Send the response handshake
-                    SendServerHandshake(ServerShake, AContext);
+                    SendServerHandshake(serverShake, context);
                     return true;
                 }
             }
             return false;
         }
 
-        private static ServerHandshake GenerateResponseHandshake(ClientHandshake AHandshake, Context AContext)
+        private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake, Context context)
         {
-            ServerHandshake AResponseHandshake = new ServerHandshake();
-            AResponseHandshake.Accept = GenerateAccept(AHandshake.Key, AContext);
-            return AResponseHandshake;
+            ServerHandshake responseHandshake = new ServerHandshake();
+            responseHandshake.Accept = GenerateAccept(handshake.Key, context);
+            return responseHandshake;
         }
         
-        private static void SendServerHandshake(ServerHandshake AHandshake, Context AContext)
+        private static void SendServerHandshake(ServerHandshake handshake, Context context)
         {
             // generate a byte array representation of the handshake including the answer to the challenge
-            string temp = AHandshake.ToString();
-            byte[] HandshakeBytes = AContext.UserContext.Encoding.GetBytes(temp);
-            AContext.UserContext.SendRaw(HandshakeBytes);
+            string temp = handshake.ToString();
+            byte[] handshakeBytes = context.UserContext.Encoding.GetBytes(temp);
+            context.UserContext.SendRaw(handshakeBytes);
         }
 
-        private static string GenerateAccept(string Key, Context AContext)
+        private static string GenerateAccept(string key, Context context)
         {
-            string RawAnswer = Key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+            string rawAnswer = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
-            // Create a hash of the RawAnswer and return it
-            SHA1 Hasher = SHA1.Create();
-            return Convert.ToBase64String(Hasher.ComputeHash(AContext.UserContext.Encoding.GetBytes(RawAnswer)));
+            // Create a hash of the rawAnswer and return it
+            SHA1 hasher = SHA1.Create();
+            return Convert.ToBase64String(hasher.ComputeHash(context.UserContext.Encoding.GetBytes(rawAnswer)));
         }
     }
 }

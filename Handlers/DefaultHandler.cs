@@ -30,23 +30,23 @@ namespace Alchemy.Server.Handlers
     /// When the protocol has not yet been determined the system defaults to this request handler.
     /// Singleton, just like the other handlers.
     /// </summary>
-    class DefaultHandler : Handler
+    class _defaultHandler : Handler
     {
-        private static DefaultHandler _Instance;
+        private static _defaultHandler _instance;
 
-        private DefaultHandler() { }
+        private _defaultHandler() { }
 
-        public static DefaultHandler Instance
+        public static _defaultHandler Instance
         {
             get 
             {
-                CreateLock.Wait();
-                if (_Instance == null)
+                _createLock.Wait();
+                if (_instance == null)
                 {
-                    _Instance = new DefaultHandler();
+                    _instance = new _defaultHandler();
                 }
-                CreateLock.Release();
-                return _Instance;
+                _createLock.Release();
+                return _instance;
             }
         }
 
@@ -55,65 +55,65 @@ namespace Alchemy.Server.Handlers
         /// Attempts to process the header that should have been sent.
         /// Otherwise, through magic and wizardry, the client gets disconnected.
         /// </summary>
-        /// <param name="AContext">The user context.</param>
-        public override void HandleRequest(Context AContext)
+        /// <param name="context">The user context.</param>
+        public override void HandleRequest(Context context)
         {
-            if (AContext.IsSetup)
+            if (context.IsSetup)
             {
-                AContext.Dispose();
+                context.Dispose();
             }
             else
             {
-                ProcessHeader(AContext);
+                ProcessHeader(context);
             }
         }
 
         /// <summary>
         /// Processes the header.
         /// </summary>
-        /// <param name="AContext">The user context.</param>
-        public void ProcessHeader(Context AContext)
+        /// <param name="context">The user context.</param>
+        public void ProcessHeader(Context context)
         {
-            string Data = AContext.UserContext.Encoding.GetString(AContext.Buffer, 0, AContext.ReceivedByteCount);
+            string data = context.UserContext.Encoding.GetString(context.Buffer, 0, context.ReceivedByteCount);
             //Check first to see if this is a flash socket XML request.
-            if (Data == "<policy-file-request/>\0")
+            if (data == "<policy-file-request/>\0")
             {
                 try
                 {
                     //if it is, we access the Access Policy Server instance to send the appropriate response.
-                    AContext.Server.AccessPolicyServer.SendResponse(AContext.Connection);
+                    context.Server.AccessPolicyServer.SendResponse(context.Connection);
                 }
                 catch { }
-                AContext.Dispose();
+                context.Dispose();
             }
             else//If it isn't, process http/websocket header as normal.
             {
-                AContext.Header = new Header(Data);
-                switch (AContext.Header.Protocol)
+                context.Header = new Header(data);
+                switch (context.Header.Protocol)
                 {
                     case Protocol.WebSocketHybi00:
-                        AContext.Handler = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketHandler.Instance;
-                        AContext.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi00.DataFrame();
+                        context.Handler = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketHandler.Instance;
+                        context.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi00.DataFrame();
                         break;
                     case Protocol.WebSocketHybi10:
-                        AContext.Handler = Alchemy.Server.Handlers.WebSocket.hybi10.WebSocketHandler.Instance;
-                        AContext.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi10.DataFrame();
+                        context.Handler = Alchemy.Server.Handlers.WebSocket.hybi10.WebSocketHandler.Instance;
+                        context.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi10.DataFrame();
                         break;
                     case Protocol.FlashSocket:
-                        AContext.Handler = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketHandler.Instance;
-                        AContext.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi00.DataFrame();
+                        context.Handler = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketHandler.Instance;
+                        context.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi00.DataFrame();
                         break;
                     default:
-                        AContext.Header.Protocol = Protocol.None;
+                        context.Header.Protocol = Protocol.None;
                         break;
                 }
-                if (AContext.Header.Protocol != Protocol.None)
+                if (context.Header.Protocol != Protocol.None)
                 {
-                    AContext.Handler.HandleRequest(AContext);
+                    context.Handler.HandleRequest(context);
                 }
                 else
                 {
-                    AContext.UserContext.Send(Response.NotImplemented, true);
+                    context.UserContext.Send(Response.NotImplemented, true);
                 }
             }
         }
@@ -121,62 +121,62 @@ namespace Alchemy.Server.Handlers
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="Data">The data.</param>
-        /// <param name="AContext">The user context.</param>
-        /// <param name="Close">if set to <c>true</c> [close].</param>
-        public override void Send(byte[] Data, Context AContext, bool Close = false)
+        /// <param name="data">The data.</param>
+        /// <param name="context">The user context.</param>
+        /// <param name="close">if set to <c>true</c> [close].</param>
+        public override void Send(byte[] data, Context context, bool close = false)
         {
-            AsyncCallback ACallback = EndSend;
-            if (Close)
-                ACallback = EndSendAndClose;
-            AContext.SendReady.Wait();
+            AsyncCallback callback = EndSend;
+            if (close)
+                callback = EndSendAndClose;
+            context.SendReady.Wait();
             try
             {
-                AContext.Connection.Client.BeginSend(Data, 0, Data.Length, SocketFlags.None, ACallback, AContext);
+                context.Connection.Client.BeginSend(data, 0, data.Length, SocketFlags.None, callback, context);
             }
             catch
             {
-                AContext.SendReady.Release();
+                context.SendReady.Release();
             }
         }
 
         /// <summary>
         /// Ends the send.
         /// </summary>
-        /// <param name="AResult">The Async result.</param>
-        public override void EndSend(IAsyncResult AResult)
+        /// <param name="result">The Async result.</param>
+        public override void EndSend(IAsyncResult result)
         {
-            Context AContext = (Context)AResult.AsyncState;
+            Context context = (Context)result.AsyncState;
             try
             {
-                AContext.Connection.Client.EndSend(AResult);
-                AContext.SendReady.Release();
+                context.Connection.Client.EndSend(result);
+                context.SendReady.Release();
             }
             catch
             {
-                AContext.SendReady.Release();
+                context.SendReady.Release();
             }
-            AContext.UserContext.OnSend();
+            context.UserContext.OnSend();
         }
 
         /// <summary>
         /// Ends the send and closes the connection.
         /// </summary>
-        /// <param name="AResult">The Async result.</param>
-        public override void EndSendAndClose(IAsyncResult AResult)
+        /// <param name="result">The Async result.</param>
+        public override void EndSendAndClose(IAsyncResult result)
         {
-            Context AContext = (Context)AResult.AsyncState;
+            Context context = (Context)result.AsyncState;
             try
             {
-                AContext.Connection.Client.EndSend(AResult);
-                AContext.SendReady.Release();
+                context.Connection.Client.EndSend(result);
+                context.SendReady.Release();
             }
             catch
             {
-                AContext.SendReady.Release();
+                context.SendReady.Release();
             }
-            AContext.UserContext.OnSend();
-            AContext.Dispose();
+            context.UserContext.OnSend();
+            context.Dispose();
         }
     }
 }

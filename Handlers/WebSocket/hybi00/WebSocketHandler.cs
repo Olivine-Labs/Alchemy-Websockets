@@ -42,12 +42,12 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         {
             get 
             {
-                CreateLock.Wait();
+                _createLock.Wait();
                 if (_instance == null)
                 {
                     _instance = new WebSocketHandler();
                 }
-                CreateLock.Release();
+                _createLock.Release();
                 return _instance;
             }
         }
@@ -55,48 +55,48 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <summary>
         /// Handles the request.
         /// </summary>
-        /// <param name="AContext">The user context.</param>
-        public override void HandleRequest(Context AContext)
+        /// <param name="context">The user context.</param>
+        public override void HandleRequest(Context context)
         {
-            if (AContext.IsSetup)
+            if (context.IsSetup)
             {
-                AContext.UserContext.DataFrame.Append(AContext.Buffer);
-                if (AContext.UserContext.DataFrame.State == DataFrame.DataState.Complete)
+                context.UserContext.DataFrame.Append(context.Buffer);
+                if (context.UserContext.DataFrame.State == DataFrame.DataState.Complete)
                 {
-                    switch (AContext.UserContext.DataFrame.Length)
+                    switch (context.UserContext.DataFrame.Length)
                     {
                         case 1:
                             //Process Command
-                            string ACommand = AContext.UserContext.DataFrame.ToString();
-                            if (ACommand == AContext.Server.PingCommand)
+                            string command = context.UserContext.DataFrame.ToString();
+                            if (command == context.Server.PingCommand)
                             {
-                                SendPingResponse(AContext);
-                                AContext.Pings++;
+                                SendPingResponse(context);
+                                context.Pings++;
                             }
                             else
                             {
-                                AContext.Pings = 0;
-                                AContext.UserContext.OnReceive();
+                                context.Pings = 0;
+                                context.UserContext.OnReceive();
                             }
-                            if ((AContext.Pings >= AContext.Server.MaxPingsInSequence) && (AContext.Server.MaxPingsInSequence != 0))
+                            if ((context.Pings >= context.Server.MaxPingsInSequence) && (context.Server.MaxPingsInSequence != 0))
                             {
-                                AContext.Dispose();
+                                context.Dispose();
                             }
                             break;
                         default:
-                            AContext.Pings = 0;
-                            AContext.UserContext.OnReceive();
+                            context.Pings = 0;
+                            context.UserContext.OnReceive();
                             break;
                     }
                 }
-                else if (AContext.UserContext.DataFrame.State == DataFrame.DataState.Closed)
+                else if (context.UserContext.DataFrame.State == DataFrame.DataState.Closed)
                 {
-                    AContext.UserContext.Send(new byte[0], true);
+                    context.UserContext.Send(new byte[0], true);
                 }
             }
             else
             {
-                Authenticate(AContext);
+                Authenticate(context);
             }
         }
 
@@ -104,91 +104,91 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// Attempts to authenticates the specified user context.
         /// If authentication fails it kills the connection.
         /// </summary>
-        /// <param name="AContext">The user context.</param>
-        private void Authenticate(Context AContext)
+        /// <param name="context">The user context.</param>
+        private static void Authenticate(Context context)
         {
-            if (AContext.Handler.Authentication.CheckHandshake(AContext))
+            if (context.Handler.Authentication.CheckHandshake(context))
             {
-                AContext.UserContext.Protocol = AContext.Header.Protocol;
-                AContext.UserContext.RequestPath = AContext.Header.RequestPath;
-                AContext.Header = null;
-                AContext.IsSetup = true;
+                context.UserContext.Protocol = context.Header.Protocol;
+                context.UserContext.RequestPath = context.Header.RequestPath;
+                context.Header = null;
+                context.IsSetup = true;
             }
             else
             {
-                AContext.Dispose();
+                context.Dispose();
             }
         }
 
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="Data">The data.</param>
-        /// <param name="AContext">The user context.</param>
-        /// <param name="Close">if set to <c>true</c> [close].</param>
-        public override void Send(byte[] Data, Context AContext, bool Close = false)
+        /// <param name="data">The data.</param>
+        /// <param name="context">The user context.</param>
+        /// <param name="close">if set to <c>true</c> [close].</param>
+        public override void Send(byte[] data, Context context, bool close = false)
         {
-                byte[] WrappedData = AContext.UserContext.DataFrame.Wrap(Data);
-                AsyncCallback ACallback = EndSend;
-                if (Close)
-                    ACallback = EndSendAndClose;
-                AContext.SendReady.Wait();
+                byte[] wrappedData = context.UserContext.DataFrame.Wrap(data);
+                AsyncCallback callback = EndSend;
+                if (close)
+                    callback = EndSendAndClose;
+                context.SendReady.Wait();
                 try
                 {
-                    AContext.Connection.Client.BeginSend(WrappedData, 0, WrappedData.Length, SocketFlags.None, ACallback, AContext);
+                    context.Connection.Client.BeginSend(wrappedData, 0, wrappedData.Length, SocketFlags.None, callback, context);
                 }
                 catch
                 {
-                    AContext.SendReady.Release();
+                    context.SendReady.Release();
                 }
         }
 
         /// <summary>
         /// Ends the send.
         /// </summary>
-        /// <param name="AResult">The Async result.</param>
-        public override void EndSend(IAsyncResult AResult)
+        /// <param name="result">The Async result.</param>
+        public override void EndSend(IAsyncResult result)
         {
-            Context AContext = (Context)AResult.AsyncState;
+            Context context = (Context)result.AsyncState;
             try
             {
-                AContext.Connection.Client.EndSend(AResult);
-                AContext.SendReady.Release();
+                context.Connection.Client.EndSend(result);
+                context.SendReady.Release();
             }
             catch
             {
-                AContext.SendReady.Release(); 
+                context.SendReady.Release(); 
             }
-            AContext.UserContext.OnSend();
+            context.UserContext.OnSend();
         }
 
         /// <summary>
         /// Ends the send and closes the connection.
         /// </summary>
-        /// <param name="AResult">The Async result.</param>
-        public override void EndSendAndClose(IAsyncResult AResult)
+        /// <param name="result">The Async result.</param>
+        public override void EndSendAndClose(IAsyncResult result)
         {
-            Context AContext = (Context)AResult.AsyncState;
+            Context context = (Context)result.AsyncState;
             try
             {
-                AContext.Connection.Client.EndSend(AResult);
-                AContext.SendReady.Release();
+                context.Connection.Client.EndSend(result);
+                context.SendReady.Release();
             }
             catch
             {
-               AContext.SendReady.Release();
+               context.SendReady.Release();
             }
-            AContext.UserContext.OnSend();
-            AContext.Dispose();
+            context.UserContext.OnSend();
+            context.Dispose();
         }
 
         /// <summary>
         /// Sends the ping response.
         /// </summary>
-        /// <param name="AContext">The user context.</param>
-        private void SendPingResponse(Context AContext)
+        /// <param name="context">The user context.</param>
+        private static void SendPingResponse(Context context)
         {
-            AContext.UserContext.Send(AContext.Server.PongCommand);
+            context.UserContext.Send(context.Server.PongCommand);
         }
     }
 }

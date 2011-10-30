@@ -95,7 +95,7 @@ namespace Alchemy.Server.Classes
         /// Initializes a new instance of the <see cref="Header"/> class.
         /// Accepts a string that represents an HTTP header.
         /// </summary>
-        /// <param name="Data">The data.</param>
+        /// <param name="data">The data.</param>
         public Header(string Data)
         {
             try
