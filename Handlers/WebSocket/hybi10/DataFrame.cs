@@ -103,7 +103,6 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 wrappedBytes = new byte[data.Length + startIndex];
                 Array.Copy(headerBytes, 0, wrappedBytes, 0, startIndex);
                 Array.Copy(data, 0, wrappedBytes, startIndex, data.Length);
-                Console.WriteLine(Encoding.UTF8.GetString(wrappedBytes));
             }
             else
             {
