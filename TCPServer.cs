@@ -10,9 +10,9 @@ namespace Alchemy.Server
 {
     public abstract class TCPServer
     {
-        protected TcpListener Listener = null;
+        private TcpListener _listener = null;
 
-        protected int _port = 80;
+        private int _port = 80;
         /// <summary>
         /// Gets or sets the port.
         /// </summary>
@@ -38,23 +38,23 @@ namespace Alchemy.Server
         /// The number of connected clients.
         /// </summary>
         /// 
-        private int _Clients = 0;
+        private int _clients = 0;
 
         /// <summary>
         /// Gets the client count.
         /// </summary>
         public int ClientCount
-        { get { return _Clients; } }
+        { get { return _clients; } }
 
         /// <summary>
         /// This Semaphore protects our clients variable on increment/decrement when a user connects/disconnects.
         /// </summary>
-        private SemaphoreSlim ClientLock = new SemaphoreSlim(1);
+        private SemaphoreSlim _clientLock = new SemaphoreSlim(1);
 
         /// <summary>
         /// Limits how many active connect events we have.
         /// </summary>
-        private SemaphoreSlim ConnectReady = new SemaphoreSlim(10);
+        private SemaphoreSlim _connectReady = new SemaphoreSlim(10);
 
         /// <summary>
         /// Gets or sets the listener address.
@@ -87,11 +87,11 @@ namespace Alchemy.Server
         /// </summary>
         public virtual void Start()
         {
-            if (Listener == null)
+            if (_listener == null)
             {
                 try
                 {
-                    Listener = new TcpListener(_listenAddress, _port);
+                    _listener = new TcpListener(_listenAddress, _port);
                     ThreadPool.QueueUserWorkItem(Listen, null);
                 }
                 catch { /* Ignore */ }
@@ -103,15 +103,15 @@ namespace Alchemy.Server
         /// </summary>
         public virtual void Stop()
         {
-            if (Listener != null)
+            if (_listener != null)
             {
                 try
                 {
-                    Listener.Stop();
+                    _listener.Stop();
                 }
                 catch { /* Ignore */ }
             }
-            Listener = null;
+            _listener = null;
         }
 
         /// <summary>
@@ -129,15 +129,15 @@ namespace Alchemy.Server
         /// <param name="State">The state.</param>
         private void Listen(object State)
         {
-            Listener.Start();
-            while (Listener != null)
+            _listener.Start();
+            while (_listener != null)
             {
                 try
                 {
-                    Listener.BeginAcceptTcpClient(RunClient, null);
+                    _listener.BeginAcceptTcpClient(RunClient, null);
                 }
                 catch { /* Ignore */ }
-                ConnectReady.Wait();
+                _connectReady.Wait();
             }
         }
 
@@ -153,23 +153,23 @@ namespace Alchemy.Server
             TcpClient AConnection = null;
             try
             {
-                if (Listener != null)
-                    AConnection = Listener.EndAcceptTcpClient(AResult);
+                if (_listener != null)
+                    AConnection = _listener.EndAcceptTcpClient(AResult);
             }
             catch (Exception) { /* Ignore*/ }
 
-            ConnectReady.Release();
+            _connectReady.Release();
             if (AConnection != null)
             {
-                ClientLock.Wait();
-                _Clients++;
-                ClientLock.Release();
+                _clientLock.Wait();
+                _clients++;
+                _clientLock.Release();
 
                 OnRunClient(AConnection);
 
-                ClientLock.Wait();
-                _Clients--;
-                ClientLock.Release();
+                _clientLock.Wait();
+                _clients--;
+                _clientLock.Release();
             }
         }
 
