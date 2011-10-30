@@ -98,11 +98,11 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 Array.Copy(BitConverter.GetBytes(key), 0, headerBytes, startIndex, 4);
                 startIndex += 4;
 
-                Mask(ref data, key);
+                byte[] maskedData=Mask(data, key);
 
                 wrappedBytes = new byte[data.Length + startIndex];
                 Array.Copy(headerBytes, 0, wrappedBytes, 0, startIndex);
-                Array.Copy(data, 0, wrappedBytes, startIndex, data.Length);
+                Array.Copy(maskedData, 0, wrappedBytes, startIndex, maskedData.Length);
             }
             else
             {
@@ -152,7 +152,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 byte[] payload = new byte[dataLength];
                 Array.Copy(data, (int)startIndex, payload, 0, (int)dataLength);
                 if(masked)
-                    Mask(ref payload, maskingKey);
+                    payload = Mask(payload, maskingKey);
 
                 OpCode currentFrameOpcode = (OpCode)nibble2;
                 switch (currentFrameOpcode)
@@ -193,14 +193,16 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             _rawFrame = newFrame;
         }
 
-        private static void Mask(ref byte[] someBytes, Int32 key)
+        private static byte[] Mask(byte[] someBytes, Int32 key)
         {
+            byte[] newBytes = new byte[someBytes.Length];
             byte[] byteKeys = BitConverter.GetBytes(key);
             for(int index = 0; index < someBytes.Length; index++)
             {
                 int KeyIndex = index % 4;
-                someBytes[index] = (byte)(someBytes[index]^byteKeys[KeyIndex]);
+                newBytes[index] = (byte)(someBytes[index]^byteKeys[KeyIndex]);
             }
+            return newBytes;
         }
     }
 }
