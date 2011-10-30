@@ -38,19 +38,10 @@ namespace Alchemy.Server
     /// It manages sending the XML cross domain policy to flash socket clients over port 843.
     /// See http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html for details.
     /// </summary>
-    public class APServer : IDisposable
+    public class APServer : TCPServer, IDisposable
     {
-        private int _Port = 843;
-        private IPAddress _ListenerAddress = IPAddress.Any;
         private string _AllowedHost = "localhost";
-        private int _AllowedPort = 81;
-
-        private TcpListener Listener = null;
-
-        /// <summary>
-        /// Limits how many active connect events we have.
-        /// </summary>
-        private SemaphoreSlim ConnectReady = new SemaphoreSlim(10);
+        private int _AllowedPort = 80;
 
         /// <summary>
         /// The pre-formatted XML response.
@@ -61,132 +52,34 @@ namespace Alchemy.Server
             "</cross-domain-policy>\r\n\0";
 
         /// <summary>
-        /// Gets or sets the listener address.
-        /// </summary>
-        /// <value>
-        /// The listener address.
-        /// </value>
-        public IPAddress ListenerAddress
-        {
-            get
-            {
-                return _ListenerAddress;
-            }
-            set
-            {
-                _ListenerAddress = value;
-            }
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="APServer"/> class.
         /// </summary>
         /// <param name="ListenAddress">The listen address.</param>
         /// <param name="OriginDomain">The origin domain.</param>
         /// <param name="AllowedPort">The allowed port.</param>
-        public APServer(IPAddress ListenAddress, string OriginDomain, int AllowedPort)
+        public APServer(IPAddress listenAddress, string originDomain, int allowedPort) : base(843, listenAddress)
         {
             string OriginLockdown = "*";
-            if (OriginDomain != String.Empty)
-                OriginLockdown = OriginDomain;
+            if (originDomain != String.Empty)
+                OriginLockdown = originDomain;
 
-            _ListenerAddress = ListenAddress;
             _AllowedHost = OriginLockdown;
-            _AllowedPort = AllowedPort;
+            _AllowedPort = allowedPort;
         }
 
         /// <summary>
-        /// Starts this instance.
+        /// Fires when a client connects.
         /// </summary>
-        public void Start()
+        /// <param name="AConnection">The TCP Connection.</param>
+        protected override void OnRunClient(TcpClient AConnection)
         {
-            if (Listener == null)
-            {
-                try
-                {
-                    Listener = new TcpListener(ListenerAddress, _Port);
-                    ThreadPool.QueueUserWorkItem(Listen, null);
-                }
-                catch { /* Ignore */ }
-            }
-        }
-
-        /// <summary>
-        /// Stops this instance.
-        /// </summary>
-        public void Stop()
-        {
-            if (Listener != null)
-            {
-                try
-                {
-                    Listener.Stop();
-                }
-                catch { /* Ignore */ }
-            }
-            Listener = null;
-        }
-
-        /// <summary>
-        /// Restarts this instance.
-        /// </summary>
-        public void Restart()
-        {
-            Stop();
-            Start();
-        }
-
-        /// <summary>
-        /// Listens on the ip and port specified.
-        /// </summary>
-        /// <param name="State">The state.</param>
-        private void Listen(object State)
-        {
-            Listener.Start();
-            while (Listener != null)
-            {
-                try
-                {
-                    Listener.BeginAcceptTcpClient(RunClient, null);
-                }
-                catch { /* Ignore */ }
-                ConnectReady.Wait();
-            }
-        }
-
-        /// <summary>
-        /// Runs the client.
-        /// </summary>
-        /// <param name="AResult">The Async result.</param>
-        private void RunClient(IAsyncResult AResult)
-        {
-            TcpClient AConnection = null;
             try
             {
-                if (Listener != null)
-                    AConnection = Listener.EndAcceptTcpClient(AResult);
+                AConnection.Client.Receive(new byte[32]);
+                SendResponse(AConnection);
+                AConnection.Client.Close();
             }
             catch { /* Ignore */ }
-
-            ConnectReady.Release();
-            if (AConnection != null)
-            {
-                try
-                {
-                    AConnection.Client.Receive(new byte[32]);
-                    SendResponse(AConnection);
-                    AConnection.Client.Close();
-                }
-                catch { /* Ignore */ }
-            }
-        }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            Stop();
         }
 
         /// <summary>

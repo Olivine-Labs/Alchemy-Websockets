@@ -38,33 +38,8 @@ namespace Alchemy.Server
     /// <summary>
     /// The Main WebSocket Server
     /// </summary>
-    public class WSServer : IDisposable
+    public class WSServer : TCPServer, IDisposable
     {
-
-        /// <summary>
-        /// Private, Internal variables.
-        /// </summary>
-        private int _Port = 81;
-        private IPAddress _ListenerAddress = IPAddress.Any;
-
-        /// <summary>
-        /// The number of connected clients.
-        /// </summary>
-        /// 
-        private int _Clients = 0;
-
-        /// <summary>
-        /// This Semaphore protects out clients variable on increment/decrement when a user connects/disconnects.
-        /// </summary>
-        private SemaphoreSlim ClientLock = new SemaphoreSlim(1);
-        private int DefaultBufferSize = 512;
-        private TcpListener Listener = null;
-
-        /// <summary>
-        /// This Semaphore limits how many connection events we have active at a time.
-        /// </summary>
-        private SemaphoreSlim ConnectReady = new SemaphoreSlim(10);
-
         private string _OriginHost = String.Empty;
         private string _DestinationHost = String.Empty;
 
@@ -110,48 +85,6 @@ namespace Alchemy.Server
         /// Warning, any flash socket connections will have an added delay on connection due to the client looking to port 843 first for the connection restrictions.
         /// </summary>
         public bool FlashAPEnabled = true;
-
-        /// <summary>
-        /// Gets the client count.
-        /// </summary>
-        public int ClientCount
-        { get { return _Clients; } }
-
-        /// <summary>
-        /// Gets or sets the port.
-        /// </summary>
-        /// <value>
-        /// The port.
-        /// </value>
-        public int Port
-        {
-            get
-            {
-                return _Port;
-            }
-            set
-            {
-                _Port = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the listener address.
-        /// </summary>
-        /// <value>
-        /// The listener address.
-        /// </value>
-        public IPAddress ListenerAddress
-        {
-            get
-            {
-                return _ListenerAddress;
-            }
-            set
-            {
-                _ListenerAddress = value;
-            }
-        }
 
         /// <summary>
         /// Gets or sets the origin host.
@@ -224,34 +157,28 @@ namespace Alchemy.Server
         /// </summary>
         /// <param name="ListenPort">The listen port.</param>
         /// <param name="ListenIp">The listen ip.</param>
-        public WSServer(int ListenPort = 0, IPAddress ListenIp = null)
+        public WSServer(int ListenPort = 0, IPAddress ListenIp = null): base(ListenPort, ListenIp)
         {
             LogConfigFile = "Alchemy.config";
             LoggerName = "Alchemy.Log";
-            if(ListenPort > 0)
-                _Port = ListenPort;
-            if(ListenIp != null)
-                _ListenerAddress = ListenIp;
         }
 
         /// <summary>
         /// Starts this instance.
         /// </summary>
-        public void Start()
+        public override void Start()
         {
-            if (Listener == null)
+            base.Start();
+            if (AccessPolicyServer == null)
             {
                 try
                 {
-                    AccessPolicyServer = new APServer(ListenerAddress, OriginHost, Port);
+                    AccessPolicyServer = new APServer(ListenAddress, OriginHost, Port);
 
                     if (FlashAPEnabled)
                     {
                         AccessPolicyServer.Start();
                     }
-
-                    Listener = new TcpListener(ListenerAddress, Port);
-                    ThreadPool.QueueUserWorkItem(Listen, null);
                 }
                 catch { /* Ignore */ }
             }
@@ -261,106 +188,50 @@ namespace Alchemy.Server
         /// <summary>
         /// Stops this instance.
         /// </summary>
-        public void Stop()
+        public override void Stop()
         {
-            if (Listener != null)
+            try
             {
-                try
-                {
-                    Listener.Stop();
-                    if((AccessPolicyServer != null) && (FlashAPEnabled))
-                        AccessPolicyServer.Stop();
-                }
-                catch { /* Ignore */ }
+                if((AccessPolicyServer != null) && (FlashAPEnabled))
+                    AccessPolicyServer.Stop();
             }
-            Listener = null;
+            catch { /* Ignore */ }
             AccessPolicyServer = null;
             Log.Info("Alchemy Server Stopped");
         }
 
         /// <summary>
-        /// Restarts this instance.
+        /// Fires when a client connects.
         /// </summary>
-        public void Restart()
+        /// <param name="AConnection">The TCP Connection.</param>
+        protected override void OnRunClient(TcpClient AConnection)
         {
-            Stop();
-            Start();
-        }
-
-        /// <summary>
-        /// Listens for new connections.
-        /// Utilizes a semaphore(ConnectReady) to manage how many active connect attempts we can manage concurrently.
-        /// </summary>
-        /// <param name="State">The state.</param>
-        private void Listen(object State)
-        {
-            Listener.Start();
-            while (Listener != null)
+            using (Context AContext = new Context())
             {
+                AContext.Server = this;
+                AContext.Connection = AConnection;
+                AContext.UserContext.ClientAddress = AContext.Connection.Client.RemoteEndPoint;
+                AContext.UserContext.SetOnConnect(DefaultOnConnect);
+                AContext.UserContext.SetOnDisconnect(DefaultOnDisconnect);
+                AContext.UserContext.SetOnSend(DefaultOnSend);
+                AContext.UserContext.SetOnReceive(DefaultOnReceive);
+                AContext.BufferSize = _defaultBufferSize;
+                AContext.UserContext.OnConnect();
                 try
                 {
-                    Listener.BeginAcceptTcpClient(RunClient, null);
-                    ConnectReady.Wait();
-                }
-                catch {/* Ignore */ }
-            }
-        }
-
-        /// <summary>
-        /// Runs the client.
-        /// Sets up the UserContext.
-        /// Executes in it's own thread.
-        /// Utilizes a semaphore(ReceiveReady) to limit the number of receive events active for this client to 1 at a time.
-        /// </summary>
-        /// <param name="AResult">The A result.</param>
-        private void RunClient(IAsyncResult AResult)
-        {
-            TcpClient AConnection = null;
-            try
-            {
-                if (Listener != null)
-                    AConnection = Listener.EndAcceptTcpClient(AResult);
-            }
-            catch (Exception e) { Log.Debug("Connect Failed", e); }
-
-            ConnectReady.Release();
-            if(AConnection != null)
-            {
-                ClientLock.Wait();
-                _Clients++;
-                ClientLock.Release();
-
-                using (Context AContext = new Context())
-                {
-                    AContext.Server = this;
-                    AContext.Connection = AConnection;
-                    AContext.UserContext.ClientAddress = AContext.Connection.Client.RemoteEndPoint;
-                    AContext.UserContext.SetOnConnect(DefaultOnConnect);
-                    AContext.UserContext.SetOnDisconnect(DefaultOnDisconnect);
-                    AContext.UserContext.SetOnSend(DefaultOnSend);
-                    AContext.UserContext.SetOnReceive(DefaultOnReceive);
-                    AContext.BufferSize = DefaultBufferSize;
-                    AContext.UserContext.OnConnect();
-                    try
+                    while (AContext.Connection.Connected)
                     {
-                        while (AContext.Connection.Connected)
+                        if (AContext.ReceiveReady.Wait(TimeOut))
                         {
-                            if (AContext.ReceiveReady.Wait(TimeOut))
-                            {
-                                AContext.Connection.Client.BeginReceive(AContext.Buffer, 0, AContext.Buffer.Length, SocketFlags.None, DoReceive, AContext);
-                            }
-                            else
-                            {
-                                break;
-                            }
+                            AContext.Connection.Client.BeginReceive(AContext.Buffer, 0, AContext.Buffer.Length, SocketFlags.None, DoReceive, AContext);
+                        }
+                        else
+                        {
+                            break;
                         }
                     }
-                    catch (Exception e) { Log.Debug("Client Forcefully Disconnected", e); }
                 }
-
-                ClientLock.Wait();
-                _Clients--;
-                ClientLock.Release();
+                catch (Exception e) { Log.Debug("Client Forcefully Disconnected", e); }
             }
         }
 
@@ -388,14 +259,6 @@ namespace Alchemy.Server
                 AContext.Dispose();
                 AContext.ReceiveReady.Release();
             }
-        }
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            Stop();
         }
     }
 }
