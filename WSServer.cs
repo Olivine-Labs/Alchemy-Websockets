@@ -40,8 +40,8 @@ namespace Alchemy.Server
     /// </summary>
     public class WSServer : TCPServer, IDisposable
     {
-        private string _OriginHost = String.Empty;
-        private string _DestinationHost = String.Empty;
+        private string _originHost = String.Empty;
+        private string _destinationHost = String.Empty;
 
         /// <summary>
         /// These are the default OnEvent delegates for the server. By default, all new UserContexts will use these events.
@@ -96,11 +96,11 @@ namespace Alchemy.Server
         {
             get
             {
-                return _OriginHost;
+                return _originHost;
             }
             set
             {
-                _OriginHost = value;
+                _originHost = value;
                 Alchemy.Server.Handlers.WebSocket.hybi10.WebSocketAuthentication.Origin = value;
             }
         }
@@ -115,11 +115,11 @@ namespace Alchemy.Server
         {
             get
             {
-                return _DestinationHost;
+                return _destinationHost;
             }
             set
             {
-                _DestinationHost = value;
+                _destinationHost = value;
                 Alchemy.Server.Handlers.WebSocket.hybi10.WebSocketAuthentication.Location = value;
             }
         }

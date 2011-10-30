@@ -40,13 +40,13 @@ namespace Alchemy.Server
     /// </summary>
     public class APServer : TCPServer, IDisposable
     {
-        private string _AllowedHost = "localhost";
-        private int _AllowedPort = 80;
+        private string  _allowedHost = "localhost";
+        private int     _allowedPort = 80;
 
         /// <summary>
         /// The pre-formatted XML response.
         /// </summary>
-        private const string Response = 
+        private const string _response = 
             "<cross-domain-policy>\r\n" +
                 "\t<allow-access-from domain=\"{0}\" to-ports=\"{1}\" />\r\n" +
             "</cross-domain-policy>\r\n\0";
@@ -63,8 +63,8 @@ namespace Alchemy.Server
             if (originDomain != String.Empty)
                 OriginLockdown = originDomain;
 
-            _AllowedHost = OriginLockdown;
-            _AllowedPort = allowedPort;
+            _allowedHost = OriginLockdown;
+            _allowedPort = allowedPort;
         }
 
         /// <summary>
@@ -88,7 +88,7 @@ namespace Alchemy.Server
         /// <param name="AConnection">The TCP Connection.</param>
         public void SendResponse(TcpClient AConnection)
         {
-            AConnection.Client.Send(UTF8Encoding.UTF8.GetBytes(String.Format(Response, _AllowedHost, _AllowedPort.ToString())));
+            AConnection.Client.Send(UTF8Encoding.UTF8.GetBytes(String.Format(_response, _allowedHost, _allowedPort.ToString())));
         }
     }
 }
