@@ -51,8 +51,8 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// The internal byte buffer used to store received data until the entire frame comes through.
         /// </summary>
-        protected byte[] RawFrame = null;
-        protected DataState _State = DataState.Empty;
+        protected byte[] _rawFrame = null;
+        protected DataState _state = DataState.Empty;
 
         /// <summary>
         /// Gets the current length of the received frame.
@@ -61,7 +61,7 @@ namespace Alchemy.Server.Classes
         {
             get
             {
-                return RawFrame.Length;
+                return _rawFrame.Length;
             }
         }
 
@@ -72,7 +72,7 @@ namespace Alchemy.Server.Classes
         {
             get
             {
-                return _State;
+                return _state;
             }
         }
 
@@ -82,10 +82,10 @@ namespace Alchemy.Server.Classes
         /// </summary>
         /// <param name="Data">The data.</param>
         /// <returns></returns>
-        public byte[] Wrap(string Data)
+        public byte[] Wrap(string data)
         {
-            byte[] SomeBytes = Encoding.UTF8.GetBytes(Data);
-            return Wrap(SomeBytes);
+            byte[] someBytes = Encoding.UTF8.GetBytes(data);
+            return Wrap(someBytes);
         }
 
         /// <summary>
@@ -94,13 +94,13 @@ namespace Alchemy.Server.Classes
         /// </summary>
         /// <param name="Data">The data.</param>
         /// <returns>The Data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
-        public abstract byte[] Wrap(byte[] Data);
+        public abstract byte[] Wrap(byte[] data);
 
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
         /// </summary>
         /// <param name="Data">The data.</param>
-        public abstract void Append(byte[] Data);
+        public abstract void Append(byte[] data);
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents this Data Frame.
@@ -110,8 +110,8 @@ namespace Alchemy.Server.Classes
         /// </returns>
         public override string ToString()
         {
-            if (RawFrame != null)
-                return UTF8Encoding.UTF8.GetString(RawFrame);
+            if (_rawFrame != null)
+                return UTF8Encoding.UTF8.GetString(_rawFrame);
             else
                 return String.Empty;
         }
@@ -124,8 +124,8 @@ namespace Alchemy.Server.Classes
         /// </returns>
         public byte[] ToBytes()
         {
-            if (RawFrame != null)
-                return RawFrame;
+            if (_rawFrame != null)
+                return _rawFrame;
             else
                 return new byte[0];
         }
@@ -135,8 +135,8 @@ namespace Alchemy.Server.Classes
         /// </summary>
         public void Clear()
         {
-            RawFrame = null;
-            _State = DataState.Empty;
+            _rawFrame = null;
+            _state = DataState.Empty;
         }
 
     }

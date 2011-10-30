@@ -44,46 +44,46 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// </summary>
         /// <param name="Data">The data.</param>
         /// <returns>The Data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
-        public override byte[] Wrap(byte[] Data)
+        public override byte[] Wrap(byte[] data)
         {
             // wrap the array with the wrapper bytes
-            byte[] WrappedBytes = new byte[Data.Length + 2];
-            WrappedBytes[0] = StartByte;
-            WrappedBytes[WrappedBytes.Length - 1] = EndByte;
-            Array.Copy(Data, 0, WrappedBytes, 1, Data.Length);
-            return WrappedBytes;
+            byte[] wrappedBytes = new byte[data.Length + 2];
+            wrappedBytes[0] = StartByte;
+            wrappedBytes[wrappedBytes.Length - 1] = EndByte;
+            Array.Copy(data, 0, wrappedBytes, 1, data.Length);
+            return wrappedBytes;
         }
 
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
         /// </summary>
         /// <param name="Data">The data.</param>
-        public override void Append(byte[] Data)
+        public override void Append(byte[] data)
         {
-            if (Data.Length > 0)
+            if (data.Length > 0)
             {
-                int End = Array.IndexOf(Data, EndByte);
-                if (End != -1)
+                int end = Array.IndexOf(data, EndByte);
+                if (end != -1)
                 {
-                    _State = DataState.Complete;
+                    _state = DataState.Complete;
                 }
                 else //If no match found, default.
                 {
-                    End = Data.Length;
-                    _State = DataState.Receiving;
+                    end = data.Length;
+                    _state = DataState.Receiving;
                 }
 
-                int Start = Array.IndexOf(Data, StartByte);
-                if ((Start != -1) && (Start < End)) // Make sure the start is before the end and that we actually found a match.
+                int start = Array.IndexOf(data, StartByte);
+                if ((start != -1) && (start < end)) // Make sure the start is before the end and that we actually found a match.
                 {
-                    Start++; // Do not include the Start Byte
+                    start++; // Do not include the Start Byte
                 }
                 else //If no match found, default.
                 {
-                    Start = 0;
+                    start = 0;
                 }
 
-                AppendDataToFrame(Data, Start, End);
+                AppendDataToFrame(data, start, end);
             }
         }
 
@@ -93,16 +93,16 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <param name="SomeBytes">Some bytes.</param>
         /// <param name="Start">The start index.</param>
         /// <param name="End">The end index.</param>
-        private void AppendDataToFrame(byte[] SomeBytes, int Start, int End)
+        private void AppendDataToFrame(byte[] someBytes, int start, int end)
         {
             int CurrentFrameLength = 0;
-            if (RawFrame != null)
-                CurrentFrameLength = RawFrame.Length;
-            byte[] NewFrame = new byte[CurrentFrameLength + (End - Start)];
+            if (_rawFrame != null)
+                CurrentFrameLength = _rawFrame.Length;
+            byte[] NewFrame = new byte[CurrentFrameLength + (end - start)];
             if (CurrentFrameLength > 0)
-                Array.Copy(RawFrame, 0, NewFrame, 0, CurrentFrameLength);
-            Array.Copy(SomeBytes, Start, NewFrame, CurrentFrameLength, End - Start);
-            RawFrame = NewFrame;
+                Array.Copy(_rawFrame, 0, NewFrame, 0, CurrentFrameLength);
+            Array.Copy(someBytes, start, NewFrame, CurrentFrameLength, end - start);
+            _rawFrame = NewFrame;
         }
     }
 }

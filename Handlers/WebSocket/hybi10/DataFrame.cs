@@ -45,8 +45,8 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             Pong        = 0xA
         }
 
-        private const byte ContinueBit  = 0x0;
-        private const byte EndBit       = 0x80;
+        private const byte _continueBit  = 0x0;
+        private const byte _endBit       = 0x80;
 
         /// <summary>
         /// Wraps the specified data in WebSocket Start/End Bytes.
@@ -54,126 +54,125 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// </summary>
         /// <param name="Data">The data.</param>
         /// <returns>The Data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
-        public override byte[] Wrap(byte[] Data)
+        public override byte[] Wrap(byte[] data)
         {
-            byte[] WrappedBytes = null;
+            byte[] wrappedBytes = null;
 
-            if (Data.Length > 0)
+            if (data.Length > 0)
             {
                 // wrap the array with the wrapper bytes
-                int StartIndex = 2;
-                byte[] HeaderBytes = new byte[14];
-                HeaderBytes[0] = 0x81;
-                if (Data.Length <= 125)
+                int startIndex = 2;
+                byte[] headerBytes = new byte[14];
+                headerBytes[0] = 0x81;
+                if (data.Length <= 125)
                 {
-                    HeaderBytes[1] = (byte)Data.Length;
+                    headerBytes[1] = (byte)data.Length;
                 }
                 else
                 {
-                    if (Data.Length <= ushort.MaxValue)
+                    if (data.Length <= ushort.MaxValue)
                     {
-                        HeaderBytes[1] = 126;
-                        byte[] extendedLength = BitConverter.GetBytes((UInt16)Data.Length);
-                        HeaderBytes[2] = extendedLength[1];
-                        HeaderBytes[3] = extendedLength[0];
-                        StartIndex = 4;
+                        headerBytes[1] = 126;
+                        byte[] extendedLength = BitConverter.GetBytes((UInt16)data.Length);
+                        headerBytes[2] = extendedLength[1];
+                        headerBytes[3] = extendedLength[0];
+                        startIndex = 4;
                     }
                     else
                     {
-                        HeaderBytes[1] = 127;
-                        byte[] extendedLength = BitConverter.GetBytes((UInt64)Data.Length);
-                        HeaderBytes[2] = extendedLength[7];
-                        HeaderBytes[3] = extendedLength[6];
-                        HeaderBytes[4] = extendedLength[5];
-                        HeaderBytes[5] = extendedLength[4];
-                        HeaderBytes[6] = extendedLength[3];
-                        HeaderBytes[7] = extendedLength[2];
-                        HeaderBytes[8] = extendedLength[1];
-                        HeaderBytes[9] = extendedLength[0];
-                        StartIndex = 10;
+                        headerBytes[1] = 127;
+                        byte[] extendedLength = BitConverter.GetBytes((UInt64)data.Length);
+                        headerBytes[2] = extendedLength[7];
+                        headerBytes[3] = extendedLength[6];
+                        headerBytes[4] = extendedLength[5];
+                        headerBytes[5] = extendedLength[4];
+                        headerBytes[6] = extendedLength[3];
+                        headerBytes[7] = extendedLength[2];
+                        headerBytes[8] = extendedLength[1];
+                        headerBytes[9] = extendedLength[0];
+                        startIndex = 10;
                     }
                 }
-                HeaderBytes[1] = (byte)(HeaderBytes[1] | 0x80);
+                headerBytes[1] = (byte)(headerBytes[1] | 0x80);
 
-                Random ARandom = new Random();
-                int Key = ARandom.Next(Int32.MaxValue);
-                Array.Copy(BitConverter.GetBytes(Key), 0, HeaderBytes, StartIndex, 4);
-                StartIndex += 4;
+                Random random = new Random();
+                int key = random.Next(Int32.MaxValue);
+                Array.Copy(BitConverter.GetBytes(key), 0, headerBytes, startIndex, 4);
+                startIndex += 4;
 
-                Mask(ref Data, Key);
+                Mask(ref data, key);
 
-                WrappedBytes = new byte[Data.Length + StartIndex];
-                Array.Copy(HeaderBytes, 0, WrappedBytes, 0, StartIndex);
-                Array.Copy(Data, 0, WrappedBytes, StartIndex, Data.Length);
-                Console.WriteLine(Encoding.UTF8.GetString(WrappedBytes));
+                wrappedBytes = new byte[data.Length + startIndex];
+                Array.Copy(headerBytes, 0, wrappedBytes, 0, startIndex);
+                Array.Copy(data, 0, wrappedBytes, startIndex, data.Length);
+                Console.WriteLine(Encoding.UTF8.GetString(wrappedBytes));
             }
             else
             {
-                WrappedBytes = new byte[1];
-                WrappedBytes[0] = 0x0;
+                wrappedBytes = new byte[1];
+                wrappedBytes[0] = 0x0;
             }
-            return WrappedBytes;
+            return wrappedBytes;
         }
 
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
         /// </summary>
         /// <param name="Data">The data.</param>
-        public override void Append(byte[] Data)
+        public override void Append(byte[] data)
         {
-            if (Data.Length > 0)
+            if (data.Length > 0)
             {
-                byte Nibble2 = (byte)(Data[0] & 0x0F);
-                byte Nibble1 = (byte)(Data[0] & 0xF0);
+                byte nibble2 = (byte)(data[0] & 0x0F);
+                byte nibble1 = (byte)(data[0] & 0xF0);
 
-                if ((Nibble1 & EndBit) == EndBit)
-                    _State = DataState.Complete;
+                if ((nibble1 & _endBit) == _endBit)
+                    _state = DataState.Complete;
 
 
                 //Combine bytes to form one large number
-                int StartIndex = 2;
-                Int64 DataLength = 0;
-                DataLength = (byte)(Data[1] & 0x7F);
-                if (DataLength == 126)
+                int startIndex = 2;
+                Int64 dataLength = (byte)(data[1] & 0x7F);
+                if (dataLength == 126)
                 {
-                    BitConverter.ToInt16(Data, StartIndex);
-                    StartIndex = 4;
+                    BitConverter.ToInt16(data, startIndex);
+                    startIndex = 4;
                 }
-                else if (DataLength == 127)
+                else if (dataLength == 127)
                 {
-                    BitConverter.ToInt64(Data, StartIndex);
-                    StartIndex = 10;
-                }
-
-                bool Masked = Convert.ToBoolean((Data[1] & 0x80) >> 7);
-                int MaskingKey = 0;
-                if (Masked)
-                {
-                    MaskingKey = BitConverter.ToInt32(Data, StartIndex);
-                    StartIndex = StartIndex + 4;
+                    BitConverter.ToInt64(data, startIndex);
+                    startIndex = 10;
                 }
 
-                byte[] Payload = new byte[DataLength];
-                Array.Copy(Data, (int)StartIndex, Payload, 0, (int)DataLength);
-                if(Masked)
-                    Mask(ref Payload, MaskingKey);
+                bool masked = Convert.ToBoolean((data[1] & 0x80) >> 7);
+                int maskingKey = 0;
+                if (masked)
+                {
+                    maskingKey = BitConverter.ToInt32(data, startIndex);
+                    startIndex = startIndex + 4;
+                }
 
-                OpCode CurrentFrameOpcode = (OpCode)Nibble2;
-                switch (CurrentFrameOpcode)
+                byte[] payload = new byte[dataLength];
+                Array.Copy(data, (int)startIndex, payload, 0, (int)dataLength);
+                if(masked)
+                    Mask(ref payload, maskingKey);
+
+                OpCode currentFrameOpcode = (OpCode)nibble2;
+                switch (currentFrameOpcode)
                 {
                     case OpCode.Continue:
                     case OpCode.Binary:
                     case OpCode.Text:
-                        AppendDataToFrame(Payload);
+                        AppendDataToFrame(payload);
                         break;
                     case OpCode.Close:
-                        _State = DataState.Closed;
+                        _state = DataState.Closed;
                         break;
                     case OpCode.Ping:
-                        _State = DataState.Ping;
+                        _state = DataState.Ping;
                         break;
                     case OpCode.Pong:
-                        _State = DataState.Pong;
+                        _state = DataState.Pong;
                         break;
                 }
             }
@@ -185,25 +184,25 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// <param name="SomeBytes">Some bytes.</param>
         /// <param name="Start">The start index.</param>
         /// <param name="End">The end index.</param>
-        private void AppendDataToFrame(byte[] SomeBytes)
+        private void AppendDataToFrame(byte[] someBytes)
         {
-            int CurrentFrameLength = 0;
-            if (RawFrame != null)
-                CurrentFrameLength = RawFrame.Length;
-            byte[] NewFrame = new byte[CurrentFrameLength + SomeBytes.Length];
-            if(CurrentFrameLength > 0)
-                Array.Copy(RawFrame, 0, NewFrame, 0, CurrentFrameLength);
-            Array.Copy(SomeBytes, 0, NewFrame, CurrentFrameLength, SomeBytes.Length);
-            RawFrame = NewFrame;
+            int currentFrameLength = 0;
+            if (_rawFrame != null)
+                currentFrameLength = _rawFrame.Length;
+            byte[] newFrame = new byte[currentFrameLength + someBytes.Length];
+            if(currentFrameLength > 0)
+                Array.Copy(_rawFrame, 0, newFrame, 0, currentFrameLength);
+            Array.Copy(someBytes, 0, newFrame, currentFrameLength, someBytes.Length);
+            _rawFrame = newFrame;
         }
 
-        private static void Mask(ref byte[] SomeBytes, Int32 Key)
+        private static void Mask(ref byte[] someBytes, Int32 key)
         {
-            byte[] ByteKeys = BitConverter.GetBytes(Key);
-            for(int Index = 0; Index < SomeBytes.Length; Index++)
+            byte[] byteKeys = BitConverter.GetBytes(key);
+            for(int index = 0; index < someBytes.Length; index++)
             {
-                int KeyIndex = Index % 4;
-                SomeBytes[Index] = (byte)(SomeBytes[Index]^ByteKeys[KeyIndex]);
+                int KeyIndex = index % 4;
+                someBytes[index] = (byte)(someBytes[index]^byteKeys[KeyIndex]);
             }
         }
     }

@@ -33,7 +33,7 @@ using System.IO;
 
 namespace Alchemy.Server
 {
-    public delegate void OnEventDelegate(UserContext AContext);
+    public delegate void OnEventDelegate(UserContext context);
 
     /// <summary>
     /// The Main WebSocket Server
@@ -157,7 +157,7 @@ namespace Alchemy.Server
         /// </summary>
         /// <param name="ListenPort">The listen port.</param>
         /// <param name="ListenIp">The listen ip.</param>
-        public WSServer(int ListenPort = 0, IPAddress ListenIp = null): base(ListenPort, ListenIp)
+        public WSServer(int listenPort = 0, IPAddress listenAddress = null): base(listenPort, listenAddress)
         {
             LogConfigFile = "Alchemy.config";
             LoggerName = "Alchemy.Log";
@@ -204,26 +204,26 @@ namespace Alchemy.Server
         /// Fires when a client connects.
         /// </summary>
         /// <param name="AConnection">The TCP Connection.</param>
-        protected override void OnRunClient(TcpClient AConnection)
+        protected override void OnRunClient(TcpClient connection)
         {
-            using (Context AContext = new Context())
+            using (Context context = new Context())
             {
-                AContext.Server = this;
-                AContext.Connection = AConnection;
-                AContext.UserContext.ClientAddress = AContext.Connection.Client.RemoteEndPoint;
-                AContext.UserContext.SetOnConnect(DefaultOnConnect);
-                AContext.UserContext.SetOnDisconnect(DefaultOnDisconnect);
-                AContext.UserContext.SetOnSend(DefaultOnSend);
-                AContext.UserContext.SetOnReceive(DefaultOnReceive);
-                AContext.BufferSize = _defaultBufferSize;
-                AContext.UserContext.OnConnect();
+                context.Server = this;
+                context.Connection = connection;
+                context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;
+                context.UserContext.SetOnConnect(DefaultOnConnect);
+                context.UserContext.SetOnDisconnect(DefaultOnDisconnect);
+                context.UserContext.SetOnSend(DefaultOnSend);
+                context.UserContext.SetOnReceive(DefaultOnReceive);
+                context.BufferSize = _defaultBufferSize;
+                context.UserContext.OnConnect();
                 try
                 {
-                    while (AContext.Connection.Connected)
+                    while (context.Connection.Connected)
                     {
-                        if (AContext.ReceiveReady.Wait(TimeOut))
+                        if (context.ReceiveReady.Wait(TimeOut))
                         {
-                            AContext.Connection.Client.BeginReceive(AContext.Buffer, 0, AContext.Buffer.Length, SocketFlags.None, DoReceive, AContext);
+                            context.Connection.Client.BeginReceive(context.Buffer, 0, context.Buffer.Length, SocketFlags.None, DoReceive, context);
                         }
                         else
                         {
@@ -239,25 +239,25 @@ namespace Alchemy.Server
         /// The root receive event for each client. Executes in it's own thread.
         /// </summary>
         /// <param name="AResult">The Async result.</param>
-        private void DoReceive(IAsyncResult AResult)
+        private void DoReceive(IAsyncResult result)
         {
-            Context AContext = (Context)AResult.AsyncState;
-            AContext.Reset();
+            Context context = (Context)result.AsyncState;
+            context.Reset();
             try
             {
-                AContext.ReceivedByteCount = AContext.Connection.Client.EndReceive(AResult);
+                context.ReceivedByteCount = context.Connection.Client.EndReceive(result);
             }
             catch (Exception e) { Log.Debug("Client Forcefully Disconnected", e); }
 
-            if (AContext.ReceivedByteCount > 0)
+            if (context.ReceivedByteCount > 0)
             {
-                AContext.ReceiveReady.Release();
-                AContext.Handler.HandleRequest(AContext);
+                context.ReceiveReady.Release();
+                context.Handler.HandleRequest(context);
             }
             else
             {
-                AContext.Dispose();
-                AContext.ReceiveReady.Release();
+                context.Dispose();
+                context.ReceiveReady.Release();
             }
         }
     }

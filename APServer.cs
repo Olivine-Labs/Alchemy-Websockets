@@ -40,13 +40,13 @@ namespace Alchemy.Server
     /// </summary>
     public class APServer : TCPServer, IDisposable
     {
-        private string  _allowedHost = "localhost";
-        private int     _allowedPort = 80;
+        private string _allowedHost = "localhost";
+        private int _allowedPort = 80;
 
         /// <summary>
         /// The pre-formatted XML response.
         /// </summary>
-        private const string _response = 
+        private const string _response =
             "<cross-domain-policy>\r\n" +
                 "\t<allow-access-from domain=\"{0}\" to-ports=\"{1}\" />\r\n" +
             "</cross-domain-policy>\r\n\0";
@@ -57,13 +57,13 @@ namespace Alchemy.Server
         /// <param name="ListenAddress">The listen address.</param>
         /// <param name="OriginDomain">The origin domain.</param>
         /// <param name="AllowedPort">The allowed port.</param>
-        public APServer(IPAddress listenAddress, string originDomain, int allowedPort) : base(843, listenAddress)
+        public APServer(IPAddress listenAddress, string originDomain, int allowedPort)
+            : base(843, listenAddress)
         {
-            string OriginLockdown = "*";
+            _allowedHost = "*";
             if (originDomain != String.Empty)
-                OriginLockdown = originDomain;
+                _allowedHost = originDomain;
 
-            _allowedHost = OriginLockdown;
             _allowedPort = allowedPort;
         }
 
@@ -71,13 +71,13 @@ namespace Alchemy.Server
         /// Fires when a client connects.
         /// </summary>
         /// <param name="AConnection">The TCP Connection.</param>
-        protected override void OnRunClient(TcpClient AConnection)
+        protected override void OnRunClient(TcpClient connection)
         {
             try
             {
-                AConnection.Client.Receive(new byte[32]);
-                SendResponse(AConnection);
-                AConnection.Client.Close();
+                connection.Client.Receive(new byte[32]);
+                SendResponse(connection);
+                connection.Client.Close();
             }
             catch { /* Ignore */ }
         }
@@ -86,9 +86,9 @@ namespace Alchemy.Server
         /// Sends the response.
         /// </summary>
         /// <param name="AConnection">The TCP Connection.</param>
-        public void SendResponse(TcpClient AConnection)
+        public void SendResponse(TcpClient connection)
         {
-            AConnection.Client.Send(UTF8Encoding.UTF8.GetBytes(String.Format(_response, _allowedHost, _allowedPort.ToString())));
+            connection.Client.Send(UTF8Encoding.UTF8.GetBytes(String.Format(_response, _allowedHost, _allowedPort.ToString())));
         }
     }
 }

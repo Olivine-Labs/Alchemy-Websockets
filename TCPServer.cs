@@ -148,24 +148,24 @@ namespace Alchemy.Server
         /// Utilizes a semaphore(ReceiveReady) to limit the number of receive events active for this client to 1 at a time.
         /// </summary>
         /// <param name="AResult">The A result.</param>
-        private void RunClient(IAsyncResult AResult)
+        private void RunClient(IAsyncResult result)
         {
-            TcpClient AConnection = null;
+            TcpClient connection = null;
             try
             {
                 if (_listener != null)
-                    AConnection = _listener.EndAcceptTcpClient(AResult);
+                    connection = _listener.EndAcceptTcpClient(result);
             }
             catch (Exception) { /* Ignore*/ }
 
             _connectReady.Release();
-            if (AConnection != null)
+            if (connection != null)
             {
                 _clientLock.Wait();
                 _clients++;
                 _clientLock.Release();
 
-                OnRunClient(AConnection);
+                OnRunClient(connection);
 
                 _clientLock.Wait();
                 _clients--;
@@ -173,7 +173,7 @@ namespace Alchemy.Server
             }
         }
 
-        protected abstract void OnRunClient(TcpClient AConnection);
+        protected abstract void OnRunClient(TcpClient connection);
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
