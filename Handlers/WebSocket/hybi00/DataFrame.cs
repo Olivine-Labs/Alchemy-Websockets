@@ -21,9 +21,6 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 
 namespace Alchemy.Server.Handlers.WebSocket.hybi00
@@ -95,14 +92,14 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <param name="End">The end index.</param>
         private void AppendDataToFrame(byte[] someBytes, int start, int end)
         {
-            int CurrentFrameLength = 0;
+            int currentFrameLength = 0;
             if (_rawFrame != null)
-                CurrentFrameLength = _rawFrame.Length;
-            byte[] NewFrame = new byte[CurrentFrameLength + (end - start)];
-            if (CurrentFrameLength > 0)
-                Array.Copy(_rawFrame, 0, NewFrame, 0, CurrentFrameLength);
-            Array.Copy(someBytes, start, NewFrame, CurrentFrameLength, end - start);
-            _rawFrame = NewFrame;
+                currentFrameLength = _rawFrame.Length;
+            byte[] newFrame = new byte[currentFrameLength + (end - start)];
+            if (currentFrameLength > 0)
+                Array.Copy(_rawFrame, 0, newFrame, 0, currentFrameLength);
+            Array.Copy(someBytes, start, newFrame, currentFrameLength, end - start);
+            _rawFrame = newFrame;
         }
     }
 }

@@ -21,15 +21,9 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
 using System.Net;
 using System.Net.Sockets;
-using System.Threading;
-using Alchemy.Server.Classes;
-using log4net;
-using System.IO;
 
 namespace Alchemy.Server
 {

@@ -21,15 +21,9 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Net;
-using System.IO;
-using System.Text.RegularExpressions;
 using System.Threading;
 using System.Security.Cryptography;
-using System.Web;
 using Alchemy.Server.Classes;
 
 namespace Alchemy.Server.Handlers.WebSocket.hybi00
