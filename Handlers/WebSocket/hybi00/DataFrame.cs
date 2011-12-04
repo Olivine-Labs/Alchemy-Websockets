@@ -30,7 +30,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
     /// Automatically manages adding received data to an existing frame and checking whether or not we've received the entire frame yet.
     /// See http://www.whatwg.org/specs/web-socket-protocol/ for more details on the WebSocket Protocol.
     /// </summary>
-    public class DataFrame : Alchemy.Server.Classes.DataFrame
+    public class DataFrame : Alchemy.Server.Handlers.WebSocket.DataFrame
     {
         public const byte StartByte = 0;
         public const byte EndByte = 255;
