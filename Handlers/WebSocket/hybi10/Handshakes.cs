@@ -83,9 +83,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             return (
                 (Host != null) &&
                 (Key != null) &&
-                (Int32.Parse(Version) >= 8) &&
-                (Origin != null) &&
-                (ResourcePath != null)
+                (Int32.Parse(Version) >= 8)
             );
         }
 
