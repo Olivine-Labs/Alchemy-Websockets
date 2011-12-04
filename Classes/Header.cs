@@ -139,7 +139,12 @@ namespace Alchemy.Server.Classes
                     Version = Fields["sec-websocket-version"];
                 }
                 catch (Exception){}
-                if (Version != "8")
+                
+                if(Int32.Parse(Version) >= 8)
+                {
+                    this.Protocol = Protocol.WebSocketHybi10;
+                }
+                else
                 {
                     string[] PathExplode = RequestPath.Split('/');
                     string ProtocolString = string.Empty;
@@ -158,10 +163,7 @@ namespace Alchemy.Server.Classes
                             break;
                     }
                 }
-                else
-                {
-                    this.Protocol = Protocol.WebSocketHybi10;
-                }
+
             }
             catch{ /* Ignore bad header */ }
         }

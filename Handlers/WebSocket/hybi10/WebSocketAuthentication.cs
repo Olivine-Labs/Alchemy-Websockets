@@ -75,10 +75,10 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 if (handshake.IsValid())
                 {
                     // Optionally check Origin and Location if they're set.
-                    if (Origin != string.Empty)
+                    if (!String.IsNullOrEmpty(Origin))
                         if (handshake.Origin != "http://" + Origin)
                             return false;
-                    if (Location != string.Empty)
+                    if (!String.IsNullOrEmpty(Location))
                         if (handshake.Host != Location + ":" + context.Server.Port.ToString())
                             return false;
                     // Generate response handshake for the client

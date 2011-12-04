@@ -43,7 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="APServer.cs" />
-    <Compile Include="Classes\DataFrame.cs" />
+    <Compile Include="Handlers\WebSocket\DataFrame.cs" />
     <Compile Include="Handlers\WebSocket\hybi00\DataFrame.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\DataFrame.cs" />
     <Compile Include="Classes\Header.cs" />

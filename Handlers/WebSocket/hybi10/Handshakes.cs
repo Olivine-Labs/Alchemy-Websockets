@@ -66,7 +66,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             ResourcePath= header.RequestPath;
             Key         = header["sec-websocket-key"];
             SubProtocol = header["sec-websocket-protocol"];
-            Origin      = header["sec-websocket-origin"];
+            Origin      = header["origin"];
             Host        = header["host"];
             Version     = header["sec-websocket-version"];
             Cookies     = header.Cookies;
@@ -83,9 +83,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             return (
                 (Host != null) &&
                 (Key != null) &&
-                (Version == "8") &&
-                (Origin != null) &&
-                (ResourcePath != null)
+                (Int32.Parse(Version) >= 8)
             );
         }
 
