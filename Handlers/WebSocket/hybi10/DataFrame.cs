@@ -132,12 +132,16 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 Int64 dataLength = (byte)(data[1] & 0x7F);
                 if (dataLength == 126)
                 {
-                    BitConverter.ToInt16(data, startIndex);
+                    dataLength = data[startIndex] * 256; 
+                    dataLength += data[startIndex + 1]; 
                     startIndex = 4;
                 }
                 else if (dataLength == 127)
                 {
-                    BitConverter.ToInt64(data, startIndex);
+                    dataLength = data[startIndex] * 16777216; 
+                    dataLength += data[startIndex + 1] * 65536; 
+                    dataLength += data[startIndex + 2] * 256; 
+                    dataLength += data[startIndex + 3]; 
                     startIndex = 10;
                 }
 
