@@ -61,7 +61,7 @@ Because it is on the official support list (due to Safari), it is on the list to
 
 This covers Chrome current, beta, and alpha channels; Firefox
 latest, beta, and alpha channels; Safari, and includes support
-for a flash-based socket fallback for browsers with no sorkcet
+for a flash-based socket fallback for browsers with no socket 
 support natively.
 
 [Browser Support List](http://en.wikipedia.org/wiki/WebSocket#Browser_support)
