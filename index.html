@@ -23,7 +23,7 @@
 <body>
 
   <div id="container">
-    <header class="topbar">
+    <nav class="topbar">
       <div class="fill">
         <div class="container">
           <a class="brand" href="#">Alchemy Websockets</a>
@@ -43,81 +43,128 @@
           </ul>
         </div>
       </div>
-    </header>
+    </nav>
 
     <div id="main" role="main" class="container">
-      <h1>Alchemy Websockets</h1>
+      <header class="hero-unit">
+        <h1>Alchemy Websockets</h1>
 
-      <p>
-        A websocket server built in C# to be extremely efficient and scalable over high 
-        numbers of connections.
-      </p>
+        <p>
+          A websocket server built in C# to be extremely efficient and scalable over high
+          numbers of connections.
+        </p>
 
-      <h2>Usage</h2>
+        <p><a class="btn primary large" href="https://github.com/Olivine-Labs/Alchemy-Websockets">Get it on Github</a></p>
+      </header>
 
-      <p>
-        Alchemy Websockets is a Visual Studio 2010 project. It can be loaded in the free
-        Visual C# Express and Monodevelop as well (and potentially other compatible IDEs.)
-      </p>
+      <div class="row">
+        <div class="span10">
+          <h2>Usage</h2>
 
-      <p>
-        After compilation, include the dll as a reference into your project. From there,
-        starting a server is as simple as instantiating an WSServer object, opening the 
-        connection, and binding events.
-      </p>
+          <p>
+            Alchemy Websockets is a Visual Studio 2010 project. It can be loaded in the free
+            Visual C# Express and Monodevelop as well (and potentially other compatible IDEs.)
+          </p>
 
-      <p>Example:</p>
+          <p>
+            After compilation, include the dll as a reference into your project. From there,
+            starting a server is as simple as instantiating an WSServer object, opening the 
+            connection, and binding events.
+          </p>
 
-      <pre class="prettyprint">
-static void Main(string[] args)
-{
-  var aServer = new WSServer(8100, IPAddress.Any)
-                {
-                    DefaultOnReceive = new OnEventDelegate(OnReceive),
-                    DefaultOnSend = new OnEventDelegate(OnSend),
-                    DefaultOnConnect = new OnEventDelegate(OnConnect),
-                    DefaultOnDisconnect = new OnEventDelegate(OnDisconnect),
-                    TimeOut = new TimeSpan(0, 5, 0)
-                };
+          <p>Example:</p>
 
-  aServer.Start();
-}
+          <pre class="prettyprint">
+    static void Main(string[] args)
+    {
+      var aServer = new WSServer(8100, IPAddress.Any)
+                    {
+                        DefaultOnReceive = new OnEventDelegate(OnReceive),
+                        DefaultOnSend = new OnEventDelegate(OnSend),
+                        DefaultOnConnect = new OnEventDelegate(OnConnect),
+                        DefaultOnDisconnect = new OnEventDelegate(OnDisconnect),
+                        TimeOut = new TimeSpan(0, 5, 0)
+                    };
 
-static void OnConnect(UserContext aContext)
-{
-    Console.WriteLine("Client Connection From : " + aContext.ClientAddress.ToString());
-}
+      aServer.Start();
+    }
 
-//...etc
-      </pre>
+    static void OnConnect(UserContext aContext)
+    {
+        Console.WriteLine("Client Connection From : " + aContext.ClientAddress.ToString());
+    }
 
-      <h2>Object Documentation</h2>
-      <p>
-        We've produced documentation for the <a href="aserver.html">WSServer</a> 
-        and <a href="usercontext.html">UserContext</a> objects.
-      </p>
+    //...etc
+          </pre>
+
+          <h2>Object Documentation</h2>
+          <p>
+            We've produced documentation for the <a href="aserver.html">WSServer</a> 
+            and <a href="usercontext.html">UserContext</a> objects.
+          </p>
 
 
-      <h2>Example Project</h2>
+          <h2>Example Project</h2>
 
-      <p>An example application can be seen on <a href="https://github.com/Olivine-Labs/Alchemy-Websockets-Example">alchemy-websockets-example</a></p>
+          <p>An example application can be seen on <a href="https://github.com/Olivine-Labs/Alchemy-Websockets-Example">alchemy-websockets-example</a></p>
 
-      <h2>Client Library</h2>
+          <h2>Client Library</h2>
 
-      <p>
-        <span class="label notice">Notice</span>  The client library is not necessary; it simply provides a helpful
-        abstraction and sets up automatic keep-alive pings to the server for older websocket protocols.
-      </p>
+          <p>
+            <span class="label notice">Notice</span>  The client library is not necessary; it simply provides a helpful
+            abstraction and sets up automatic keep-alive pings to the server for older websocket protocols.
+          </p>
 
-      <p>
-        You can download the client javascript library at
-        <a href="https://github.com/Olivine-Labs/Alchemy-Websockets-Client-Library">alchemy-websockets-client-library</a>.
-      </p>
+          <p>
+            You can download the client javascript library at
+            <a href="https://github.com/Olivine-Labs/Alchemy-Websockets-Client-Library">alchemy-websockets-client-library</a>.
+          </p>
 
-      <h2>License</h2>
+          <h2>License</h2>
 
-      <p>Copyright 2011, Olivine Labs, LLC.
-      Licensed under <a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>.</p>
+          <p>Copyright 2011, Olivine Labs, LLC.
+          Licensed under <a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>.</p>
+        </div>
+
+        <div class="span6">
+          <div class="sidebar">
+            <div class="well">
+              <h3>Status</h3>
+
+              <p>
+                Alchemy websockets supports:
+              </p>
+
+              <ul>
+                <li><span class="label warning">!</span> hixie-76 (hybi00)</li>
+                <li><span class="label success">✓</span> hybi-10</li>
+                <li><span class="label success">✓</span> hybi-17</li>
+              </ul>
+
+              <div class="alert-message block-message warning">
+                <p>
+                  <strong>hixie-76 has open issues in github.</strong> 
+                  Because it is on the official support list (due to Safari), it is on the list to be resolved.
+                </p>
+                <div class="alert-actions">
+                  <a class="btn small" href="https://github.com/Olivine-Labs/Alchemy-Websockets/issues">View the Open Issues</a>
+                </div>
+              </div>
+
+              <p>
+                This covers Chrome current, beta, and alpha channels; Firefox
+                latest, beta, and alpha channels; Safari, and includes support
+                for a flash-based socket fallback for browsers with no sorkcet
+                support natively.
+              </p>
+
+              <p>
+                <a href="http://en.wikipedia.org/wiki/WebSocket#Browser_support" class="btn info">Browser Support List</a>
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <footer>
