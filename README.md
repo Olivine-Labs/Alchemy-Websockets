@@ -29,6 +29,7 @@ Example:
             DefaultOnReceive = new OnEventDelegate(OnReceive),
             DefaultOnSend = new OnEventDelegate(OnSend),
             DefaultOnConnect = new OnEventDelegate(OnConnect),
+            DefaultOnConnected = new OnEventDelegate(OnConnected),
             DefaultOnDisconnect = new OnEventDelegate(OnDisconnect),
             TimeOut = new TimeSpan(0, 5, 0)
         };
