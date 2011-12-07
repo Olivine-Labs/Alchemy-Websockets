@@ -44,6 +44,7 @@ namespace Alchemy.Server
         /// It is up to you whether you want to replace them at runtime or even manually set the events differently per connection in OnReceive.
         /// </summary>
         public OnEventDelegate DefaultOnConnect = (x) => { };
+        public OnEventDelegate DefaultOnConnected = (x) => { };
         public OnEventDelegate DefaultOnDisconnect = (x) => { };
         public OnEventDelegate DefaultOnReceive = (x) => { };
         public OnEventDelegate DefaultOnSend = (x) => { };
@@ -208,6 +209,7 @@ namespace Alchemy.Server
                 context.Connection = connection;
                 context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;
                 context.UserContext.SetOnConnect(DefaultOnConnect);
+                context.UserContext.SetOnConnected(DefaultOnConnected);
                 context.UserContext.SetOnDisconnect(DefaultOnDisconnect);
                 context.UserContext.SetOnSend(DefaultOnSend);
                 context.UserContext.SetOnReceive(DefaultOnReceive);

@@ -113,6 +113,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
                 context.UserContext.RequestPath = context.Header.RequestPath;
                 context.Header = null;
                 context.IsSetup = true;
+                context.UserContext.OnConnected();
             }
             else
             {

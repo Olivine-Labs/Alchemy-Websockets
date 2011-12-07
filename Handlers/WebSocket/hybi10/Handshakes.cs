@@ -67,6 +67,8 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             Key         = header["sec-websocket-key"];
             SubProtocol = header["sec-websocket-protocol"];
             Origin      = header["origin"];
+            if (String.IsNullOrEmpty(Origin))
+                Origin = header["sec-websocket-origin"];
             Host        = header["host"];
             Version     = header["sec-websocket-version"];
             Cookies     = header.Cookies;

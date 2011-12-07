@@ -66,6 +66,7 @@ namespace Alchemy.Server.Classes
         /// OnEvent Delegates specific to this connection.
         /// </summary>
         protected OnEventDelegate _OnConnect = (x) => { };
+        protected OnEventDelegate _OnConnected = (x) => { };
         protected OnEventDelegate _OnDisconnect = (x) => { };
         protected OnEventDelegate _OnReceive = (x) => { };
         protected OnEventDelegate _OnSend = (x) => { };
@@ -92,6 +93,18 @@ namespace Alchemy.Server.Classes
                 _OnConnect(this);
             }
             catch (Exception e) { Context.Server.Log.Error("Fatal Error in user specified OnConnect", e); }
+        }
+
+        /// <summary>
+        /// Called when [connected].
+        /// </summary>
+        public void OnConnected()
+        {
+            try
+            {
+                _OnConnected(this);
+            }
+            catch (Exception e) { Context.Server.Log.Error("Fatal Error in user specified OnConnected", e); }
         }
 
         /// <summary>
@@ -138,6 +151,15 @@ namespace Alchemy.Server.Classes
         public void SetOnConnect(OnEventDelegate ADelegate)
         {
             _OnConnect = ADelegate;
+        }
+
+        /// <summary>
+        /// Sets the on connected event.
+        /// </summary>
+        /// <param name="ADelegate">The Event Delegate.</param>
+        public void SetOnConnected(OnEventDelegate ADelegate)
+        {
+            _OnConnected = ADelegate;
         }
 
         /// <summary>
@@ -294,8 +316,8 @@ namespace Alchemy.Server.Classes
                 if (Connected)
                 {
                     Connected = false;
-                    UserContext.OnDisconnect();
                 }
+                UserContext.OnDisconnect();
             }
         }
 
