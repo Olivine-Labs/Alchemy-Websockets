@@ -1,0 +1,5 @@
+var searchData=
+[
+  ['state',['State',['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1_data_frame.html#ab99cb88dc585282c7bb43b9610ae4f02',1,'Alchemy::Server::Handlers::WebSocket::DataFrame']]],
+  ['subprotocol',['SubProtocol',['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_client_handshake.html#a0c56ba4cb3fddb533523651463cfc7ce',1,'Alchemy::Server::Handlers::WebSocket::hybi00::ClientHandshake.SubProtocol()'],['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_server_handshake.html#a82fdc72c31acf832d477665112987b6a',1,'Alchemy::Server::Handlers::WebSocket::hybi00::ServerHandshake.SubProtocol()'],['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_client_handshake.html#af17d050573b44471677541f71d6e8421',1,'Alchemy::Server::Handlers::WebSocket::hybi10::ClientHandshake.SubProtocol()'],['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_server_handshake.html#aaebb32b4641c854971b2f2ff8badb156',1,'Alchemy::Server::Handlers::WebSocket::hybi10::ServerHandshake.SubProtocol()']]]
+];

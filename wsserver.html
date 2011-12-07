@@ -1,0 +1,590 @@
+<!doctype html>
+<!--[if lt IE 7]> <html class="no-js ie6 oldie" lang="en"> <![endif]-->
+<!--[if IE 7]>    <html class="no-js ie7 oldie" lang="en"> <![endif]-->
+<!--[if IE 8]>    <html class="no-js ie8 oldie" lang="en"> <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en"> <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+
+  <title>Alchemy Websockets : Efficient Websockets for C#</title>
+  <meta name="description" content="Documentation for the open-source Alchemy Websocket library for C#">
+  <meta name="author" content="Olivine Labs, LLC <projects@olivinelabs.com>">
+
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+
+  <link rel="stylesheet" href="css/bootstrap.min.css">
+  <link rel="stylesheet" href="css/prettify.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <script src="js/libs/modernizr-2.0.6.min.js"></script>
+</head>
+
+<body>
+
+  <div id="container">
+    <header class="topbar">
+      <div class="fill">
+        <div class="container">
+          <a class="brand" href="#">Alchemy Websockets</a>
+          <ul class="nav">
+            <li><a href="#">Home</a></li>
+            <li class="dropdown active" data-dropdown="dropdown">
+              <a href="#" class="dropdown-toggle">Docs</a>
+              <ul class="dropdown-menu">
+                <li><a href="wsserver.html">WSServer</a></li>
+                <li><a href="usercontext.html">UserContext</a></li>
+                <li class="divider"></li>
+                <li><a href="./docs/">Doxygen Docs</a></li>
+              </ul>
+            </li>
+            <li><a href="https://github.com/Olivine-Labs/Alchemy-Websockets">Github</a></li>
+            <li><a href="mailto:projects@olivinelabs.com">Contact</a></li>
+          </ul>
+        </div>
+      </div>
+    </header>
+
+    <div id="main" role="main" class="container">
+      <h1>Alchemy Websockets</h1>
+
+      <h2>WSServer Object</h2>
+
+      <p>
+        The WSServer object is the core of Alchemy websockets - it's what hands
+        off events to your application from incoming connections. You instantiate
+        an WSServer and bind to it connect, disconnect, and error events to track
+        user connections.
+      </p>
+
+      <h2>Docs</h2>
+
+      <div class="contents">
+      <!-- doxytag: class="Alchemy::Server::WSServer" --><!-- doxytag: inherits="Alchemy::Server::TCPServer" -->
+      <p>The Main WebSocket <a class="el" href="./docs/namespace_alchemy_1_1_server.html">Server</a>.  
+       <a href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#details">More...</a></p>
+
+      <p>Inherits <a class="el" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html">Alchemy.Server.TCPServer</a>.</p>
+
+      <p><a href="./docs/class_alchemy_1_1_server_1_1_w_s_server-members.html">List of all members.</a></p>
+      <table class="memberdecls">
+      <tbody><tr><td colspan="2"><h2><a name="pub-methods"></a>
+      Public Member Functions</h2></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#aa743fad8d308a662bb6a6b06970fd4c7">WSServer</a> (int listenPort=0, IPAddress listenAddress=null)</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html" title="The Main WebSocket Server.">WSServer</a> class.  <a href="./docs/#aa743fad8d308a662bb6a6b06970fd4c7"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">override void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ab660f3162f892d6eee974563137a2853">Start</a> ()</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Starts this instance.  <a href="./docs/#ab660f3162f892d6eee974563137a2853"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">override void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ae048699aa8d2250ac2380f01b723fe1c">Stop</a> ()</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Stops this instance.  <a href="./docs/#ae048699aa8d2250ac2380f01b723fe1c"></a><br></td></tr>
+      <tr><td colspan="2"><h2><a name="pub-attribs"></a>
+      Public Attributes</h2></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ad7050efb63d73f4795e50400a24ed589">DefaultOnConnect</a> = (x) =&gt; { }</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">These are the default OnEvent delegates for the server. By default, all new UserContexts will use these events. It is up to you whether you want to replace them at runtime or even manually set the events differently per connection in OnReceive.  <a href="./docs/#ad7050efb63d73f4795e50400a24ed589"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a03353e2c6fb2f26e380c3ad9c0f3847b">DefaultOnConnected</a> = (x) =&gt; { }</td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ab79ef0aeabb14f4c954a2ef6ddd85ed6">DefaultOnDisconnect</a> = (x) =&gt; { }</td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#adca8e62f1b37cb0b7d9729cb61132c43">DefaultOnReceive</a> = (x) =&gt; { }</td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ae608dbe6149762994e55a157ed39b3a3">DefaultOnSend</a> = (x) =&gt; { }</td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_a_p_server.html">APServer</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a443f1c345ea3432d6838e082b19f70df">AccessPolicyServer</a> = null</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">This is the Flash Access Policy <a class="el" href="./docs/namespace_alchemy_1_1_server.html">Server</a>. It allows us to facilitate flash socket connections much more quickly in most cases. Don't mess with it through here. It's only public so we can access it later from all the IOCPs.  <a href="./docs/#a443f1c345ea3432d6838e082b19f70df"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">ILog&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a> = LogManager.GetLogger("Alchemy.Log")</td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a42cb72f09d1c72f0b58b0a679b3c2b8a">PingCommand</a> = "7"</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">These are the command strings that the server and client will filter out and treat as heartbeats.  <a href="./docs/#a42cb72f09d1c72f0b58b0a679b3c2b8a"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#aa271d5f7ef4a4008564ecc23ef99a710">PongCommand</a> = "7"</td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">TimeSpan&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a6691d831697cb9494af9649ee4ad59a3">TimeOut</a> = TimeSpan.FromMinutes(1)</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Configuration for the above heartbeat setup. TimeOut : How long until a connection drops when it doesn't receive anything. MaxPingsInSequence : A multiple of TimeOut for how long a connection can remain idle(only pings received) before we kill it.  <a href="./docs/#a6691d831697cb9494af9649ee4ad59a3"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">int&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ac45304f6b85433f64cdd92656cc6e20b">MaxPingsInSequence</a> = 0</td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">bool&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a3240d19aa9c8db7399da545c27e4b904">FlashAPEnabled</a> = true</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Enables or disables the Flash Access Policy Server(APServer). This is used when you would like your app to only listen on a single port rather than 2. Warning, any flash socket connections will have an added delay on connection due to the client looking to port 843 first for the connection restrictions.  <a href="./docs/#a3240d19aa9c8db7399da545c27e4b904"></a><br></td></tr>
+      <tr><td colspan="2"><h2><a name="pro-methods"></a>
+      Protected Member Functions</h2></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">override void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a29e681a43c18566e39a543b47f4da2ac">OnRunClient</a> (TcpClient connection)</td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Fires when a client connects.  <a href="./docs/#a29e681a43c18566e39a543b47f4da2ac"></a><br></td></tr>
+      <tr><td colspan="2"><h2><a name="properties"></a>
+      Properties</h2></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a60112f801e7eeff19bd7e0352622be20">OriginHost</a><code> [get, set]</code></td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets or sets the origin host.  <a href="./docs/#a60112f801e7eeff19bd7e0352622be20"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a7931b6a9b509ba0f12832dc0e4a7363c">DestinationHost</a><code> [get, set]</code></td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Gets or sets the destination host.  <a href="./docs/#a7931b6a9b509ba0f12832dc0e4a7363c"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a2fc9aff1b4b23599810a38d20c05fe65">LoggerName</a><code> [set]</code></td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the name of the logger.  <a href="./docs/#a2fc9aff1b4b23599810a38d20c05fe65"></a><br></td></tr>
+      <tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#aea36ba2da3c555e856e1205a3f239a69">LogConfigFile</a><code> [set]</code></td></tr>
+      <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the log config file name.  <a href="./docs/#aea36ba2da3c555e856e1205a3f239a69"></a><br></td></tr>
+      </tbody></table>
+      <hr><a name="details" id="details"></a><h2>Detailed Description</h2>
+      <div class="textblock"><p>The Main WebSocket <a class="el" href="./docs/namespace_alchemy_1_1_server.html">Server</a>. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00037">37</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+      </div><hr><h2>Constructor &amp; Destructor Documentation</h2>
+      <a class="anchor" id="aa743fad8d308a662bb6a6b06970fd4c7"></a><!-- doxytag: member="Alchemy::Server::WSServer::WSServer" ref="aa743fad8d308a662bb6a6b06970fd4c7" args="(int listenPort=0, IPAddress listenAddress=null)" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#aa743fad8d308a662bb6a6b06970fd4c7">Alchemy.Server.WSServer.WSServer</a> </td>
+                <td>(</td>
+                <td class="paramtype">int&nbsp;</td>
+                <td class="paramname"><em>listenPort</em> = <code>0</code>, </td>
+              </tr>
+              <tr>
+                <td class="paramkey"></td>
+                <td></td>
+                <td class="paramtype">IPAddress&nbsp;</td>
+                <td class="paramname"><em>listenAddress</em> = <code>null</code>&nbsp;</td>
+              </tr>
+              <tr>
+                <td></td>
+                <td>)</td>
+                <td></td><td></td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Initializes a new instance of the <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html" title="The Main WebSocket Server.">WSServer</a> class. </p>
+      <dl class="params"><dt><b>Parameters:</b></dt><dd>
+        <table class="params">
+          <tbody><tr><td class="paramname">ListenPort</td><td>The listen port.</td></tr>
+          <tr><td class="paramname">ListenIp</td><td>The listen ip.</td></tr>
+        </tbody></table>
+        </dd>
+      </dl>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00157">157</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+      <div class="fragment prettyprint"><pre class="fragment prettyprint">                                                                           : base(listenPort, listenAddress)
+              {
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#aea36ba2da3c555e856e1205a3f239a69" title="Sets the log config file name.">LogConfigFile</a> = <span class="stringliteral">"Alchemy.config"</span>;
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a2fc9aff1b4b23599810a38d20c05fe65" title="Sets the name of the logger.">LoggerName</a> = <span class="stringliteral">"Alchemy.Log"</span>;
+              }
+      </pre></div>
+      </div>
+      </div>
+      <hr><h2>Member Function Documentation</h2>
+      <a class="anchor" id="a29e681a43c18566e39a543b47f4da2ac"></a><!-- doxytag: member="Alchemy::Server::WSServer::OnRunClient" ref="a29e681a43c18566e39a543b47f4da2ac" args="(TcpClient connection)" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">override void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a29e681a43c18566e39a543b47f4da2ac">Alchemy.Server.WSServer.OnRunClient</a> </td>
+                <td>(</td>
+                <td class="paramtype">TcpClient&nbsp;</td>
+                <td class="paramname"><em>connection</em></td><td>)</td>
+                <td><code> [protected, virtual]</code></td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Fires when a client connects. </p>
+      <dl class="params"><dt><b>Parameters:</b></dt><dd>
+        <table class="params">
+          <tbody><tr><td class="paramname">AConnection</td><td>The TCP Connection.</td></tr>
+        </tbody></table>
+        </dd>
+      </dl>
+
+      <p>Implements <a class="el" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html#a7425c286910f296c811c111d17a27658">Alchemy.Server.TCPServer</a>.</p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00204">204</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+      <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+                  <span class="keyword">using</span> (<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html" title="This class contains the required data for each connection to the server.">Context</a> context = <span class="keyword">new</span> <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html" title="This class contains the required data for each connection to the server.">Context</a>())
+                  {
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a> = <span class="keyword">this</span>;
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#ab539628b39f56d712bd588bd808cabfa" title="The raw client connection.">Connection</a> = connection;
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#adec49614b299d7c395d252a68a3aa6b4" title="The exported version of this context.">UserContext</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a59b59169c1532ec98bdb3e421d20460c" title="The remote endpoint address.">ClientAddress</a> = context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#ab539628b39f56d712bd588bd808cabfa" title="The raw client connection.">Connection</a>.Client.RemoteEndPoint;
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#adec49614b299d7c395d252a68a3aa6b4" title="The exported version of this context.">UserContext</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7e1766a0caff57ba9eac13a1475b69bd" title="Sets the on connect event.">SetOnConnect</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ad7050efb63d73f4795e50400a24ed589" title="These are the default OnEvent delegates for the server. By default, all new UserContexts will use the...">DefaultOnConnect</a>);
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#adec49614b299d7c395d252a68a3aa6b4" title="The exported version of this context.">UserContext</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7d7da818e61aeb581e50ae27a02e8742" title="Sets the on connected event.">SetOnConnected</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a03353e2c6fb2f26e380c3ad9c0f3847b">DefaultOnConnected</a>);
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#adec49614b299d7c395d252a68a3aa6b4" title="The exported version of this context.">UserContext</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a8e2e4ede3510f07d702e4472a3016278" title="Sets the on disconnect event.">SetOnDisconnect</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ab79ef0aeabb14f4c954a2ef6ddd85ed6">DefaultOnDisconnect</a>);
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#adec49614b299d7c395d252a68a3aa6b4" title="The exported version of this context.">UserContext</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a3523ef4560854a044d557937aefea4d2" title="Sets the on send event.">SetOnSend</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ae608dbe6149762994e55a157ed39b3a3">DefaultOnSend</a>);
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#adec49614b299d7c395d252a68a3aa6b4" title="The exported version of this context.">UserContext</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ace9378592d72c68085aa4d8ebbe42238" title="Sets the on receive event.">SetOnReceive</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#adca8e62f1b37cb0b7d9729cb61132c43">DefaultOnReceive</a>);
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a6d4ce99e75bd4a186fd048d8ba6b40ce" title="Gets or sets the size of the buffer.">BufferSize</a> = <a class="code" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html#a07efaf5f9d964188acf41e5c292f5823">_defaultBufferSize</a>;
+                      context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#adec49614b299d7c395d252a68a3aa6b4" title="The exported version of this context.">UserContext</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1e922fdb44b00347af802c3e26932988" title="Called when [connect].">OnConnect</a>();
+                      <span class="keywordflow">try</span>
+                      {
+                          <span class="keywordflow">while</span> (context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#ab539628b39f56d712bd588bd808cabfa" title="The raw client connection.">Connection</a>.Connected)
+                          {
+                              <span class="keywordflow">if</span> (context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#adf7c62934c177f687b48da7a11a723bd" title="Semaphores that limit sends and receives to 1 and a time.">ReceiveReady</a>.Wait(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a6691d831697cb9494af9649ee4ad59a3" title="Configuration for the above heartbeat setup. TimeOut : How long until a connection drops when it does...">TimeOut</a>))
+                              {
+                                  context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#ab539628b39f56d712bd588bd808cabfa" title="The raw client connection.">Connection</a>.Client.BeginReceive(context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#ac1d9afa3d4abbfc0c2552546c760aadf" title="The buffer used for accepting raw data from the socket.">Buffer</a>, 0, context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#ac1d9afa3d4abbfc0c2552546c760aadf" title="The buffer used for accepting raw data from the socket.">Buffer</a>.Length, SocketFlags.None, DoReceive, context);
+                              }
+                              <span class="keywordflow">else</span>
+                              {
+                                  <span class="keywordflow">break</span>;
+                              }
+                          }
+                      }
+                      <span class="keywordflow">catch</span> (Exception e) { <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Debug(<span class="stringliteral">"Client Forcefully Disconnected"</span>, e); }
+                  }
+              }
+      </pre></div>
+      </div>
+      </div>
+      <a class="anchor" id="ab660f3162f892d6eee974563137a2853"></a><!-- doxytag: member="Alchemy::Server::WSServer::Start" ref="ab660f3162f892d6eee974563137a2853" args="()" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">override void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ab660f3162f892d6eee974563137a2853">Alchemy.Server.WSServer.Start</a> </td>
+                <td>(</td>
+                <td class="paramname"></td><td>)</td>
+                <td><code> [virtual]</code></td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Starts this instance. </p>
+
+      <p>Reimplemented from <a class="el" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html#a6911c39fff9452596e4e9716cebfaaac">Alchemy.Server.TCPServer</a>.</p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00166">166</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+      <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+                  base.Start();
+                  <span class="keywordflow">if</span> (<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a443f1c345ea3432d6838e082b19f70df" title="This is the Flash Access Policy Server. It allows us to facilitate flash socket connections much more...">AccessPolicyServer</a> == null)
+                  {
+                      <span class="keywordflow">try</span>
+                      {
+                          <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a443f1c345ea3432d6838e082b19f70df" title="This is the Flash Access Policy Server. It allows us to facilitate flash socket connections much more...">AccessPolicyServer</a> = <span class="keyword">new</span> APServer(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html#ae41b26d35e0718a775ccb367c0e46ce7" title="Gets or sets the listener address.">ListenAddress</a>, <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a60112f801e7eeff19bd7e0352622be20" title="Gets or sets the origin host.">OriginHost</a>, <a class="code" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html#aa89bd274f43567d4af99dd8032788c9e" title="Gets or sets the port.">Port</a>);
+
+                          <span class="keywordflow">if</span> (<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a3240d19aa9c8db7399da545c27e4b904" title="Enables or disables the Flash Access Policy Server(APServer). This is used when you would like your a...">FlashAPEnabled</a>)
+                          {
+                              <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a443f1c345ea3432d6838e082b19f70df" title="This is the Flash Access Policy Server. It allows us to facilitate flash socket connections much more...">AccessPolicyServer</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html#a6911c39fff9452596e4e9716cebfaaac" title="Starts this instance.">Start</a>();
+                          }
+                      }
+                      <span class="keywordflow">catch</span> { <span class="comment">/* Ignore */</span> }
+                  }
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Info(<span class="stringliteral">"Alchemy Server Started"</span>);
+              }
+      </pre></div>
+      </div>
+      </div>
+      <a class="anchor" id="ae048699aa8d2250ac2380f01b723fe1c"></a><!-- doxytag: member="Alchemy::Server::WSServer::Stop" ref="ae048699aa8d2250ac2380f01b723fe1c" args="()" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">override void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ae048699aa8d2250ac2380f01b723fe1c">Alchemy.Server.WSServer.Stop</a> </td>
+                <td>(</td>
+                <td class="paramname"></td><td>)</td>
+                <td><code> [virtual]</code></td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Stops this instance. </p>
+
+      <p>Reimplemented from <a class="el" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html#ae9c362a72cc1eaf23ee49a21a549c706">Alchemy.Server.TCPServer</a>.</p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00188">188</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+      <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+                  <span class="keywordflow">try</span>
+                  {
+                      <span class="keywordflow">if</span>((<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a443f1c345ea3432d6838e082b19f70df" title="This is the Flash Access Policy Server. It allows us to facilitate flash socket connections much more...">AccessPolicyServer</a> != null) &amp;&amp; (<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a3240d19aa9c8db7399da545c27e4b904" title="Enables or disables the Flash Access Policy Server(APServer). This is used when you would like your a...">FlashAPEnabled</a>))
+                          <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a443f1c345ea3432d6838e082b19f70df" title="This is the Flash Access Policy Server. It allows us to facilitate flash socket connections much more...">AccessPolicyServer</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_t_c_p_server.html#ae9c362a72cc1eaf23ee49a21a549c706" title="Stops this instance.">Stop</a>();
+                  }
+                  <span class="keywordflow">catch</span> { <span class="comment">/* Ignore */</span> }
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a443f1c345ea3432d6838e082b19f70df" title="This is the Flash Access Policy Server. It allows us to facilitate flash socket connections much more...">AccessPolicyServer</a> = null;
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Info(<span class="stringliteral">"Alchemy Server Stopped"</span>);
+              }
+      </pre></div>
+      </div>
+      </div>
+      <hr><h2>Member Data Documentation</h2>
+      <a class="anchor" id="a443f1c345ea3432d6838e082b19f70df"></a><!-- doxytag: member="Alchemy::Server::WSServer::AccessPolicyServer" ref="a443f1c345ea3432d6838e082b19f70df" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_a_p_server.html">APServer</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a443f1c345ea3432d6838e082b19f70df">Alchemy.Server.WSServer.AccessPolicyServer</a> = null</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>This is the Flash Access Policy <a class="el" href="./docs/namespace_alchemy_1_1_server.html">Server</a>. It allows us to facilitate flash socket connections much more quickly in most cases. Don't mess with it through here. It's only public so we can access it later from all the IOCPs. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00056">56</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="ad7050efb63d73f4795e50400a24ed589"></a><!-- doxytag: member="Alchemy::Server::WSServer::DefaultOnConnect" ref="ad7050efb63d73f4795e50400a24ed589" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ad7050efb63d73f4795e50400a24ed589">Alchemy.Server.WSServer.DefaultOnConnect</a> = (x) =&gt; { }</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>These are the default OnEvent delegates for the server. By default, all new UserContexts will use these events. It is up to you whether you want to replace them at runtime or even manually set the events differently per connection in OnReceive. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00046">46</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="a03353e2c6fb2f26e380c3ad9c0f3847b"></a><!-- doxytag: member="Alchemy::Server::WSServer::DefaultOnConnected" ref="a03353e2c6fb2f26e380c3ad9c0f3847b" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a03353e2c6fb2f26e380c3ad9c0f3847b">Alchemy.Server.WSServer.DefaultOnConnected</a> = (x) =&gt; { }</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00047">47</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="ab79ef0aeabb14f4c954a2ef6ddd85ed6"></a><!-- doxytag: member="Alchemy::Server::WSServer::DefaultOnDisconnect" ref="ab79ef0aeabb14f4c954a2ef6ddd85ed6" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ab79ef0aeabb14f4c954a2ef6ddd85ed6">Alchemy.Server.WSServer.DefaultOnDisconnect</a> = (x) =&gt; { }</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00048">48</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="adca8e62f1b37cb0b7d9729cb61132c43"></a><!-- doxytag: member="Alchemy::Server::WSServer::DefaultOnReceive" ref="adca8e62f1b37cb0b7d9729cb61132c43" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#adca8e62f1b37cb0b7d9729cb61132c43">Alchemy.Server.WSServer.DefaultOnReceive</a> = (x) =&gt; { }</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00049">49</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="ae608dbe6149762994e55a157ed39b3a3"></a><!-- doxytag: member="Alchemy::Server::WSServer::DefaultOnSend" ref="ae608dbe6149762994e55a157ed39b3a3" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ae608dbe6149762994e55a157ed39b3a3">Alchemy.Server.WSServer.DefaultOnSend</a> = (x) =&gt; { }</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00050">50</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="a3240d19aa9c8db7399da545c27e4b904"></a><!-- doxytag: member="Alchemy::Server::WSServer::FlashAPEnabled" ref="a3240d19aa9c8db7399da545c27e4b904" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">bool <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a3240d19aa9c8db7399da545c27e4b904">Alchemy.Server.WSServer.FlashAPEnabled</a> = true</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Enables or disables the Flash Access Policy Server(APServer). This is used when you would like your app to only listen on a single port rather than 2. Warning, any flash socket connections will have an added delay on connection due to the client looking to port 843 first for the connection restrictions. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00084">84</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="add10f505c3c91ca55d131181fe694325"></a><!-- doxytag: member="Alchemy::Server::WSServer::Log" ref="add10f505c3c91ca55d131181fe694325" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">ILog <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Alchemy.Server.WSServer.Log</a> = LogManager.GetLogger("Alchemy.Log")</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00062">62</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="ac45304f6b85433f64cdd92656cc6e20b"></a><!-- doxytag: member="Alchemy::Server::WSServer::MaxPingsInSequence" ref="ac45304f6b85433f64cdd92656cc6e20b" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">int <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#ac45304f6b85433f64cdd92656cc6e20b">Alchemy.Server.WSServer.MaxPingsInSequence</a> = 0</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00077">77</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="a42cb72f09d1c72f0b58b0a679b3c2b8a"></a><!-- doxytag: member="Alchemy::Server::WSServer::PingCommand" ref="a42cb72f09d1c72f0b58b0a679b3c2b8a" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a42cb72f09d1c72f0b58b0a679b3c2b8a">Alchemy.Server.WSServer.PingCommand</a> = "7"</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>These are the command strings that the server and client will filter out and treat as heartbeats. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00068">68</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="aa271d5f7ef4a4008564ecc23ef99a710"></a><!-- doxytag: member="Alchemy::Server::WSServer::PongCommand" ref="aa271d5f7ef4a4008564ecc23ef99a710" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#aa271d5f7ef4a4008564ecc23ef99a710">Alchemy.Server.WSServer.PongCommand</a> = "7"</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00069">69</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="a6691d831697cb9494af9649ee4ad59a3"></a><!-- doxytag: member="Alchemy::Server::WSServer::TimeOut" ref="a6691d831697cb9494af9649ee4ad59a3" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">TimeSpan <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a6691d831697cb9494af9649ee4ad59a3">Alchemy.Server.WSServer.TimeOut</a> = TimeSpan.FromMinutes(1)</td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Configuration for the above heartbeat setup. TimeOut : How long until a connection drops when it doesn't receive anything. MaxPingsInSequence : A multiple of TimeOut for how long a connection can remain idle(only pings received) before we kill it. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00076">76</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <hr><h2>Property Documentation</h2>
+      <a class="anchor" id="a7931b6a9b509ba0f12832dc0e4a7363c"></a><!-- doxytag: member="Alchemy::Server::WSServer::DestinationHost" ref="a7931b6a9b509ba0f12832dc0e4a7363c" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a7931b6a9b509ba0f12832dc0e4a7363c">Alchemy.Server.WSServer.DestinationHost</a><code> [get, set]</code></td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Gets or sets the destination host. </p>
+      <p>The destination host. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00112">112</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="aea36ba2da3c555e856e1205a3f239a69"></a><!-- doxytag: member="Alchemy::Server::WSServer::LogConfigFile" ref="aea36ba2da3c555e856e1205a3f239a69" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#aea36ba2da3c555e856e1205a3f239a69">Alchemy.Server.WSServer.LogConfigFile</a><code> [set]</code></td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Sets the log config file name. </p>
+      <p>The log config file name. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00145">145</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="a2fc9aff1b4b23599810a38d20c05fe65"></a><!-- doxytag: member="Alchemy::Server::WSServer::LoggerName" ref="a2fc9aff1b4b23599810a38d20c05fe65" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a2fc9aff1b4b23599810a38d20c05fe65">Alchemy.Server.WSServer.LoggerName</a><code> [set]</code></td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Sets the name of the logger. </p>
+      <p>The name of the logger. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00131">131</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <a class="anchor" id="a60112f801e7eeff19bd7e0352622be20"></a><!-- doxytag: member="Alchemy::Server::WSServer::OriginHost" ref="a60112f801e7eeff19bd7e0352622be20" args="" -->
+      <div class="memitem">
+      <div class="memproto">
+            <table class="memname">
+              <tbody><tr>
+                <td class="memname">string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#a60112f801e7eeff19bd7e0352622be20">Alchemy.Server.WSServer.OriginHost</a><code> [get, set]</code></td>
+              </tr>
+            </tbody></table>
+      </div>
+      <div class="memdoc">
+
+      <p>Gets or sets the origin host. </p>
+      <p>The origin host. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_w_s_server_8cs_source.html#l00093">93</a> of file <a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a>.</p>
+
+      </div>
+      </div>
+      <hr>The documentation for this class was generated from the following file:<ul>
+      <li><a class="el" href="./docs/_w_s_server_8cs_source.html">WSServer.cs</a></li>
+      </ul>
+      </div>
+    </div>
+
+    <footer>
+      &copy; 2011 <a href="http://www.olivinelabs.com">Olivine Labs, LLC.</a>
+    </footer>
+  </div>
+
+
+  <script src="//ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+  <script>window.jQuery || document.write('<script src="js/libs/jquery-1.7.1.min.js"><\/script>')</script>
+
+  <script defer src="js/libs/bootstrap-1.4.0.min.js"></script>
+  <script defer src="js/libs/prettify.js"></script>
+  <script defer src="js/script.js"></script>
+
+  <script>
+    window._gaq = [['_setAccount','UA-22280040-1'],['_trackPageview'],['_trackPageLoadTime'],['_setDomainName', 'alchemywebsockets.net']];
+    Modernizr.load({
+      load: ('https:' == location.protocol ? '//ssl' : '//www') + '.google-analytics.com/ga.js'
+    });
+  </script>
+
+
+  <!--[if lt IE 7 ]>
+    <script src="//ajax.googleapis.com/ajax/libs/chrome-frame/1.0.3/CFInstall.min.js"></script>
+    <script>window.attachEvent('onload',function(){CFInstall.check({mode:'overlay'})})</script>
+  <![endif]-->
+
+</body>
+</html>
+

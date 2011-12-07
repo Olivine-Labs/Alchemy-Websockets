@@ -29,6 +29,15 @@
           <a class="brand" href="#">Alchemy Websockets</a>
           <ul class="nav">
             <li class="active"><a href="#">Home</a></li>
+            <li class="dropdown" data-dropdown="dropdown">
+              <a href="#" class="dropdown-toggle">Docs</a>
+              <ul class="dropdown-menu">
+                <li><a href="wsserver.html">WSServer</a></li>
+                <li><a href="usercontext.html">UserContext</a></li>
+                <li class="divider"></li>
+                <li><a href="./docs/">Doxygen Docs</a></li>
+              </ul>
+            </li>
             <li><a href="https://github.com/Olivine-Labs/Alchemy-Websockets">Github</a></li>
             <li><a href="mailto:projects@olivinelabs.com">Contact</a></li>
           </ul>
@@ -53,7 +62,7 @@
 
       <p>
         After compilation, include the dll as a reference into your project. From there,
-        starting a server is as simple as instantiating an AServer object, opening the 
+        starting a server is as simple as instantiating an WSServer object, opening the 
         connection, and binding events.
       </p>
 
@@ -82,10 +91,12 @@ static void OnConnect(UserContext aContext)
 //...etc
       </pre>
 
-      <h2>Objects</h2>
-      <h3>WSServer</h3>
+      <h2>Object Documentation</h2>
+      <p>
+        We've produced documentation for the <a href="aserver.html">WSServer</a> 
+        and <a href="usercontext.html">UserContext</a> objects.
+      </p>
 
-      <h3>UserContext</h3>
 
       <h2>Example Project</h2>
 
@@ -110,7 +121,7 @@ static void OnConnect(UserContext aContext)
     </div>
 
     <footer>
-
+      &copy; 2011 <a href="http://www.olivinelabs.com">Olivine Labs, LLC.</a>
     </footer>
   </div>
 
