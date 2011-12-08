@@ -77,22 +77,22 @@
           <pre class="prettyprint">
     static void Main(string[] args)
     {
-      var aServer = new WSServer(8100, IPAddress.Any)
-                    {
-                        DefaultOnReceive = new OnEventDelegate(OnReceive),
-                        DefaultOnSend = new OnEventDelegate(OnSend),
-                        DefaultOnConnect = new OnEventDelegate(OnConnected),
-                        DefaultOnConnected = new OnEventDelegate(OnConnect),
-                        DefaultOnDisconnect = new OnEventDelegate(OnDisconnect),
-                        TimeOut = new TimeSpan(0, 5, 0)
-                    };
+      var aServer = new WSServer(8100, IPAddress.Any) {
+        DefaultOnReceive = new OnEventDelegate(OnReceive),
+        DefaultOnSend = new OnEventDelegate(OnSend),
+        DefaultOnConnect = new OnEventDelegate(OnConnected),
+        DefaultOnConnected = new OnEventDelegate(OnConnect),
+        DefaultOnDisconnect = new OnEventDelegate(OnDisconnect),
+        TimeOut = new TimeSpan(0, 5, 0)
+      };
 
       aServer.Start();
     }
 
     static void OnConnected(UserContext aContext)
     {
-        Console.WriteLine("Client Connection From : " + aContext.ClientAddress.ToString());
+      Console.WriteLine("Client Connection From : " +
+        aContext.ClientAddress.ToString());
     }
 
     //...etc
