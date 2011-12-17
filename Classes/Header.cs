@@ -125,16 +125,12 @@ namespace Alchemy.Server.Classes
                 RequestPath = someFields["path"].Captures[0].Value.Trim();
                 Method = someFields["connect"].Captures[0].Value.Trim();
 
-                string version = string.Empty;
-                try
-                {
-                    version = _fields["sec-websocket-version"];
-                }
-                    // ReSharper disable EmptyGeneralCatchClause
-                catch {}
+                var version = 0;
+                Int32.TryParse(_fields["sec-websocket-version"], out version);
+                
                 // ReSharper restore EmptyGeneralCatchClause
 
-                if (Int32.Parse(version) >= 8)
+                if (version >= 8)
                 {
                     Protocol = Protocol.WebSocketHybi10;
                 }
