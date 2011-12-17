@@ -151,7 +151,8 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// <param name="aString">Some bytes.</param>
         public void AppendStringToFrame(String aString)
         {
-            RawFrame.Add(new ArraySegment<byte>(Encoding.UTF8.GetBytes(aString)));
+            byte[] someBytes = Encoding.UTF8.GetBytes(aString);
+            AppendDataToFrame(someBytes);
         }
     }
 }
