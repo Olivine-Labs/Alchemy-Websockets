@@ -29,25 +29,25 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
     /// <summary>
     /// A threadsafe singleton that contains functions which are used to handle incoming connections for the WebSocket Protocol
     /// </summary>
-    sealed class WebSocketHandler : Handler
+    internal sealed class WebSocketHandler : Handler
     {
         private static WebSocketHandler _instance;
 
         private WebSocketHandler()
         {
-            Authentication = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketAuthentication.Instance;
+            Authentication = WebSocketAuthentication.Instance;
         }
 
         public static WebSocketHandler Instance
         {
-            get 
+            get
             {
-                _createLock.Wait();
+                CreateLock.Wait();
                 if (_instance == null)
                 {
                     _instance = new WebSocketHandler();
                 }
-                _createLock.Release();
+                CreateLock.Release();
                 return _instance;
             }
         }
@@ -61,7 +61,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
             if (context.IsSetup)
             {
                 context.UserContext.DataFrame.Append(context.Buffer);
-                if (context.UserContext.DataFrame.State == DataFrame.DataState.Complete)
+                if (context.UserContext.DataFrame.State == WebSocket.DataFrame.DataState.Complete)
                 {
                     switch (context.UserContext.DataFrame.Length)
                     {
@@ -78,7 +78,8 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
                                 context.Pings = 0;
                                 context.UserContext.OnReceive();
                             }
-                            if ((context.Pings >= context.Server.MaxPingsInSequence) && (context.Server.MaxPingsInSequence != 0))
+                            if ((context.Pings >= context.Server.MaxPingsInSequence) &&
+                                (context.Server.MaxPingsInSequence != 0))
                             {
                                 context.Dispose();
                             }
@@ -89,7 +90,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
                             break;
                     }
                 }
-                else if (context.UserContext.DataFrame.State == DataFrame.DataState.Closed)
+                else if (context.UserContext.DataFrame.State == WebSocket.DataFrame.DataState.Closed)
                 {
                     context.UserContext.Send(new byte[0], true);
                 }
@@ -129,19 +130,22 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <param name="close">if set to <c>true</c> [close].</param>
         public override void Send(byte[] data, Context context, bool close = false)
         {
-                byte[] wrappedData = context.UserContext.DataFrame.Wrap(data);
-                AsyncCallback callback = EndSend;
-                if (close)
-                    callback = EndSendAndClose;
-                context.SendReady.Wait();
-                try
-                {
-                    context.Connection.Client.BeginSend(wrappedData, 0, wrappedData.Length, SocketFlags.None, callback, context);
-                }
-                catch
-                {
-                    context.SendReady.Release();
-                }
+            byte[] wrappedData = context.UserContext.DataFrame.Wrap(data);
+            AsyncCallback callback = EndSend;
+            if (close)
+            {
+                callback = EndSendAndClose;
+            }
+            context.SendReady.Wait();
+            try
+            {
+                context.Connection.Client.BeginSend(wrappedData, 0, wrappedData.Length, SocketFlags.None, callback,
+                                                    context);
+            }
+            catch
+            {
+                context.SendReady.Release();
+            }
         }
 
         /// <summary>
@@ -150,7 +154,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <param name="result">The Async result.</param>
         public override void EndSend(IAsyncResult result)
         {
-            Context context = (Context)result.AsyncState;
+            var context = (Context) result.AsyncState;
             try
             {
                 context.Connection.Client.EndSend(result);
@@ -158,7 +162,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
             }
             catch
             {
-                context.SendReady.Release(); 
+                context.SendReady.Release();
             }
             context.UserContext.OnSend();
         }
@@ -169,7 +173,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <param name="result">The Async result.</param>
         public override void EndSendAndClose(IAsyncResult result)
         {
-            Context context = (Context)result.AsyncState;
+            var context = (Context) result.AsyncState;
             try
             {
                 context.Connection.Client.EndSend(result);
@@ -177,7 +181,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
             }
             catch
             {
-               context.SendReady.Release();
+                context.SendReady.Release();
             }
             context.UserContext.OnSend();
             context.Dispose();

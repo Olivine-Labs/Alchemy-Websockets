@@ -22,8 +22,8 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Linq;
-using System.Threading;
 using System.Security.Cryptography;
+using System.Threading;
 using Alchemy.Server.Classes;
 
 namespace Alchemy.Server.Handlers.WebSocket.hybi00
@@ -31,32 +31,31 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
     /// <summary>
     /// Handles the handshaking between the client and the host, when a new connection is created
     /// </summary>
-    public class WebSocketAuthentication : Alchemy.Server.Handlers.WebSocket.WebSocketAuthentication
+    public class WebSocketAuthentication : IWebSocketAuthentication
     {
         public static string Origin = string.Empty;
         public static string Location = string.Empty;
 
-        private static SemaphoreSlim _createLock = new SemaphoreSlim(1);
-        private static WebSocketAuthentication _instance = null;
+        private static readonly SemaphoreSlim CreateLock = new SemaphoreSlim(1);
+        private static WebSocketAuthentication _instance;
 
-        private WebSocketAuthentication()
-        {
-
-        }
+        private WebSocketAuthentication() {}
 
         public static WebSocketAuthentication Instance
         {
             get
             {
-                _createLock.Wait();
+                CreateLock.Wait();
                 if (_instance == null)
                 {
                     _instance = new WebSocketAuthentication();
                 }
-                _createLock.Release();
+                CreateLock.Release();
                 return _instance;
             }
         }
+
+        #region IWebSocketAuthentication Members
 
         public void SetOrigin(string origin)
         {
@@ -72,17 +71,27 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         {
             if (context.ReceivedByteCount > 8)
             {
-                ClientHandshake handshake = new ClientHandshake(new ArraySegment<byte>(context.Buffer, context.ReceivedByteCount - 8, 8), context.Header);
+                var handshake =
+                    new ClientHandshake(new ArraySegment<byte>(context.Buffer, context.ReceivedByteCount - 8, 8),
+                                        context.Header);
                 // See if our header had the required information
                 if (handshake.IsValid())
                 {
                     // Optionally check Origin and Location if they're set.
                     if (Origin != string.Empty)
+                    {
                         if (handshake.Origin != "http://" + Origin)
+                        {
                             return false;
+                        }
+                    }
                     if (Location != string.Empty)
+                    {
                         if (handshake.Host != Location + ":" + context.Server.Port.ToString())
+                        {
                             return false;
+                        }
+                    }
                     // Generate response handshake for the client
                     ServerHandshake serverShake = GenerateResponseHandshake(handshake);
                     // Send the response handshake
@@ -93,13 +102,17 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
             return false;
         }
 
+        #endregion
+
         private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake)
         {
-            ServerHandshake responseHandshake = new ServerHandshake();
-            responseHandshake.Location = "ws://" + handshake.Host + handshake.ResourcePath;
-            responseHandshake.Origin = handshake.Origin;
-            responseHandshake.SubProtocol = handshake.SubProtocol;
-            responseHandshake.AnswerBytes = GenerateAnswerBytes(handshake.Key1, handshake.Key2, handshake.ChallengeBytes);
+            var responseHandshake = new ServerHandshake
+            {
+                Location = "ws://" + handshake.Host + handshake.ResourcePath,
+                Origin = handshake.Origin,
+                SubProtocol = handshake.SubProtocol,
+                AnswerBytes = GenerateAnswerBytes(handshake.Key1, handshake.Key2, handshake.ChallengeBytes)
+            };
 
             return responseHandshake;
         }
@@ -119,24 +132,24 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
             int keySpaceCount = key.Count(x => x == ' ');
 
             // Get a number which is a concatenation of all digits in the keys.
-            string keyNumberString = new String(key.Where(x => Char.IsDigit(x)).ToArray());
+            var keyNumberString = new String(key.Where(Char.IsDigit).ToArray());
 
             // Divide the number with the number of spaces
-            Int32 keyResult = (Int32)(Int64.Parse(keyNumberString) / keySpaceCount);
+            var keyResult = (Int32) (Int64.Parse(keyNumberString)/keySpaceCount);
 
             // convert the results to 32 bit big endian byte arrays
-            byte[] KeyResultBytes = BitConverter.GetBytes(keyResult);
+            byte[] keyResultBytes = BitConverter.GetBytes(keyResult);
             if (BitConverter.IsLittleEndian)
             {
-                Array.Reverse(KeyResultBytes);
+                Array.Reverse(keyResultBytes);
             }
-            return KeyResultBytes;
+            return keyResultBytes;
         }
 
         private static byte[] GenerateAnswerBytes(string key1, string key2, ArraySegment<byte> challenge)
         {
             // Translate the two keys, concatenate them and the 8 challenge bytes from the client
-            byte[] rawAnswer = new byte[16];
+            var rawAnswer = new byte[16];
             Array.Copy(TranslateKey(key1), 0, rawAnswer, 0, 4);
             Array.Copy(TranslateKey(key2), 0, rawAnswer, 4, 4);
             Array.Copy(challenge.Array, challenge.Offset, rawAnswer, 8, 8);

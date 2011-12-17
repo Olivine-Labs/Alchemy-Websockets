@@ -20,9 +20,8 @@ You should have received a copy of the GNU Lesser General Public License
 along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-﻿using System;
+using System;
 using System.Text;
-
 
 namespace Alchemy.Server.Handlers.WebSocket
 {
@@ -33,6 +32,8 @@ namespace Alchemy.Server.Handlers.WebSocket
     /// </summary>
     public abstract class DataFrame
     {
+        #region DataState enum
+
         /// <summary>
         /// The Dataframe's state
         /// </summary>
@@ -46,21 +47,21 @@ namespace Alchemy.Server.Handlers.WebSocket
             Pong = 4
         }
 
+        #endregion
+
+        protected DataState InternalState = DataState.Empty;
+
         /// <summary>
         /// The internal byte buffer used to store received data until the entire frame comes through.
         /// </summary>
-        protected byte[] _rawFrame = null;
-        protected DataState _state = DataState.Empty;
+        protected byte[] RawFrame;
 
         /// <summary>
         /// Gets the current length of the received frame.
         /// </summary>
         public int Length
         {
-            get
-            {
-                return _rawFrame.Length;
-            }
+            get { return RawFrame.Length; }
         }
 
         /// <summary>
@@ -68,10 +69,7 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// </summary>
         public DataState State
         {
-            get
-            {
-                return _state;
-            }
+            get { return InternalState; }
         }
 
         /// <summary>
@@ -108,10 +106,11 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// </returns>
         public override string ToString()
         {
-            if (_rawFrame != null)
-                return UTF8Encoding.UTF8.GetString(_rawFrame);
-            else
-                return String.Empty;
+            if (RawFrame != null)
+            {
+                return Encoding.UTF8.GetString(RawFrame);
+            }
+            return String.Empty;
         }
 
         /// <summary>
@@ -122,10 +121,11 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// </returns>
         public byte[] ToBytes()
         {
-            if (_rawFrame != null)
-                return _rawFrame;
-            else
-                return new byte[0];
+            if (RawFrame != null)
+            {
+                return RawFrame;
+            }
+            return new byte[0];
         }
 
         /// <summary>
@@ -133,9 +133,8 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// </summary>
         public void Clear()
         {
-            _rawFrame = null;
-            _state = DataState.Empty;
+            RawFrame = null;
+            InternalState = DataState.Empty;
         }
-
     }
 }

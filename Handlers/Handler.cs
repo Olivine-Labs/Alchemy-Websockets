@@ -21,8 +21,8 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
-using Alchemy.Server.Classes;
 using System.Threading;
+using Alchemy.Server.Classes;
 using Alchemy.Server.Handlers.WebSocket;
 
 namespace Alchemy.Server.Handlers
@@ -33,11 +33,11 @@ namespace Alchemy.Server.Handlers
     /// </summary>
     public abstract class Handler
     {
-        public WebSocketAuthentication Authentication = null;
-        protected static SemaphoreSlim _createLock = new SemaphoreSlim(1);
-        public abstract void HandleRequest(Context Request);
-        public abstract void Send(byte[] Data, Context AContext, bool Close = false);
-        public abstract void EndSend(IAsyncResult AResult);
-        public abstract void EndSendAndClose(IAsyncResult AResult);
+        protected static SemaphoreSlim CreateLock = new SemaphoreSlim(1);
+        public IWebSocketAuthentication Authentication;
+        public abstract void HandleRequest(Context request);
+        public abstract void Send(byte[] data, Context context, bool close = false);
+        public abstract void EndSend(IAsyncResult result);
+        public abstract void EndSendAndClose(IAsyncResult result);
     }
 }

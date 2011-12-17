@@ -22,6 +22,7 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Web;
 using Alchemy.Server.Classes;
 
@@ -36,7 +37,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <summary>
         /// The preformatted handshake as a string.
         /// </summary>
-        private const String _handshake =
+        private const String Handshake =
             "GET {0} HTTP/1.1\r\n" +
             "Upgrade: WebSocket\r\n" +
             "Connection: Upgrade\r\n" +
@@ -46,20 +47,16 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
             "Sec-Websocket-Key2: {4}\r\n" +
             "{5}";
 
-        public string Origin = String.Empty;
         public string Host = String.Empty;
-        public string ResourcePath = String.Empty;
         public string Key1 = String.Empty;
         public string Key2 = String.Empty;
-        public ArraySegment<byte> ChallengeBytes { get; set; }
-        public HttpCookieCollection Cookies { get; set; }
-        public string SubProtocol { get; set; }
-        public Dictionary<string, string> AdditionalFields { get; set; }
+        public string Origin = String.Empty;
+        public string ResourcePath = String.Empty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientHandshake"/> class.
         /// </summary>
-        /// <param name="ChallengeBytes">The challenge bytes.</param>
+        /// <param name="challengeBytes">The challenge bytes.</param>
         /// <param name="header">The header.</param>
         public ClientHandshake(ArraySegment<byte> challengeBytes, Header header)
         {
@@ -73,6 +70,11 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
             Cookies = header.Cookies;
         }
 
+        public ArraySegment<byte> ChallengeBytes { get; set; }
+        public HttpCookieCollection Cookies { get; set; }
+        public string SubProtocol { get; set; }
+        public Dictionary<string, string> AdditionalFields { get; set; }
+
         /// <summary>
         /// Determines whether this instance is valid.
         /// </summary>
@@ -82,13 +84,12 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         public bool IsValid()
         {
             return (
-                (ChallengeBytes != null) &&
-                (Host != null) &&
-                (Key1 != null) &&
-                (Key2 != null) &&
-                (Origin != null) &&
-                (ResourcePath != null)
-            );
+                       (Host != null) &&
+                       (Key1 != null) &&
+                       (Key2 != null) &&
+                       (Origin != null) &&
+                       (ResourcePath != null)
+                   );
         }
 
         /// <summary>
@@ -103,21 +104,22 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
 
             if (Cookies != null)
             {
-                additionalFields += "Cookie: " + Cookies.ToString() + "\r\n";
+                additionalFields += "Cookie: " + Cookies + "\r\n";
             }
             if (SubProtocol != null)
-                additionalFields += "Sec-Websocket-Protocol: " + SubProtocol + "\r\n";
-
-            if (additionalFields != null)
             {
-                foreach (KeyValuePair<string, string> field in this.AdditionalFields)
-                {
-                    additionalFields += field.Key + ": " + field.Value + "\r\n";
-                }
+                additionalFields += "Sec-Websocket-Protocol: " + SubProtocol + "\r\n";
+            }
+
+            if (additionalFields != String.Empty)
+            {
+                additionalFields = AdditionalFields.Aggregate(additionalFields,
+                                                              (current, field) =>
+                                                              current + (field.Key + ": " + field.Value + "\r\n"));
             }
             additionalFields += "\r\n";
 
-            return String.Format(_handshake, ResourcePath, Origin, Host, Key1, Key2, AdditionalFields);
+            return String.Format(Handshake, ResourcePath, Origin, Host, Key1, Key2, additionalFields);
         }
     }
 
@@ -130,17 +132,17 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         /// <summary>
         /// The preformatted handshake string.
         /// </summary>
-        private const string _handshake =
+        private const string Handshake =
             "HTTP/1.1 101 Web Socket Protocol Handshake\r\n" +
-                "Upgrade: WebSocket\r\n" +
-                "Connection: Upgrade\r\n" +
-                "Sec-WebSocket-Origin: {0}\r\n" +
-                "Sec-WebSocket-Location: {1}\r\n" +
-                "{2}" +
-                "                ";//Empty space for challenge answer
+            "Upgrade: WebSocket\r\n" +
+            "Connection: Upgrade\r\n" +
+            "Sec-WebSocket-Origin: {0}\r\n" +
+            "Sec-WebSocket-Location: {1}\r\n" +
+            "{2}" +
+            "                "; //Empty space for challenge answer
 
-        public string Origin = String.Empty;
         public string Location = String.Empty;
+        public string Origin = String.Empty;
         public byte[] AnswerBytes { get; set; }
         public string SubProtocol { get; set; }
         public Dictionary<string, string> AdditionalFields { get; set; }
@@ -160,7 +162,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
             }
             additionalFields += "\r\n";
 
-            return String.Format(_handshake, Origin, Location, AdditionalFields);
+            return String.Format(Handshake, Origin, Location, additionalFields);
         }
     }
 }

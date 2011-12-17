@@ -42,7 +42,7 @@
     <Reference Include="System.XML" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="APServer.cs" />
+    <Compile Include="AccessPolicyServer.cs" />
     <Compile Include="Handlers\WebSocket\DataFrame.cs" />
     <Compile Include="Handlers\WebSocket\hybi00\DataFrame.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\DataFrame.cs" />
@@ -57,9 +57,9 @@
     <Compile Include="Handlers\WebSocket\hybi10\WebSocketAuthentication.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\Handshakes.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\WebSocketHandler.cs" />
-    <Compile Include="Handlers\WebSocket\WebSocketAuthentication.cs" />
-    <Compile Include="TCPServer.cs" />
-    <Compile Include="WSServer.cs" />
+    <Compile Include="Handlers\WebSocket\IWebSocketAuthentication.cs" />
+    <Compile Include="TcpServer.cs" />
+    <Compile Include="WebSocketServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
