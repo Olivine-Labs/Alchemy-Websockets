@@ -261,8 +261,8 @@ namespace Alchemy.Server
 
             if (context.ReceivedByteCount > 0)
             {
-                context.ReceiveReady.Release();
                 context.Handler.HandleRequest(context);
+                context.ReceiveReady.Release();
             }
             else
             {

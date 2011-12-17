@@ -21,6 +21,8 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 namespace Alchemy.Server.Handlers.WebSocket
@@ -42,9 +44,10 @@ namespace Alchemy.Server.Handlers.WebSocket
             Empty = -1,
             Receiving = 0,
             Complete = 1,
-            Closed = 2,
-            Ping = 3,
-            Pong = 4
+            Waiting = 2,
+            Closed = 3,
+            Ping = 4,
+            Pong = 5
         }
 
         #endregion
@@ -54,14 +57,18 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// <summary>
         /// The internal byte buffer used to store received data until the entire frame comes through.
         /// </summary>
-        protected byte[] RawFrame;
+        protected List<byte[]> RawFrame = new List<byte[]>();
 
         /// <summary>
         /// Gets the current length of the received frame.
         /// </summary>
-        public int Length
+        public UInt64 Length
         {
-            get { return RawFrame.Length; }
+
+            get
+            {
+                return RawFrame.Aggregate<byte[], ulong>(0, (current, data) => current + Convert.ToUInt64(data.Length));
+            }
         }
 
         /// <summary>
@@ -106,11 +113,12 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// </returns>
         public override string ToString()
         {
-            if (RawFrame != null)
+            var sb = new StringBuilder();
+            foreach(var data in RawFrame)
             {
-                return Encoding.UTF8.GetString(RawFrame);
+                sb.Append(Encoding.UTF8.GetString(data));
             }
-            return String.Empty;
+            return sb.ToString();
         }
 
         /// <summary>
@@ -121,11 +129,7 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// </returns>
         public byte[] ToBytes()
         {
-            if (RawFrame != null)
-            {
-                return RawFrame;
-            }
-            return new byte[0];
+            return  Encoding.UTF8.GetBytes(ToString());
         }
 
         /// <summary>
@@ -133,8 +137,19 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// </summary>
         public void Clear()
         {
-            RawFrame = null;
+            RawFrame.Clear();
             InternalState = DataState.Empty;
+        }
+
+        /// <summary>
+        /// Appends the data to frame. Manages recreating the byte array and such.
+        /// </summary>
+        /// <param name="someBytes">Some bytes.</param>
+        /// <param name="start">The start index.</param>
+        /// <param name="end">The end index.</param>
+        protected void AppendDataToFrame(byte[] someBytes)
+        {
+            RawFrame.Add(someBytes);
         }
     }
 }

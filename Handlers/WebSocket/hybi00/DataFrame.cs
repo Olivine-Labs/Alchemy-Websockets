@@ -80,36 +80,10 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
                     start = 0;
                 }
 
-                AppendDataToFrame(data, start, end);
+                var temp = new byte[end-start];
+                Array.Copy(data, start, temp, 0, end - start);
+                AppendDataToFrame(temp);
             }
-        }
-
-        /// <summary>
-        /// Appends the data to frame. Manages recreating the byte array and such.
-        /// </summary>
-        /// <param name="someBytes">Some bytes.</param>
-        /// <param name="start">The start index.</param>
-        /// <param name="end">The end index.</param>
-        private void AppendDataToFrame(byte[] someBytes, int start, int end)
-        {
-            int currentFrameLength = 0;
-            byte[] newFrame;
-            if (RawFrame != null)
-            {
-                currentFrameLength = RawFrame.Length;
-
-                newFrame = new byte[currentFrameLength + (end - start)];
-                if (currentFrameLength > 0)
-                {
-                    Array.Copy(RawFrame, 0, newFrame, 0, currentFrameLength);
-                }
-            }
-            else
-            {
-                newFrame = new byte[end - start];
-            }
-            Array.Copy(someBytes, start, newFrame, currentFrameLength, end - start);
-            RawFrame = newFrame;
         }
     }
 }
