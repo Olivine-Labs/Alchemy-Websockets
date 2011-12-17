@@ -21,11 +21,12 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
-using System.Text;
-using System.Net.Sockets;
-using Alchemy.Server.Handlers;
-using System.Threading;
 using System.Net;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading;
+using Alchemy.Server.Handlers;
+using Alchemy.Server.Handlers.WebSocket;
 
 namespace Alchemy.Server.Classes
 {
@@ -34,53 +35,61 @@ namespace Alchemy.Server.Classes
     /// </summary>
     public class UserContext
     {
+        public readonly Header Header;
+
         /// <summary>
         /// AQ Link to the parent User Context
         /// </summary>
-        private Context Context = null;
+        private readonly Context _context;
+
+        /// <summary>
+        /// The remote endpoint address.
+        /// </summary>
+        public EndPoint ClientAddress;
+
+        /// <summary>
+        /// User defined data. Can be anything.
+        /// </summary>
+        public Object Data;
+
         /// <summary>
         /// The data Frame that this client is currently processing.
         /// </summary>
-        public Alchemy.Server.Handlers.WebSocket.DataFrame DataFrame = null;
+        public DataFrame DataFrame;
+
         /// <summary>
         /// What character encoding to use.
         /// </summary>
         public UTF8Encoding Encoding = new UTF8Encoding();
+
         /// <summary>
-        /// User defined data. Can be anything.
+        /// OnEvent Delegates specific to this connection.
         /// </summary>
-        public Object Data = null;
-        /// <summary>
-        /// The path of this request.
-        /// </summary>
-        public string RequestPath = "/";
-        /// <summary>
-        /// The remote endpoint address.
-        /// </summary>
-        public EndPoint ClientAddress = null;
+        protected OnEventDelegate OnConnectDelegate = x => { };
+
+        protected OnEventDelegate OnConnectedDelegate = x => { };
+        protected OnEventDelegate OnDisconnectDelegate = x => { };
+        protected OnEventDelegate OnReceiveDelegate = x => { };
+        protected OnEventDelegate OnSendDelegate = x => { };
+
         /// <summary>
         /// The type of connection this is
         /// </summary>
         public Protocol Protocol = Protocol.None;
-        /// <summary>
-        /// OnEvent Delegates specific to this connection.
-        /// </summary>
-        protected OnEventDelegate _OnConnect = (x) => { };
-        protected OnEventDelegate _OnConnected = (x) => { };
-        protected OnEventDelegate _OnDisconnect = (x) => { };
-        protected OnEventDelegate _OnReceive = (x) => { };
-        protected OnEventDelegate _OnSend = (x) => { };
 
-        public readonly Header Header;
+        /// <summary>
+        /// The path of this request.
+        /// </summary>
+        public string RequestPath = "/";
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserContext"/> class.
         /// </summary>
         /// <param name="context">The user context.</param>
-        public UserContext(Context AContext)
+        public UserContext(Context context)
         {
-            this.Context = AContext;
-            this.Header = this.Context.Header;
+            _context = context;
+            Header = context.Header;
         }
 
         /// <summary>
@@ -90,9 +99,12 @@ namespace Alchemy.Server.Classes
         {
             try
             {
-                _OnConnect(this);
+                OnConnectDelegate(this);
             }
-            catch (Exception e) { Context.Server.Log.Error("Fatal Error in user specified OnConnect", e); }
+            catch (Exception e)
+            {
+                _context.Server.Log.Error("Fatal Error in user specified OnConnect", e);
+            }
         }
 
         /// <summary>
@@ -102,9 +114,12 @@ namespace Alchemy.Server.Classes
         {
             try
             {
-                _OnConnected(this);
+                OnConnectedDelegate(this);
             }
-            catch (Exception e) { Context.Server.Log.Error("Fatal Error in user specified OnConnected", e); }
+            catch (Exception e)
+            {
+                _context.Server.Log.Error("Fatal Error in user specified OnConnected", e);
+            }
         }
 
         /// <summary>
@@ -114,10 +129,13 @@ namespace Alchemy.Server.Classes
         {
             try
             {
-                Context.Connected = false;
-                _OnDisconnect(this);
+                _context.Connected = false;
+                OnDisconnectDelegate(this);
             }
-            catch (Exception e) { Context.Server.Log.Error("Fatal Error in user specified OnDisconnect", e); }
+            catch (Exception e)
+            {
+                _context.Server.Log.Error("Fatal Error in user specified OnDisconnect", e);
+            }
         }
 
         /// <summary>
@@ -127,9 +145,12 @@ namespace Alchemy.Server.Classes
         {
             try
             {
-                _OnSend(this);
+                OnSendDelegate(this);
             }
-            catch (Exception e) { Context.Server.Log.Error("Fatal Error in user specified OnSend", e); }
+            catch (Exception e)
+            {
+                _context.Server.Log.Error("Fatal Error in user specified OnSend", e);
+            }
         }
 
         /// <summary>
@@ -139,54 +160,57 @@ namespace Alchemy.Server.Classes
         {
             try
             {
-                _OnReceive(this);
+                OnReceiveDelegate(this);
             }
-            catch (Exception e) { Context.Server.Log.Error("Fatal Error in user specified OnReceive", e); }
+            catch (Exception e)
+            {
+                _context.Server.Log.Error("Fatal Error in user specified OnReceive", e);
+            }
         }
 
         /// <summary>
         /// Sets the on connect event.
         /// </summary>
-        /// <param name="ADelegate">The Event Delegate.</param>
-        public void SetOnConnect(OnEventDelegate ADelegate)
+        /// <param name="aDelegate">The Event Delegate.</param>
+        public void SetOnConnect(OnEventDelegate aDelegate)
         {
-            _OnConnect = ADelegate;
+            OnConnectDelegate = aDelegate;
         }
 
         /// <summary>
         /// Sets the on connected event.
         /// </summary>
-        /// <param name="ADelegate">The Event Delegate.</param>
-        public void SetOnConnected(OnEventDelegate ADelegate)
+        /// <param name="aDelegate">The Event Delegate.</param>
+        public void SetOnConnected(OnEventDelegate aDelegate)
         {
-            _OnConnected = ADelegate;
+            OnConnectedDelegate = aDelegate;
         }
 
         /// <summary>
         /// Sets the on disconnect event.
         /// </summary>
-        /// <param name="ADelegate">The Event Delegate.</param>
-        public void SetOnDisconnect(OnEventDelegate ADelegate)
+        /// <param name="aDelegate">The Event Delegate.</param>
+        public void SetOnDisconnect(OnEventDelegate aDelegate)
         {
-            _OnDisconnect = ADelegate;
+            OnDisconnectDelegate = aDelegate;
         }
 
         /// <summary>
         /// Sets the on send event.
         /// </summary>
-        /// <param name="ADelegate">The Event Delegate.</param>
-        public void SetOnSend(OnEventDelegate ADelegate)
+        /// <param name="aDelegate">The Event Delegate.</param>
+        public void SetOnSend(OnEventDelegate aDelegate)
         {
-            _OnSend = ADelegate;
+            OnSendDelegate = aDelegate;
         }
 
         /// <summary>
         /// Sets the on receive event.
         /// </summary>
-        /// <param name="ADelegate">The Event Delegate.</param>
-        public void SetOnReceive(OnEventDelegate ADelegate)
+        /// <param name="aDelegate">The Event Delegate.</param>
+        public void SetOnReceive(OnEventDelegate aDelegate)
         {
-            _OnReceive = ADelegate;
+            OnReceiveDelegate = aDelegate;
         }
 
         /// <summary>
@@ -194,9 +218,9 @@ namespace Alchemy.Server.Classes
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public void Send(string Data, bool Close = false)
+        public void Send(string data, bool close = false)
         {
-            Send(Encoding.GetBytes(Data), Close);
+            Send(Encoding.GetBytes(data), close);
         }
 
         /// <summary>
@@ -204,18 +228,18 @@ namespace Alchemy.Server.Classes
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public void Send(byte[] Data, bool Close = false)
+        public void Send(byte[] data, bool close = false)
         {
-            Context.Handler.Send(Data, Context, Close);
+            _context.Handler.Send(data, _context, close);
         }
 
         /// <summary>
         /// Sends raw data.
         /// </summary>
         /// <param name="data">The data.</param>
-        public void SendRaw(byte[] Data)
+        public void SendRaw(byte[] data)
         {
-            _defaultHandler.Instance.Send(Data, Context);
+            DefaultHandler.Instance.Send(data, _context);
         }
     }
 
@@ -227,50 +251,70 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// The exported version of this context.
         /// </summary>
-        public readonly UserContext UserContext = null;
+        public readonly UserContext UserContext;
+
         /// <summary>
-        /// The raw client connection.
+        /// The buffer used for accepting raw data from the socket.
         /// </summary>
-        public TcpClient Connection = null;
+        public byte[] Buffer;
+
         /// <summary>
         /// Whether or not the TCPClient is still connected.
         /// </summary>
         public bool Connected = true;
+
         /// <summary>
-        /// The buffer used for accepting raw data from the socket.
+        /// The raw client connection.
         /// </summary>
-        public byte[] Buffer = null;
-        /// <summary>
-        /// How many pings in a row we've had from this client, indicates inactivity.
-        /// </summary>
-        public int Pings = 0;
-        /// <summary>
-        /// How many bytes we received this tick.
-        /// </summary>
-        public int ReceivedByteCount = 0;
-        /// <summary>
-        /// Whether or not this client has passed all the setup routines for the current handler(authentication, etc)
-        /// </summary>
-        public Boolean IsSetup = false;
+        public TcpClient Connection;
+
         /// <summary>
         /// The current connection handler.
         /// </summary>
-        public Handler Handler = _defaultHandler.Instance;
+        public Handler Handler = DefaultHandler.Instance;
+
+        /// <summary>
+        /// The Header
+        /// </summary>
+        public Header Header;
+
+        /// <summary>
+        /// Whether or not this client has passed all the setup routines for the current handler(authentication, etc)
+        /// </summary>
+        public Boolean IsSetup;
+
+        /// <summary>
+        /// How many pings in a row we've had from this client, indicates inactivity.
+        /// </summary>
+        public int Pings;
+
         /// <summary>
         /// Semaphores that limit sends and receives to 1 and a time.
         /// </summary>
         public SemaphoreSlim ReceiveReady = new SemaphoreSlim(1);
+
+        /// <summary>
+        /// How many bytes we received this tick.
+        /// </summary>
+        public int ReceivedByteCount;
+
         public SemaphoreSlim SendReady = new SemaphoreSlim(1);
+
         /// <summary>
         /// A link to the server listener instance this client is currently hosted on.
         /// </summary>
-        public WSServer Server = null;
-        /// <summary>
-        /// The Header
-        /// </summary>
-        public Header Header = null;
+        public WebSocketServer Server;
 
-        private int _BufferSize = 512;
+        private int _bufferSize = 512;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Context"/> class.
+        /// </summary>
+        public Context()
+        {
+            Buffer = new byte[_bufferSize];
+            UserContext = new UserContext(this);
+        }
 
         /// <summary>
         /// Gets or sets the size of the buffer.
@@ -280,25 +324,15 @@ namespace Alchemy.Server.Classes
         /// </value>
         public int BufferSize
         {
-            get
-            {
-                return _BufferSize;
-            }
+            get { return _bufferSize; }
             set
             {
-                _BufferSize = value;
-                Buffer = new byte[_BufferSize];
+                _bufferSize = value;
+                Buffer = new byte[_bufferSize];
             }
         }
 
-        /// <summary>
-        /// Initializes a new instance of the <see cref="Context"/> class.
-        /// </summary>
-        public Context()
-        {
-            Buffer = new byte[_BufferSize];
-            this.UserContext = new UserContext(this);
-        }
+        #region IDisposable Members
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
@@ -310,7 +344,10 @@ namespace Alchemy.Server.Classes
                 Connection.Client.Close();
                 Connection = null;
             }
-            catch (Exception e) { Server.Log.Debug("Client Already Disconnected", e); }
+            catch (Exception e)
+            {
+                Server.Log.Debug("Client Already Disconnected", e);
+            }
             finally
             {
                 if (Connected)
@@ -321,15 +358,21 @@ namespace Alchemy.Server.Classes
             }
         }
 
+        #endregion
+
         /// <summary>
         /// Resets this instance.
         /// Clears the dataframe if necessary. Resets Received byte count.
         /// </summary>
         public void Reset()
         {
-            if(UserContext.DataFrame != null)
-            if (UserContext.DataFrame.State == Alchemy.Server.Handlers.WebSocket.DataFrame.DataState.Complete)
-                UserContext.DataFrame.Clear();
+            if (UserContext.DataFrame != null)
+            {
+                if (UserContext.DataFrame.State == DataFrame.DataState.Complete)
+                {
+                    UserContext.DataFrame.Clear();
+                }
+            }
             ReceivedByteCount = 0;
         }
     }

@@ -46,9 +46,21 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// Regular expression to parse http header
         /// </summary>
-        public static string Pattern = 
-            @"^(?<connect>[^\s]+)\s(?<path>[^\s]+)\sHTTP\/1\.1\r\n" +       // HTTP Request
-            @"((?<field_name>[^:\r\n]+):(?<field_value>[^\r\n]+)\r\n)+";    // HTTP Header Fields (<Field_Name>: <Field_Value> CR LF)
+        public static string Pattern =
+            @"^(?<connect>[^\s]+)\s(?<path>[^\s]+)\sHTTP\/1\.1\r\n" + // HTTP Request
+            @"((?<field_name>[^:\r\n]+):(?<field_value>[^\r\n]+)\r\n)+";
+
+        // HTTP Header Fields (<Field_Name>: <Field_Value> CR LF)
+
+        /// <summary>
+        /// A collection of fields attached to the header.
+        /// </summary>
+        private readonly NameValueCollection _fields = new NameValueCollection();
+
+        /// <summary>
+        /// Any cookies sent with the header.
+        /// </summary>
+        public HttpCookieCollection Cookies = new HttpCookieCollection();
 
         /// <summary>
         /// The HTTP Method (GET/POST/PUT, etc.)
@@ -67,105 +79,102 @@ namespace Alchemy.Server.Classes
         public string RequestPath = string.Empty;
 
         /// <summary>
-        /// Any cookies sent with the header.
-        /// </summary>
-        public HttpCookieCollection Cookies = new HttpCookieCollection();
-
-        /// <summary>
-        /// A collection of fields attached to the header.
-        /// </summary>
-        private NameValueCollection Fields = new NameValueCollection();
-
-        /// <summary>
-        /// Gets or sets the Fields object with the specified key.
-        /// </summary>
-        public string this[string Key]
-        {
-            get
-            {
-                return Fields[Key];
-            }
-            set
-            {
-                Fields[Key] = value;
-            }
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="Header"/> class.
         /// Accepts a string that represents an HTTP header.
         /// </summary>
         /// <param name="data">The data.</param>
-        public Header(string Data)
+        public Header(string data)
         {
             try
             {
                 // Parse HTTP Header
-                Regex regex = new Regex(Pattern, RegexOptions.IgnoreCase);
-                Match match = regex.Match(Data);
-                GroupCollection SomeFields = match.Groups;
+                var regex = new Regex(Pattern, RegexOptions.IgnoreCase);
+                Match match = regex.Match(data);
+                GroupCollection someFields = match.Groups;
                 // run through every match and save them in the handshake object
-                for (int i = 0; i < SomeFields["field_name"].Captures.Count; i++)
+                for (int i = 0; i < someFields["field_name"].Captures.Count; i++)
                 {
-                    string Name = SomeFields["field_name"].Captures[i].ToString().ToLower();
-                    string Value = SomeFields["field_value"].Captures[i].ToString().Trim();
-                    switch (Name)
+                    string name = someFields["field_name"].Captures[i].ToString().ToLower();
+                    string value = someFields["field_value"].Captures[i].ToString().Trim();
+                    switch (name)
                     {
                         case "cookie":
-                            string[] CookieArray = Value.Split(';');
-                            foreach (string ACookie in CookieArray)
+                            string[] cookieArray = value.Split(';');
+                            foreach (string cookie in cookieArray)
                             {
                                 try
                                 {
-                                    string CookieName = ACookie.Remove(ACookie.IndexOf('='));
-                                    string CookieValue = ACookie.Substring(ACookie.IndexOf('=') + 1);
-                                    Cookies.Add(new HttpCookie(CookieName.TrimStart(), CookieValue));
+                                    string cookieName = cookie.Remove(cookie.IndexOf('='));
+                                    string cookieValue = cookie.Substring(cookie.IndexOf('=') + 1);
+                                    Cookies.Add(new HttpCookie(cookieName.TrimStart(), cookieValue));
                                 }
-                                catch { /* Ignore bad cookie */ }
+                                    // ReSharper disable EmptyGeneralCatchClause
+                                catch
+                                    // ReSharper restore EmptyGeneralCatchClause
+                                {
+                                    /* Ignore bad cookie */
+                                }
                             }
                             break;
                         default:
-                            Fields.Add(Name, Value);
+                            _fields.Add(name, value);
                             break;
                     }
                 }
 
-                RequestPath = SomeFields["path"].Captures[0].Value.Trim();
-                Method = SomeFields["connect"].Captures[0].Value.Trim();
+                RequestPath = someFields["path"].Captures[0].Value.Trim();
+                Method = someFields["connect"].Captures[0].Value.Trim();
 
-                string Version = string.Empty;
+                string version = string.Empty;
                 try
                 {
-                    Version = Fields["sec-websocket-version"];
+                    version = _fields["sec-websocket-version"];
                 }
-                catch (Exception){}
-                
-                if(Int32.Parse(Version) >= 8)
+                    // ReSharper disable EmptyGeneralCatchClause
+                catch {}
+                // ReSharper restore EmptyGeneralCatchClause
+
+                if (Int32.Parse(version) >= 8)
                 {
-                    this.Protocol = Protocol.WebSocketHybi10;
+                    Protocol = Protocol.WebSocketHybi10;
                 }
                 else
                 {
-                    string[] PathExplode = RequestPath.Split('/');
-                    string ProtocolString = string.Empty;
-                    if (PathExplode.Length > 0)
-                        ProtocolString = PathExplode[PathExplode.Length - 1].ToLower().Trim();
-                    switch (ProtocolString)
+                    string[] pathExplode = RequestPath.Split('/');
+                    string protocolString = string.Empty;
+                    if (pathExplode.Length > 0)
+                    {
+                        protocolString = pathExplode[pathExplode.Length - 1].ToLower().Trim();
+                    }
+                    switch (protocolString)
                     {
                         case "websocket":
-                            this.Protocol = Protocol.WebSocketHybi00;
+                            Protocol = Protocol.WebSocketHybi00;
                             break;
                         case "flashsocket":
-                            this.Protocol = Protocol.FlashSocket;
+                            Protocol = Protocol.FlashSocket;
                             break;
                         default:
-                            this.Protocol = Protocol.None;
+                            Protocol = Protocol.None;
                             break;
                     }
                 }
-
             }
-            catch{ /* Ignore bad header */ }
+                // ReSharper disable EmptyGeneralCatchClause
+            catch
+                // ReSharper restore EmptyGeneralCatchClause
+            {
+                /* Ignore bad header */
+            }
+        }
+
+        /// <summary>
+        /// Gets or sets the Fields object with the specified key.
+        /// </summary>
+        public string this[string key]
+        {
+            get { return _fields[key]; }
+            set { _fields[key] = value; }
         }
     }
 }

@@ -21,8 +21,9 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 using System;
-using Alchemy.Server.Classes;
 using System.Net.Sockets;
+using Alchemy.Server.Classes;
+using Alchemy.Server.Handlers.WebSocket.hybi00;
 
 namespace Alchemy.Server.Handlers
 {
@@ -30,22 +31,22 @@ namespace Alchemy.Server.Handlers
     /// When the protocol has not yet been determined the system defaults to this request handler.
     /// Singleton, just like the other handlers.
     /// </summary>
-    class _defaultHandler : Handler
+    internal class DefaultHandler : Handler
     {
-        private static _defaultHandler _instance;
+        private static DefaultHandler _instance;
 
-        private _defaultHandler() { }
+        private DefaultHandler() {}
 
-        public static _defaultHandler Instance
+        public static DefaultHandler Instance
         {
-            get 
+            get
             {
-                _createLock.Wait();
+                CreateLock.Wait();
                 if (_instance == null)
                 {
-                    _instance = new _defaultHandler();
+                    _instance = new DefaultHandler();
                 }
-                _createLock.Release();
+                CreateLock.Release();
                 return _instance;
             }
         }
@@ -83,25 +84,27 @@ namespace Alchemy.Server.Handlers
                     //if it is, we access the Access Policy Server instance to send the appropriate response.
                     context.Server.AccessPolicyServer.SendResponse(context.Connection);
                 }
-                catch { }
+                    // ReSharper disable EmptyGeneralCatchClause
+                catch {}
+                // ReSharper restore EmptyGeneralCatchClause
                 context.Dispose();
             }
-            else//If it isn't, process http/websocket header as normal.
+            else //If it isn't, process http/websocket header as normal.
             {
                 context.Header = new Header(data);
                 switch (context.Header.Protocol)
                 {
                     case Protocol.WebSocketHybi00:
-                        context.Handler = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketHandler.Instance;
-                        context.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi00.DataFrame();
+                        context.Handler = WebSocketHandler.Instance;
+                        context.UserContext.DataFrame = new DataFrame();
                         break;
                     case Protocol.WebSocketHybi10:
-                        context.Handler = Alchemy.Server.Handlers.WebSocket.hybi10.WebSocketHandler.Instance;
-                        context.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi10.DataFrame();
+                        context.Handler = WebSocket.hybi10.WebSocketHandler.Instance;
+                        context.UserContext.DataFrame = new WebSocket.hybi10.DataFrame();
                         break;
                     case Protocol.FlashSocket:
-                        context.Handler = Alchemy.Server.Handlers.WebSocket.hybi00.WebSocketHandler.Instance;
-                        context.UserContext.DataFrame = new Alchemy.Server.Handlers.WebSocket.hybi00.DataFrame();
+                        context.Handler = WebSocketHandler.Instance;
+                        context.UserContext.DataFrame = new DataFrame();
                         break;
                     default:
                         context.Header.Protocol = Protocol.None;
@@ -128,7 +131,9 @@ namespace Alchemy.Server.Handlers
         {
             AsyncCallback callback = EndSend;
             if (close)
+            {
                 callback = EndSendAndClose;
+            }
             context.SendReady.Wait();
             try
             {
@@ -146,7 +151,7 @@ namespace Alchemy.Server.Handlers
         /// <param name="result">The Async result.</param>
         public override void EndSend(IAsyncResult result)
         {
-            Context context = (Context)result.AsyncState;
+            var context = (Context) result.AsyncState;
             try
             {
                 context.Connection.Client.EndSend(result);
@@ -165,7 +170,7 @@ namespace Alchemy.Server.Handlers
         /// <param name="result">The Async result.</param>
         public override void EndSendAndClose(IAsyncResult result)
         {
-            Context context = (Context)result.AsyncState;
+            var context = (Context) result.AsyncState;
             try
             {
                 context.Connection.Client.EndSend(result);

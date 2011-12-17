@@ -57,9 +57,9 @@
     <Compile Include="Handlers\WebSocket\hybi10\WebSocketAuthentication.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\Handshakes.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\WebSocketHandler.cs" />
-    <Compile Include="Handlers\WebSocket\WebSocketAuthentication.cs" />
+    <Compile Include="Handlers\WebSocket\IWebSocketAuthentication.cs" />
     <Compile Include="TCPServer.cs" />
-    <Compile Include="WSServer.cs" />
+    <Compile Include="WebSocketServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

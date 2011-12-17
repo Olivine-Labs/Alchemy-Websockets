@@ -20,9 +20,7 @@ You should have received a copy of the GNU Lesser General Public License
 along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-﻿using System;
-using System.Text;
-
+using System;
 
 namespace Alchemy.Server.Handlers.WebSocket.hybi10
 {
@@ -31,20 +29,23 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
     /// Automatically manages adding received data to an existing frame and checking whether or not we've received the entire frame yet.
     /// See http://www.whatwg.org/specs/web-socket-protocol/ for more details on the WebSocket Protocol.
     /// </summary>
-    public class DataFrame : Alchemy.Server.Handlers.WebSocket.DataFrame
+    public class DataFrame : WebSocket.DataFrame
     {
+        #region OpCode enum
+
         public enum OpCode
         {
-            Continue    = 0x0,
-            Text        = 0x1,
-            Binary      = 0x2,
-            Close       = 0x8,
-            Ping        = 0x9,
-            Pong        = 0xA
+            Continue = 0x0,
+            Text = 0x1,
+            Binary = 0x2,
+            Close = 0x8,
+            Ping = 0x9,
+            Pong = 0xA
         }
 
-        private const byte _continueBit  = 0x0;
-        private const byte _endBit       = 0x80;
+        #endregion
+
+        private const byte EndBit = 0x80;
 
         /// <summary>
         /// Wraps the specified data in WebSocket Start/End Bytes.
@@ -54,24 +55,24 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// <returns>The data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
         public override byte[] Wrap(byte[] data)
         {
-            byte[] wrappedBytes = null;
+            byte[] wrappedBytes;
 
             if (data.Length > 0)
             {
                 // wrap the array with the wrapper bytes
                 int startIndex = 2;
-                byte[] headerBytes = new byte[14];
+                var headerBytes = new byte[14];
                 headerBytes[0] = 0x81;
                 if (data.Length <= 125)
                 {
-                    headerBytes[1] = (byte)data.Length;
+                    headerBytes[1] = (byte) data.Length;
                 }
                 else
                 {
                     if (data.Length <= ushort.MaxValue)
                     {
                         headerBytes[1] = 126;
-                        byte[] extendedLength = BitConverter.GetBytes((UInt16)data.Length);
+                        byte[] extendedLength = BitConverter.GetBytes((UInt16) data.Length);
                         headerBytes[2] = extendedLength[1];
                         headerBytes[3] = extendedLength[0];
                         startIndex = 4;
@@ -79,7 +80,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                     else
                     {
                         headerBytes[1] = 127;
-                        byte[] extendedLength = BitConverter.GetBytes((UInt64)data.Length);
+                        byte[] extendedLength = BitConverter.GetBytes((UInt64) data.Length);
                         headerBytes[2] = extendedLength[7];
                         headerBytes[3] = extendedLength[6];
                         headerBytes[4] = extendedLength[5];
@@ -91,14 +92,14 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                         startIndex = 10;
                     }
                 }
-                headerBytes[1] = (byte)(headerBytes[1] | 0x80);
+                headerBytes[1] = (byte) (headerBytes[1] | 0x80);
 
-                Random random = new Random();
+                var random = new Random();
                 int key = random.Next(Int32.MaxValue);
                 Array.Copy(BitConverter.GetBytes(key), 0, headerBytes, startIndex, 4);
                 startIndex += 4;
 
-                byte[] maskedData=Mask(data, key);
+                byte[] maskedData = Mask(data, key);
 
                 wrappedBytes = new byte[data.Length + startIndex];
                 Array.Copy(headerBytes, 0, wrappedBytes, 0, startIndex);
@@ -120,16 +121,18 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         {
             if (data.Length > 0)
             {
-                byte nibble2 = (byte)(data[0] & 0x0F);
-                byte nibble1 = (byte)(data[0] & 0xF0);
+                var nibble2 = (byte) (data[0] & 0x0F);
+                var nibble1 = (byte) (data[0] & 0xF0);
 
-                if ((nibble1 & _endBit) == _endBit)
-                    _state = DataState.Complete;
+                if ((nibble1 & EndBit) == EndBit)
+                {
+                    InternalState = DataState.Complete;
+                }
 
 
                 //Combine bytes to form one large number
                 int startIndex = 2;
-                Int64 dataLength = (byte)(data[1] & 0x7F);
+                Int64 dataLength = (byte) (data[1] & 0x7F);
                 if (dataLength == 126)
                 {
                     BitConverter.ToInt16(data, startIndex);
@@ -149,12 +152,14 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                     startIndex = startIndex + 4;
                 }
 
-                byte[] payload = new byte[dataLength];
-                Array.Copy(data, (int)startIndex, payload, 0, (int)dataLength);
-                if(masked)
+                var payload = new byte[dataLength];
+                Array.Copy(data, startIndex, payload, 0, (int) dataLength);
+                if (masked)
+                {
                     payload = Mask(payload, maskingKey);
+                }
 
-                OpCode currentFrameOpcode = (OpCode)nibble2;
+                var currentFrameOpcode = (OpCode) nibble2;
                 switch (currentFrameOpcode)
                 {
                     case OpCode.Continue:
@@ -163,13 +168,13 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                         AppendDataToFrame(payload);
                         break;
                     case OpCode.Close:
-                        _state = DataState.Closed;
+                        InternalState = DataState.Closed;
                         break;
                     case OpCode.Ping:
-                        _state = DataState.Ping;
+                        InternalState = DataState.Ping;
                         break;
                     case OpCode.Pong:
-                        _state = DataState.Pong;
+                        InternalState = DataState.Pong;
                         break;
                 }
             }
@@ -178,29 +183,38 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// <summary>
         /// Appends the data to frame. Manages recreating the byte array and such.
         /// </summary>
-        /// <param name="SomeBytes">Some bytes.</param>
-        /// <param name="Start">The start index.</param>
-        /// <param name="End">The end index.</param>
+        /// <param name="someBytes">Some bytes.</param>
         private void AppendDataToFrame(byte[] someBytes)
         {
             int currentFrameLength = 0;
-            if (_rawFrame != null)
-                currentFrameLength = _rawFrame.Length;
-            byte[] newFrame = new byte[currentFrameLength + someBytes.Length];
-            if(currentFrameLength > 0)
-                Array.Copy(_rawFrame, 0, newFrame, 0, currentFrameLength);
+            byte[] newFrame;
+            if (RawFrame != null)
+            {
+                currentFrameLength = RawFrame.Length;
+
+                newFrame = new byte[currentFrameLength + someBytes.Length];
+                if (currentFrameLength > 0)
+                {
+                    Array.Copy(RawFrame, 0, newFrame, 0, currentFrameLength);
+                }
+                Array.Copy(someBytes, 0, newFrame, currentFrameLength, someBytes.Length);
+            }
+            else
+            {
+                newFrame = someBytes;
+            }
             Array.Copy(someBytes, 0, newFrame, currentFrameLength, someBytes.Length);
-            _rawFrame = newFrame;
+            RawFrame = newFrame;
         }
 
         private static byte[] Mask(byte[] someBytes, Int32 key)
         {
-            byte[] newBytes = new byte[someBytes.Length];
+            var newBytes = new byte[someBytes.Length];
             byte[] byteKeys = BitConverter.GetBytes(key);
-            for(int index = 0; index < someBytes.Length; index++)
+            for (int index = 0; index < someBytes.Length; index++)
             {
-                int KeyIndex = index % 4;
-                newBytes[index] = (byte)(someBytes[index]^byteKeys[KeyIndex]);
+                int keyIndex = index%4;
+                newBytes[index] = (byte) (someBytes[index] ^ byteKeys[keyIndex]);
             }
             return newBytes;
         }
