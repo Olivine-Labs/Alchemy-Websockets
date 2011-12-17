@@ -72,13 +72,13 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             int startIndex = 2;
             var headerBytes = new byte[14];
             headerBytes[0] = 0x81;
-            if (Length <= 125)
+            if (dataLength <= 125)
             {
                 headerBytes[1] = (byte) dataLength;
             }
             else
             {
-                if (Length <= ushort.MaxValue)
+                if (dataLength <= ushort.MaxValue)
                 {
                     headerBytes[1] = 126;
                     byte[] extendedLength = BitConverter.GetBytes(dataLength);
@@ -116,7 +116,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 RawFrame[index] = new ArraySegment<byte>(Mask(RawFrame[index].Array));
             }
 
-            RawFrame.Insert(0, new ArraySegment<byte>(headerBytes));
+            RawFrame.Insert(0, new ArraySegment<byte>(newHeaderBytes));
         }
 
         private int ProcessFrameHeader(byte[] data)
@@ -198,6 +198,11 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                     payload = Mask(payload);
                 }
 
+                if (_remainingDataLength == 0)
+                {
+                    InternalState = _isEnd ? DataState.Complete : DataState.Waiting;
+                }
+
                 switch (_currentFrameOpcode)
                 {
                     case OpCode.Continue:
@@ -215,11 +220,10 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                         InternalState = DataState.Pong;
                         break;
                 }
-
-                if (_remainingDataLength == 0)
-                {
-                    InternalState = _isEnd ? DataState.Complete : DataState.Waiting;
-                }
+            }
+            else
+            {
+                InternalState = DataState.Closed;
             }
         }
 
