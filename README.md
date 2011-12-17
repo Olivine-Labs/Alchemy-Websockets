@@ -52,12 +52,10 @@ Status
 ------
 Alchemy websockets supports:
 
-* (!) hixie-76 (hybi00)
+* (✓) hixie-76 (hybi00)
 * (✓) hybi-10
 * (✓) hybi-17 (official protocol)
 
-_hixie-76 has open issues._
-Because it is on the official support list (due to Safari), it is on the list to be resolved.
 
 This covers Chrome current, beta, and alpha channels; Firefox
 latest, beta, and alpha channels; Safari, and includes support
