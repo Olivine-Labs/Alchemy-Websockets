@@ -34,20 +34,21 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
         public const byte StartByte = 0;
         public const byte EndByte = 255;
 
+        public override WebSocket.DataFrame CreateInstance()
+        {
+            return new DataFrame();
+        }
+
         /// <summary>
         /// Wraps the specified data in WebSocket Start/End Bytes.
-        /// Accepts a byte array.
         /// </summary>
-        /// <param name="data">The data.</param>
-        /// <returns>The data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
-        public override byte[] Wrap(byte[] data)
+        public override void Wrap()
         {
             // wrap the array with the wrapper bytes
-            var wrappedBytes = new byte[data.Length + 2];
-            wrappedBytes[0] = StartByte;
-            wrappedBytes[wrappedBytes.Length - 1] = EndByte;
-            Array.Copy(data, 0, wrappedBytes, 1, data.Length);
-            return wrappedBytes;
+            var startBytes = new byte[1];
+            var endBytes = new byte[1];
+            RawFrame.Insert(0, new ArraySegment<byte>(startBytes));
+            RawFrame.Add(new ArraySegment<byte>(endBytes));
         }
 
         /// <summary>
@@ -80,7 +81,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi00
                     start = 0;
                 }
 
-                var temp = new byte[end-start];
+                var temp = new byte[end - start];
                 Array.Copy(data, start, temp, 0, end - start);
                 AppendDataToFrame(temp);
             }

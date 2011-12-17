@@ -46,85 +46,84 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         #endregion
 
         private const byte EndBit = 0x80;
-
-        private bool _masked = false;
-        private int _currentMask = 0;
-        private byte _currentMaskIndex = 0;
-        private UInt64 _dataLength = 0;
-        private UInt64 _remainingDataLength = 0;
         private OpCode _currentFrameOpcode = OpCode.Close;
-        private bool _isEnd = false;
+
+        private int _currentMask;
+        private byte _currentMaskIndex;
+        private UInt64 _dataLength;
+        private bool _isEnd;
+        private bool _masked;
+        private UInt64 _remainingDataLength;
+
+        public override WebSocket.DataFrame CreateInstance()
+        {
+            return new DataFrame();
+        }
+
         /// <summary>
         /// Wraps the specified data in WebSocket Start/End Bytes.
         /// Accepts a byte array.
         /// </summary>
-        /// <param name="data">The data.</param>
         /// <returns>The data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
-        public override byte[] Wrap(byte[] data)
+        public override void Wrap()
         {
-            byte[] wrappedBytes;
-
-            if (data.Length > 0)
+            UInt64 dataLength = Length;
+            // wrap the array with the wrapper bytes
+            int startIndex = 2;
+            var headerBytes = new byte[14];
+            headerBytes[0] = 0x81;
+            if (Length <= 125)
             {
-                // wrap the array with the wrapper bytes
-                int startIndex = 2;
-                var headerBytes = new byte[14];
-                headerBytes[0] = 0x81;
-                if (data.Length <= 125)
-                {
-                    headerBytes[1] = (byte) data.Length;
-                }
-                else
-                {
-                    if (data.Length <= ushort.MaxValue)
-                    {
-                        headerBytes[1] = 126;
-                        byte[] extendedLength = BitConverter.GetBytes((UInt16) data.Length);
-                        headerBytes[2] = extendedLength[1];
-                        headerBytes[3] = extendedLength[0];
-                        startIndex = 4;
-                    }
-                    else
-                    {
-                        headerBytes[1] = 127;
-                        byte[] extendedLength = BitConverter.GetBytes((UInt64) data.Length);
-                        headerBytes[2] = extendedLength[7];
-                        headerBytes[3] = extendedLength[6];
-                        headerBytes[4] = extendedLength[5];
-                        headerBytes[5] = extendedLength[4];
-                        headerBytes[6] = extendedLength[3];
-                        headerBytes[7] = extendedLength[2];
-                        headerBytes[8] = extendedLength[1];
-                        headerBytes[9] = extendedLength[0];
-                        startIndex = 10;
-                    }
-                }
-                headerBytes[1] = (byte) (headerBytes[1] | 0x80);
-
-                var random = new Random();
-                int key = random.Next(Int32.MaxValue);
-                Array.Copy(BitConverter.GetBytes(key), 0, headerBytes, startIndex, 4);
-                startIndex += 4;
-
-                byte[] maskedData = Mask(data, key, 0);
-
-                wrappedBytes = new byte[data.Length + startIndex];
-                Array.Copy(headerBytes, 0, wrappedBytes, 0, startIndex);
-                Array.Copy(maskedData, 0, wrappedBytes, startIndex, maskedData.Length);
+                headerBytes[1] = (byte) dataLength;
             }
             else
             {
-                wrappedBytes = new byte[1];
-                wrappedBytes[0] = 0x0;
+                if (Length <= ushort.MaxValue)
+                {
+                    headerBytes[1] = 126;
+                    byte[] extendedLength = BitConverter.GetBytes(dataLength);
+                    headerBytes[2] = extendedLength[1];
+                    headerBytes[3] = extendedLength[0];
+                    startIndex = 4;
+                }
+                else
+                {
+                    headerBytes[1] = 127;
+                    byte[] extendedLength = BitConverter.GetBytes(dataLength);
+                    headerBytes[2] = extendedLength[7];
+                    headerBytes[3] = extendedLength[6];
+                    headerBytes[4] = extendedLength[5];
+                    headerBytes[5] = extendedLength[4];
+                    headerBytes[6] = extendedLength[3];
+                    headerBytes[7] = extendedLength[2];
+                    headerBytes[8] = extendedLength[1];
+                    headerBytes[9] = extendedLength[0];
+                    startIndex = 10;
+                }
             }
-            return wrappedBytes;
+            headerBytes[1] = (byte) (headerBytes[1] | 0x80);
+
+            var random = new Random();
+            _currentMask = random.Next(Int32.MaxValue);
+            Array.Copy(BitConverter.GetBytes(_currentMask), 0, headerBytes, startIndex, 4);
+            startIndex += 4;
+            var newHeaderBytes = new byte[startIndex];
+            Array.Copy(headerBytes, 0, newHeaderBytes, 0, startIndex);
+            _currentMaskIndex = 0;
+
+            for (int index = 0; index < RawFrame.Count; index++)
+            {
+                RawFrame[index] = new ArraySegment<byte>(Mask(RawFrame[index].Array));
+            }
+
+            RawFrame.Insert(0, new ArraySegment<byte>(headerBytes));
         }
 
         private int ProcessFrameHeader(byte[] data)
         {
-            var startIndex = 2;
-            var nibble2 = (byte)(data[0] & 0x0F);
-            var nibble1 = (byte)(data[0] & 0xF0);
+            int startIndex = 2;
+            var nibble2 = (byte) (data[0] & 0x0F);
+            var nibble1 = (byte) (data[0] & 0xF0);
 
             if ((nibble1 & EndBit) == EndBit)
             {
@@ -133,7 +132,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
 
 
             //Combine bytes to form one large number
-            _dataLength = (byte)(data[1] & 0x7F);
+            _dataLength = (byte) (data[1] & 0x7F);
             if (_dataLength == 126)
             {
                 Array.Reverse(data, startIndex, 2);
@@ -156,7 +155,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 startIndex = startIndex + 4;
             }
 
-            _currentFrameOpcode = (OpCode)nibble2;
+            _currentFrameOpcode = (OpCode) nibble2;
             return startIndex;
         }
 
@@ -176,14 +175,14 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 }
 
                 int temp = data.Length;
-                if(_remainingDataLength < Convert.ToUInt64(temp))
+                if (_remainingDataLength < Convert.ToUInt64(temp))
                 {
                     temp = Convert.ToInt32(_remainingDataLength);
                 }
 
-                int currentDataLength = Math.Min(temp, data.Length-startIndex);
+                int currentDataLength = Math.Min(temp, data.Length - startIndex);
                 byte[] payload;
-                if(currentDataLength == data.Length)
+                if (currentDataLength == data.Length)
                 {
                     payload = data;
                 }
@@ -219,31 +218,27 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
 
                 if (_remainingDataLength == 0)
                 {
-                    if(_isEnd)
-                    {
-                        InternalState = DataState.Complete;
-                    }
-                    else
-                    {
-                        InternalState = DataState.Waiting;
-                    }
+                    InternalState = _isEnd ? DataState.Complete : DataState.Waiting;
                 }
-                    
             }
         }
 
         private byte[] Mask(byte[] someBytes, int? mask = null, byte? maskIndex = null)
         {
             if (mask == null)
+            {
                 mask = _currentMask;
+            }
             if (maskIndex == null)
+            {
                 maskIndex = _currentMaskIndex;
+            }
 
             var newBytes = new byte[someBytes.Length];
-            byte[] byteKeys = BitConverter.GetBytes((int)mask);
+            byte[] byteKeys = BitConverter.GetBytes((int) mask);
             for (int index = 0; index < someBytes.Length; index++)
             {
-                newBytes[index] = (byte)(someBytes[index] ^ byteKeys[(byte)maskIndex]);
+                newBytes[index] = (byte) (someBytes[index] ^ byteKeys[(byte) maskIndex]);
                 if (maskIndex == 3)
                 {
                     maskIndex = 0;
@@ -253,7 +248,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                     maskIndex++;
                 }
             }
-            _currentMaskIndex = (byte)maskIndex;
+            _currentMaskIndex = (byte) maskIndex;
             return newBytes;
         }
     }

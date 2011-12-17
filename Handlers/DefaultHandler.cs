@@ -22,8 +22,10 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Net.Sockets;
+using System.Text;
 using Alchemy.Server.Classes;
 using Alchemy.Server.Handlers.WebSocket.hybi00;
+using DataFrame = Alchemy.Server.Handlers.WebSocket.DataFrame;
 
 namespace Alchemy.Server.Handlers
 {
@@ -96,7 +98,7 @@ namespace Alchemy.Server.Handlers
                 {
                     case Protocol.WebSocketHybi00:
                         context.Handler = WebSocketHandler.Instance;
-                        context.UserContext.DataFrame = new DataFrame();
+                        context.UserContext.DataFrame = new WebSocket.hybi00.DataFrame();
                         break;
                     case Protocol.WebSocketHybi10:
                         context.Handler = WebSocket.hybi10.WebSocketHandler.Instance;
@@ -104,7 +106,7 @@ namespace Alchemy.Server.Handlers
                         break;
                     case Protocol.FlashSocket:
                         context.Handler = WebSocketHandler.Instance;
-                        context.UserContext.DataFrame = new DataFrame();
+                        context.UserContext.DataFrame = new WebSocket.hybi00.DataFrame();
                         break;
                     default:
                         context.Header.Protocol = Protocol.None;
@@ -116,7 +118,9 @@ namespace Alchemy.Server.Handlers
                 }
                 else
                 {
-                    context.UserContext.Send(Response.NotImplemented, true);
+                    var dataFrame = (WebSocket.hybi00.DataFrame) context.UserContext.DataFrame.CreateInstance();
+                    dataFrame.AppendDataToFrame(Encoding.UTF8.GetBytes(Response.NotImplemented));
+                    context.UserContext.Send(dataFrame, true);
                 }
             }
         }
@@ -124,10 +128,10 @@ namespace Alchemy.Server.Handlers
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="data">The data.</param>
+        /// <param name="dataFrame">The data.</param>
         /// <param name="context">The user context.</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public override void Send(byte[] data, Context context, bool close = false)
+        public override void Send(DataFrame dataFrame, Context context, bool close = false)
         {
             AsyncCallback callback = EndSend;
             if (close)
@@ -137,7 +141,8 @@ namespace Alchemy.Server.Handlers
             context.SendReady.Wait();
             try
             {
-                context.Connection.Client.BeginSend(data, 0, data.Length, SocketFlags.None, callback, context);
+                context.Connection.Client.BeginSend(dataFrame.GetRaw(), SocketFlags.None, callback,
+                                                    context);
             }
             catch
             {

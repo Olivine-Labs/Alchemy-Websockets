@@ -216,21 +216,38 @@ namespace Alchemy.Server.Classes
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="data">The data.</param>
+        /// <param name="dataFrame">The data.</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public void Send(string data, bool close = false)
+        public void Send(DataFrame dataFrame, bool close = false)
         {
-            Send(Encoding.GetBytes(data), close);
+            dataFrame.Wrap();
+            _context.Handler.Send(dataFrame, _context, close);
         }
 
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="data">The data.</param>
+        /// <param name="aString">The data.</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public void Send(byte[] data, bool close = false)
+        public void Send(String aString, bool close = false)
         {
-            _context.Handler.Send(data, _context, close);
+            DataFrame dataFrame = DataFrame.CreateInstance();
+            dataFrame.AppendStringToFrame(aString);
+            dataFrame.Wrap();
+            _context.Handler.Send(dataFrame, _context, close);
+        }
+
+        /// <summary>
+        /// Sends the specified data.
+        /// </summary>
+        /// <param name="someBytes">The data.</param>
+        /// <param name="close">if set to <c>true</c> [close].</param>
+        public void Send(byte[] someBytes, bool close = false)
+        {
+            DataFrame dataFrame = DataFrame.CreateInstance();
+            dataFrame.AppendDataToFrame(someBytes);
+            dataFrame.Wrap();
+            _context.Handler.Send(dataFrame, _context, close);
         }
 
         /// <summary>
@@ -239,7 +256,9 @@ namespace Alchemy.Server.Classes
         /// <param name="data">The data.</param>
         public void SendRaw(byte[] data)
         {
-            DefaultHandler.Instance.Send(data, _context);
+            DataFrame dataFrame = DataFrame.CreateInstance();
+            dataFrame.AppendDataToFrame(data);
+            DefaultHandler.Instance.Send(dataFrame, _context);
         }
     }
 

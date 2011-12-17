@@ -63,36 +63,11 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
                 context.UserContext.DataFrame.Append(context.Buffer);
                 if (context.UserContext.DataFrame.State == WebSocket.DataFrame.DataState.Complete)
                 {
-                    switch (context.UserContext.DataFrame.Length)
-                    {
-                        case 1:
-                            //Process Command
-                            string command = context.UserContext.DataFrame.ToString();
-                            if (command == context.Server.PingCommand)
-                            {
-                                SendPingResponse(context);
-                                context.Pings++;
-                            }
-                            else
-                            {
-                                context.Pings = 0;
-                                context.UserContext.OnReceive();
-                            }
-                            if ((context.Pings >= context.Server.MaxPingsInSequence) &&
-                                (context.Server.MaxPingsInSequence != 0))
-                            {
-                                context.Dispose();
-                            }
-                            break;
-                        default:
-                            context.Pings = 0;
-                            context.UserContext.OnReceive();
-                            break;
-                    }
+                    context.UserContext.OnReceive();
                 }
                 else if (context.UserContext.DataFrame.State == WebSocket.DataFrame.DataState.Closed)
                 {
-                    context.UserContext.Send(new byte[0], true);
+                    context.UserContext.Send(new DataFrame(), true);
                 }
             }
             else
@@ -125,12 +100,11 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
         /// <summary>
         /// Sends the specified data.
         /// </summary>
-        /// <param name="data">The data.</param>
+        /// <param name="dataFrame">The data.</param>
         /// <param name="context">The user context.</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public override void Send(byte[] data, Context context, bool close = false)
+        public override void Send(WebSocket.DataFrame dataFrame, Context context, bool close = false)
         {
-            byte[] wrappedData = context.UserContext.DataFrame.Wrap(data);
             AsyncCallback callback = EndSend;
             if (close)
             {
@@ -139,7 +113,7 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             context.SendReady.Wait();
             try
             {
-                context.Connection.Client.BeginSend(wrappedData, 0, wrappedData.Length, SocketFlags.None, callback,
+                context.Connection.Client.BeginSend(dataFrame.GetRaw(), SocketFlags.None, callback,
                                                     context);
             }
             catch
@@ -185,15 +159,6 @@ namespace Alchemy.Server.Handlers.WebSocket.hybi10
             }
             context.UserContext.OnSend();
             context.Dispose();
-        }
-
-        /// <summary>
-        /// Sends the ping response.
-        /// </summary>
-        /// <param name="context">The user context.</param>
-        private void SendPingResponse(Context context)
-        {
-            context.UserContext.Send(context.Server.PongCommand);
         }
     }
 }

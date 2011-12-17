@@ -36,7 +36,7 @@ namespace Alchemy.Server.Handlers
         protected static SemaphoreSlim CreateLock = new SemaphoreSlim(1);
         public IWebSocketAuthentication Authentication;
         public abstract void HandleRequest(Context request);
-        public abstract void Send(byte[] data, Context context, bool close = false);
+        public abstract void Send(DataFrame dataFrame, Context context, bool close = false);
         public abstract void EndSend(IAsyncResult result);
         public abstract void EndSendAndClose(IAsyncResult result);
     }

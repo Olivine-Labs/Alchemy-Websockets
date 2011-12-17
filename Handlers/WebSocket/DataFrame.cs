@@ -57,17 +57,18 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// <summary>
         /// The internal byte buffer used to store received data until the entire frame comes through.
         /// </summary>
-        protected List<byte[]> RawFrame = new List<byte[]>();
+        protected List<ArraySegment<byte>> RawFrame = new List<ArraySegment<byte>>();
 
         /// <summary>
         /// Gets the current length of the received frame.
         /// </summary>
         public UInt64 Length
         {
-
             get
             {
-                return RawFrame.Aggregate<byte[], ulong>(0, (current, data) => current + Convert.ToUInt64(data.Length));
+                return RawFrame.Aggregate<ArraySegment<byte>, ulong>(0,
+                                                                     (current, seg) =>
+                                                                     current + Convert.ToUInt64(seg.Count));
             }
         }
 
@@ -79,25 +80,19 @@ namespace Alchemy.Server.Handlers.WebSocket
             get { return InternalState; }
         }
 
+        public abstract DataFrame CreateInstance();
+
+        public List<ArraySegment<byte>> GetRaw()
+        {
+            return RawFrame;
+        }
+
         /// <summary>
         /// Wraps the specified data.
         /// Accepts a string, converts to bytes, sends to the real wrap function.
         /// </summary>
-        /// <param name="data">The data.</param>
         /// <returns></returns>
-        public byte[] Wrap(string data)
-        {
-            byte[] someBytes = Encoding.UTF8.GetBytes(data);
-            return Wrap(someBytes);
-        }
-
-        /// <summary>
-        /// Wraps the specified data in WebSocket Start/End Bytes.
-        /// Accepts a byte array.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        /// <returns>The data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
-        public abstract byte[] Wrap(byte[] data);
+        public abstract void Wrap();
 
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
@@ -114,9 +109,9 @@ namespace Alchemy.Server.Handlers.WebSocket
         public override string ToString()
         {
             var sb = new StringBuilder();
-            foreach(var data in RawFrame)
+            foreach (var data in RawFrame)
             {
-                sb.Append(Encoding.UTF8.GetString(data));
+                sb.Append(Encoding.UTF8.GetString(data.Array));
             }
             return sb.ToString();
         }
@@ -129,7 +124,7 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// </returns>
         public byte[] ToBytes()
         {
-            return  Encoding.UTF8.GetBytes(ToString());
+            return Encoding.UTF8.GetBytes(ToString());
         }
 
         /// <summary>
@@ -145,11 +140,18 @@ namespace Alchemy.Server.Handlers.WebSocket
         /// Appends the data to frame. Manages recreating the byte array and such.
         /// </summary>
         /// <param name="someBytes">Some bytes.</param>
-        /// <param name="start">The start index.</param>
-        /// <param name="end">The end index.</param>
-        protected void AppendDataToFrame(byte[] someBytes)
+        public void AppendDataToFrame(byte[] someBytes)
         {
-            RawFrame.Add(someBytes);
+            RawFrame.Add(new ArraySegment<byte>(someBytes));
+        }
+
+        /// <summary>
+        /// Appends the data to frame. Manages recreating the byte array and such.
+        /// </summary>
+        /// <param name="aString">Some bytes.</param>
+        public void AppendStringToFrame(String aString)
+        {
+            RawFrame.Add(new ArraySegment<byte>(Encoding.UTF8.GetBytes(aString)));
         }
     }
 }

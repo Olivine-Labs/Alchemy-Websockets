@@ -125,9 +125,9 @@ namespace Alchemy.Server.Classes
                 RequestPath = someFields["path"].Captures[0].Value.Trim();
                 Method = someFields["connect"].Captures[0].Value.Trim();
 
-                var version = 0;
+                int version;
                 Int32.TryParse(_fields["sec-websocket-version"], out version);
-                
+
                 // ReSharper restore EmptyGeneralCatchClause
 
                 if (version >= 8)
