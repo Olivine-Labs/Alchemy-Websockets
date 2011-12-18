@@ -1,4 +1,26 @@
-﻿using System;
+﻿/*
+Copyright 2011 Olivine Labs, LLC.
+http://www.olivinelabs.com
+*/
+
+/*
+This file is part of Alchemy Websockets.
+
+Alchemy Websockets is free software: you can redistribute it and/or modify
+it under the terms of the GNU Lesser General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+Alchemy Websockets is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU Lesser General Public License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -53,7 +75,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             }
 
             OpCode = (DataFrame.OpCode) nibble2;
-            byte[] someBytes = new byte[dataBegin];
+            var someBytes = new byte[dataBegin];
             Array.Copy(data, 0, someBytes, 0, dataBegin);
             return someBytes;
         }

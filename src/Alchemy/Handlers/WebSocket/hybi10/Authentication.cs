@@ -22,7 +22,6 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 
 using System;
 using System.Security.Cryptography;
-using System.Threading;
 using Alchemy.Classes;
 
 namespace Alchemy.Handlers.WebSocket.hybi10
@@ -30,28 +29,10 @@ namespace Alchemy.Handlers.WebSocket.hybi10
     /// <summary>
     /// Handles the handshaking between the client and the host, when a new connection is created
     /// </summary>
-    public class WebSocketAuthentication : IWebSocketAuthentication
+    internal class Authentication : Handlers.Authentication, IWebSocketAuthentication
     {
         public static string Origin = string.Empty;
         public static string Location = string.Empty;
-        private static readonly SemaphoreSlim CreateLock = new SemaphoreSlim(1);
-        private static WebSocketAuthentication _instance;
-
-        private WebSocketAuthentication() {}
-
-        public static WebSocketAuthentication Instance
-        {
-            get
-            {
-                CreateLock.Wait();
-                if (_instance == null)
-                {
-                    _instance = new WebSocketAuthentication();
-                }
-                CreateLock.Release();
-                return _instance;
-            }
-        }
 
         #region IWebSocketAuthentication Members
 
@@ -65,7 +46,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             Location = location;
         }
 
-        public bool CheckHandshake(Context context)
+        #endregion
+
+        protected override bool CheckAuthentication(Context context)
         {
             if (context.ReceivedByteCount > 8)
             {
@@ -99,8 +82,6 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             return false;
         }
 
-        #endregion
-
         private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake, Context context)
         {
             var responseHandshake = new ServerHandshake {Accept = GenerateAccept(handshake.Key, context)};
@@ -112,7 +93,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             // generate a byte array representation of the handshake including the answer to the challenge
             string temp = handshake.ToString();
             byte[] handshakeBytes = context.UserContext.Encoding.GetBytes(temp);
-            context.UserContext.SendRaw(handshakeBytes);
+            context.UserContext.Send(handshakeBytes, true);
         }
 
         private static string GenerateAccept(string key, Context context)

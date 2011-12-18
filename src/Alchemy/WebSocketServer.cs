@@ -70,14 +70,6 @@ namespace Alchemy
 
         public int MaxPingsInSequence;
 
-
-        /// <summary>
-        /// These are the command strings that the server and client will filter out and treat as heartbeats.
-        /// </summary>
-        public string PingCommand = "7";
-
-        public string PongCommand = "7";
-
         /// <summary>
         /// Configuration for the above heartbeat setup.
         /// TimeOut : How long until a connection drops when it doesn't receive anything.
@@ -111,7 +103,7 @@ namespace Alchemy
             set
             {
                 _originHost = value;
-                WebSocketAuthentication.Origin = value;
+                Authentication.Origin = value;
             }
         }
 
@@ -127,7 +119,7 @@ namespace Alchemy
             set
             {
                 _destinationHost = value;
-                WebSocketAuthentication.Location = value;
+                Authentication.Location = value;
             }
         }
 

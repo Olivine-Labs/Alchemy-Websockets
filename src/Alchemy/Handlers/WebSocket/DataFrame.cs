@@ -94,6 +94,7 @@ namespace Alchemy.Handlers.WebSocket
         public DataState State
         {
             get { return InternalState; }
+            set { InternalState = value; }
         }
 
         public abstract DataFrame CreateInstance();
@@ -139,7 +140,7 @@ namespace Alchemy.Handlers.WebSocket
         {
             var sb = new StringBuilder();
             List<ArraySegment<Byte>> list = AsRaw();
-            foreach(var item in list)
+            foreach (var item in list)
             {
                 sb.Append(Encoding.UTF8.GetString(item.Array));
             }

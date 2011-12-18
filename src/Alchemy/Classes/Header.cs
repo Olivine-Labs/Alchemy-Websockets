@@ -34,8 +34,7 @@ namespace Alchemy.Classes
     {
         None = -1,
         WebSocketHybi10 = 0,
-        WebSocketHybi00 = 1,
-        FlashSocket = 2
+        WebSocketHybi00 = 1
     }
 
     /// <summary>
@@ -130,31 +129,7 @@ namespace Alchemy.Classes
 
                 // ReSharper restore EmptyGeneralCatchClause
 
-                if (version >= 8)
-                {
-                    Protocol = Protocol.WebSocketHybi10;
-                }
-                else
-                {
-                    string[] pathExplode = RequestPath.Split('/');
-                    string protocolString = string.Empty;
-                    if (pathExplode.Length > 0)
-                    {
-                        protocolString = pathExplode[pathExplode.Length - 1].ToLower().Trim();
-                    }
-                    switch (protocolString)
-                    {
-                        case "websocket":
-                            Protocol = Protocol.WebSocketHybi00;
-                            break;
-                        case "flashsocket":
-                            Protocol = Protocol.FlashSocket;
-                            break;
-                        default:
-                            Protocol = Protocol.None;
-                            break;
-                    }
-                }
+                Protocol = version < 8 ? Protocol.WebSocketHybi00 : Protocol.WebSocketHybi10;
             }
                 // ReSharper disable EmptyGeneralCatchClause
             catch

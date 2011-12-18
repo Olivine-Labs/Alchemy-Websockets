@@ -20,14 +20,12 @@ You should have received a copy of the GNU Lesser General Public License
 along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-namespace Alchemy.Handlers.WebSocket
+using Alchemy.Classes;
+
+namespace Alchemy.Handlers
 {
-    /// <summary>
-    /// Handles the handshaking between the client and the host, when a new connection is created
-    /// </summary>
-    internal interface IWebSocketAuthentication : IAuthentication
+    internal interface IAuthentication
     {
-        void SetOrigin(string origin);
-        void SetLocation(string location);
+        void Authenticate(Context context);
     }
 }

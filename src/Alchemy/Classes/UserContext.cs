@@ -217,45 +217,37 @@ namespace Alchemy.Classes
         /// Sends the specified data.
         /// </summary>
         /// <param name="dataFrame">The data.</param>
+        /// <param name="raw">Whether or not to send raw data</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public void Send(DataFrame dataFrame, bool close = false)
+        public void Send(DataFrame dataFrame, bool raw = false, bool close = false)
         {
-            _context.Handler.Send(dataFrame, _context, close);
+            _context.Handler.Send(dataFrame, _context, raw, close);
         }
 
         /// <summary>
         /// Sends the specified data.
         /// </summary>
         /// <param name="aString">The data.</param>
+        /// <param name="raw">whether or not to send raw data</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public void Send(String aString, bool close = false)
+        public void Send(String aString, bool raw = false, bool close = false)
         {
             DataFrame dataFrame = DataFrame.CreateInstance();
             dataFrame.Append(aString);
-            _context.Handler.Send(dataFrame, _context, close);
+            _context.Handler.Send(dataFrame, _context, raw, close);
         }
 
         /// <summary>
         /// Sends the specified data.
         /// </summary>
         /// <param name="someBytes">The data.</param>
+        /// <param name="raw">whether or not to send raw data</param>
         /// <param name="close">if set to <c>true</c> [close].</param>
-        public void Send(byte[] someBytes, bool close = false)
+        public void Send(byte[] someBytes, bool raw = false, bool close = false)
         {
             DataFrame dataFrame = DataFrame.CreateInstance();
             dataFrame.Append(someBytes);
-            _context.Handler.Send(dataFrame, _context, close);
-        }
-
-        /// <summary>
-        /// Sends raw data.
-        /// </summary>
-        /// <param name="data">The data.</param>
-        public void SendRaw(byte[] data)
-        {
-            DataFrame dataFrame = DataFrame.CreateInstance();
-            dataFrame.Append(data);
-            DefaultHandler.Instance.Send(dataFrame, _context);
+            _context.Handler.Send(dataFrame, _context, raw, close);
         }
     }
 
@@ -287,7 +279,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// The current connection handler.
         /// </summary>
-        public Handler Handler = DefaultHandler.Instance;
+        public Handler Handler = Handler.Instance;
 
         /// <summary>
         /// The Header

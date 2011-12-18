@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using NUnit.Framework;
 
 namespace Alchemy.Handlers.WebSocket.hybi10
@@ -9,7 +8,8 @@ namespace Alchemy.Handlers.WebSocket.hybi10
     [TestFixture]
     public class DataFrameTest
     {
-        private Alchemy.Handlers.WebSocket.hybi10.DataFrame _dataframe = null;
+        #region Setup/Teardown
+
         [SetUp]
         public void SetUp()
         {
@@ -22,20 +22,40 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             _dataframe = null;
         }
 
-        [Test]
-        public void BackAndForthSmall()
+        #endregion
+
+        private DataFrame _dataframe;
+
+        public void TestBackAndForth()
         {
-            byte[] testData = GenerateRandomArray(50);
-            _dataframe.Append(testData);
-            TestBackAndForth();
+            List<ArraySegment<byte>> tempList = _dataframe.AsRaw();
+            List<ArraySegment<byte>> originalList =
+                tempList.Select(item => new ArraySegment<byte>((byte[]) item.Array.Clone())).ToList();
+            _dataframe.AsFrame();
+
+            List<ArraySegment<byte>> list = _dataframe.AsRaw();
+
+            Assert.AreEqual(list.Count, originalList.Count);
+            for (int index = 0; index < list.Count; index++)
+            {
+                for (int index2 = 0; index2 < list[index].Array.Length; index2++)
+                {
+                    Assert.AreEqual(((originalList[index])).Array[index2], list[index].Array[index2]);
+                }
+            }
         }
 
-        [Test]
-        public void BackAndForthMedium()
+        public static byte[] GenerateRandomArray(int nbOfRows)
         {
-            byte[] testData = GenerateRandomArray(10000);
-            _dataframe.Append(testData);
-            TestBackAndForth();
+            const int minNumber = 0x0;
+            const int maxNumber = 0xff;
+            var randomNumber = new Random();
+            var newarray = new byte[nbOfRows];
+            for (int row = 0; row < nbOfRows; row++)
+            {
+                newarray[row] = (byte) randomNumber.Next(minNumber, maxNumber);
+            }
+            return newarray;
         }
 
         [Test]
@@ -52,33 +72,20 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             TestBackAndForth();
         }
 
-        public void TestBackAndForth()
+        [Test]
+        public void BackAndForthMedium()
         {
-            List<ArraySegment<byte>> tempList = _dataframe.AsRaw();
-            List<ArraySegment<byte>> originalList = tempList.Select(item => new ArraySegment<byte>((byte[]) item.Array.Clone())).ToList();
-            _dataframe.AsFrame();
-
-            List<ArraySegment<byte>> list = _dataframe.AsRaw();
-
-            Assert.AreEqual(list.Count, originalList.Count);
-            for (int index = 0; index < list.Count; index++)
-            {
-                for (int index2 = 0; index2 < list[index].Array.Length; index2++)
-                {
-                    Assert.AreEqual(((ArraySegment<byte>)(originalList[index])).Array[index2], list[index].Array[index2]);
-                }
-            }
+            byte[] testData = GenerateRandomArray(10000);
+            _dataframe.Append(testData);
+            TestBackAndForth();
         }
 
-        public static byte[] GenerateRandomArray(int nbOfRows)
+        [Test]
+        public void BackAndForthSmall()
         {
-              const int minNumber = 0x0;
-              const int maxNumber = 0xff;
-              Random randomNumber = new Random();
-              byte[] newarray = new byte[nbOfRows];
-              for (int row = 0; row < nbOfRows; row++)
-                newarray[row] = (byte)randomNumber.Next(minNumber,maxNumber);
-              return newarray;
+            byte[] testData = GenerateRandomArray(50);
+            _dataframe.Append(testData);
+            TestBackAndForth();
         }
     }
 }

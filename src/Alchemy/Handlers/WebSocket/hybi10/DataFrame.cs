@@ -63,6 +63,12 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             if (Format == DataFormat.Raw)
             {
                 _header.PayloadSize = Length;
+                switch (State)
+                {
+                    case DataState.Pong:
+                        _header.OpCode = OpCode.Pong;
+                        break;
+                }
                 byte[] headerBytes = _header.ToBytes();
                 Mask();
                 Payload.Insert(0, new ArraySegment<byte>(headerBytes));
@@ -120,10 +126,13 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 UInt64 dataLength;
                 if (InternalState == DataState.Empty)
                 {
-                    var headerBytes = _header.FromBytes(someBytes);
+                    byte[] headerBytes = _header.FromBytes(someBytes);
                     Payload.Add(new ArraySegment<byte>(headerBytes));
                     int dataStart = headerBytes.Length;
-                    data = new byte[Math.Min(Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, int.MaxValue)), someBytes.Length)];
+                    data =
+                        new byte[
+                            Math.Min(Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, int.MaxValue)),
+                                     someBytes.Length)];
                     dataLength = Math.Min(_header.PayloadSizeRemaining, Convert.ToUInt64(someBytes.Length - dataStart));
                     Array.Copy(someBytes, dataStart, data, 0, Convert.ToInt32(dataLength));
                     Format = DataFormat.Frame;

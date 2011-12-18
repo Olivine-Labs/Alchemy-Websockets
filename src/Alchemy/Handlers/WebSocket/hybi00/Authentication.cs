@@ -23,7 +23,6 @@ along with Alchemy Websockets.  If not, see <http://www.gnu.org/licenses/>.
 using System;
 using System.Linq;
 using System.Security.Cryptography;
-using System.Threading;
 using Alchemy.Classes;
 
 namespace Alchemy.Handlers.WebSocket.hybi00
@@ -31,31 +30,10 @@ namespace Alchemy.Handlers.WebSocket.hybi00
     /// <summary>
     /// Handles the handshaking between the client and the host, when a new connection is created
     /// </summary>
-    public class WebSocketAuthentication : IWebSocketAuthentication
+    internal class Authentication : Handlers.Authentication
     {
         public static string Origin = string.Empty;
         public static string Location = string.Empty;
-
-        private static readonly SemaphoreSlim CreateLock = new SemaphoreSlim(1);
-        private static WebSocketAuthentication _instance;
-
-        private WebSocketAuthentication() {}
-
-        public static WebSocketAuthentication Instance
-        {
-            get
-            {
-                CreateLock.Wait();
-                if (_instance == null)
-                {
-                    _instance = new WebSocketAuthentication();
-                }
-                CreateLock.Release();
-                return _instance;
-            }
-        }
-
-        #region IWebSocketAuthentication Members
 
         public void SetOrigin(string origin)
         {
@@ -67,7 +45,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             Location = location;
         }
 
-        public bool CheckHandshake(Context context)
+        protected override bool CheckAuthentication(Context context)
         {
             if (context.ReceivedByteCount > 8)
             {
@@ -102,8 +80,6 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             return false;
         }
 
-        #endregion
-
         private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake)
         {
             var responseHandshake = new ServerHandshake
@@ -123,7 +99,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             byte[] handshakeBytes = context.UserContext.Encoding.GetBytes(handshake.ToString());
             Array.Copy(handshake.AnswerBytes, 0, handshakeBytes, handshakeBytes.Length - 16, 16);
 
-            context.UserContext.SendRaw(handshakeBytes);
+            context.UserContext.Send(handshakeBytes, true);
         }
 
         private static byte[] TranslateKey(string key)
