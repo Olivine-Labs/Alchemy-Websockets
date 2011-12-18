@@ -52,6 +52,7 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Handlers\WebSocket\hybi00\DataFrame.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\DataFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

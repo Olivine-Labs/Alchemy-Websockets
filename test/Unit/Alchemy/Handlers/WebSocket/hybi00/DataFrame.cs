@@ -4,12 +4,12 @@ using System.Linq;
 using System.Text;
 using NUnit.Framework;
 
-namespace Alchemy.Handlers.WebSocket.hybi10
+namespace Alchemy.Handlers.WebSocket.hybi00
 {
     [TestFixture]
     public class DataFrameTest
     {
-        private Alchemy.Handlers.WebSocket.hybi10.DataFrame _dataframe = null;
+        private Alchemy.Handlers.WebSocket.hybi00.DataFrame _dataframe = null;
         [SetUp]
         public void SetUp()
         {
