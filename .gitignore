@@ -1,0 +1,8 @@
+*.userprefs
+*ReSharper*
+bin/*
+obj/*
+test/Unit/Alchemy/bin
+test/Unit/Alchemy/obj
+src/Alchemy/obj
+src/Alchemy/bin
