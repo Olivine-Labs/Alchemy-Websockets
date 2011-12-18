@@ -63,8 +63,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             if (Format == DataFormat.Raw)
             {
                 _header.PayloadSize = Length;
+                byte[] headerBytes = _header.ToBytes();
                 Mask();
-                Payload.Insert(0, new ArraySegment<byte>(_header.ToBytes()));
+                Payload.Insert(0, new ArraySegment<byte>(headerBytes));
                 Format = DataFormat.Frame;
             }
             return Payload;
@@ -120,24 +121,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 if (InternalState == DataState.Empty)
                 {
                     int dataStart = _header.FromBytes(someBytes);
-                    data = new byte[someBytes.Length - dataStart];
+                    data = new byte[Math.Min(Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, int.MaxValue)), someBytes.Length)];
                     dataLength = Math.Min(_header.PayloadSizeRemaining, Convert.ToUInt64(someBytes.Length - dataStart));
                     Array.Copy(someBytes, dataStart, data, 0, Convert.ToInt32(dataLength));
-
-                    switch (_header.OpCode)
-                    {
-                        case OpCode.Close:
-                            InternalState = DataState.Closed;
-                            break;
-                        case OpCode.Ping:
-                            InternalState = DataState.Ping;
-                            break;
-                        case OpCode.Pong:
-                            InternalState = DataState.Pong;
-                            break;
-                    }
-
-                    InternalState = DataState.Receiving;
                     Format = DataFormat.Frame;
                 }
                 else
@@ -149,10 +135,22 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                         Array.Copy(someBytes, 0, data, 0, Convert.ToInt32(dataLength));
                     }
                 }
+
                 _header.PayloadSizeRemaining -= dataLength;
-                if (_header.PayloadSizeRemaining == 0)
+                switch (_header.OpCode)
                 {
-                    InternalState = DataState.Complete;
+                    case OpCode.Close:
+                        InternalState = DataState.Closed;
+                        break;
+                    case OpCode.Ping:
+                        InternalState = DataState.Ping;
+                        break;
+                    case OpCode.Pong:
+                        InternalState = DataState.Pong;
+                        break;
+                    default:
+                        InternalState = _header.PayloadSizeRemaining == 0 ? DataState.Complete : DataState.Receiving;
+                        break;
                 }
             }
             else

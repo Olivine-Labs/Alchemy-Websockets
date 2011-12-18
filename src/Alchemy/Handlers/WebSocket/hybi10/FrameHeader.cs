@@ -96,8 +96,8 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             }
 
             var random = new Random();
-            int mask = random.Next(Int32.MaxValue);
-            headerBytes.Add(BitConverter.GetBytes(mask));
+            Mask = random.Next(Int32.MaxValue);
+            headerBytes.Add(BitConverter.GetBytes(Mask));
             return headerBytes.SelectMany(a => a).ToArray();
         }
     }
