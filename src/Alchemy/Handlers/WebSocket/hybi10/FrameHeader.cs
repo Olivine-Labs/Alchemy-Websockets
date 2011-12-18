@@ -16,7 +16,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
         public UInt64 PayloadSize;
         public UInt64 PayloadSizeRemaining;
 
-        public int FromBytes(byte[] data)
+        public byte[] FromBytes(byte[] data)
         {
             int dataBegin = 2;
             var nibble2 = (byte) (data[0] & 0x0F);
@@ -53,7 +53,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             }
 
             OpCode = (DataFrame.OpCode) nibble2;
-            return dataBegin;
+            byte[] someBytes = new byte[dataBegin];
+            Array.Copy(data, 0, someBytes, 0, dataBegin);
+            return someBytes;
         }
 
         public byte[] ToBytes()

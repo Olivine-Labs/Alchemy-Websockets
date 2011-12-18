@@ -120,7 +120,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 UInt64 dataLength;
                 if (InternalState == DataState.Empty)
                 {
-                    int dataStart = _header.FromBytes(someBytes);
+                    var headerBytes = _header.FromBytes(someBytes);
+                    Payload.Add(new ArraySegment<byte>(headerBytes));
+                    int dataStart = headerBytes.Length;
                     data = new byte[Math.Min(Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, int.MaxValue)), someBytes.Length)];
                     dataLength = Math.Min(_header.PayloadSizeRemaining, Convert.ToUInt64(someBytes.Length - dataStart));
                     Array.Copy(someBytes, dataStart, data, 0, Convert.ToInt32(dataLength));

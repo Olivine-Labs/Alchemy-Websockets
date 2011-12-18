@@ -134,5 +134,16 @@ namespace Alchemy.Handlers.WebSocket
         /// <param name="someBytes">Some data.</param>
         /// /// <param name="asFrame">For internal use inside alchemy.</param>
         public abstract void Append(byte[] someBytes, bool asFrame = false);
+
+        public override string ToString()
+        {
+            var sb = new StringBuilder();
+            List<ArraySegment<Byte>> list = AsRaw();
+            foreach(var item in list)
+            {
+                sb.Append(Encoding.UTF8.GetString(item.Array));
+            }
+            return sb.ToString();
+        }
     }
 }
