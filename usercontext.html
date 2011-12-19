@@ -2,708 +2,711 @@
 layout: default
 title: UserContext Documentation
 ---
-<h1>Alchemy Websockets</h1>
 
-<h2>UserContext</h2>
+<div class="well">
+  <h1>Alchemy Websockets</h1>
 
-<p>
-  The UserContext object holds the connection information for a given connection.
-  It also provides methods for interacting with the connection, such as sending
-  data or forcing a closed connection.
-</p>
+  <h2>UserContext</h2>
 
-<div class="contents">
-<!-- doxytag: class="Alchemy::Server::Classes::UserContext" -->
-<p>Contains data we will export to the Event Delegates.  
- <a href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#details">More...</a></p>
+  <p>
+    The UserContext object holds the connection information for a given connection.
+    It also provides methods for interacting with the connection, such as sending
+    data or forcing a closed connection.
+  </p>
 
-<p><a href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context-members.html">List of all members.</a></p>
-<table class="memberdecls">
-<tbody><tr><td colspan="2"><h2><a name="pub-methods"></a>
-Public Member Functions</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1f443471b8e848e66e97c57d24241df5">UserContext</a> (<a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html">Context</a> AContext)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html" title="Contains data we will export to the Event Delegates.">UserContext</a> class.  <a href="./docs/#a1f443471b8e848e66e97c57d24241df5"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1e922fdb44b00347af802c3e26932988">OnConnect</a> ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [connect].  <a href="./docs/#a1e922fdb44b00347af802c3e26932988"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a98bda1ba88a98bfd8b46d1a6f7547c91">OnConnected</a> ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [connected].  <a href="./docs/#a98bda1ba88a98bfd8b46d1a6f7547c91"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a066cba6e05202a179fcca50dd6f0acbe">OnDisconnect</a> ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [disconnect].  <a href="./docs/#a066cba6e05202a179fcca50dd6f0acbe"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ab64f7b27b07942b5ac0e6478fb34dd61">OnSend</a> ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [send].  <a href="./docs/#ab64f7b27b07942b5ac0e6478fb34dd61"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a60f625a4cb02819e0d151230bf90a846">OnReceive</a> ()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [receive].  <a href="./docs/#a60f625a4cb02819e0d151230bf90a846"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7e1766a0caff57ba9eac13a1475b69bd">SetOnConnect</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on connect event.  <a href="./docs/#a7e1766a0caff57ba9eac13a1475b69bd"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7d7da818e61aeb581e50ae27a02e8742">SetOnConnected</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on connected event.  <a href="./docs/#a7d7da818e61aeb581e50ae27a02e8742"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a8e2e4ede3510f07d702e4472a3016278">SetOnDisconnect</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on disconnect event.  <a href="./docs/#a8e2e4ede3510f07d702e4472a3016278"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a3523ef4560854a044d557937aefea4d2">SetOnSend</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on send event.  <a href="./docs/#a3523ef4560854a044d557937aefea4d2"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ace9378592d72c68085aa4d8ebbe42238">SetOnReceive</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on receive event.  <a href="./docs/#ace9378592d72c68085aa4d8ebbe42238"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a46f114dca0a1e5cc8773800a69575c25">Send</a> (string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Data</a>, bool Close=false)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends the specified data.  <a href="./docs/#a46f114dca0a1e5cc8773800a69575c25"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a774cf56516f213cbfffd65eac791208a">Send</a> (byte[] <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Data</a>, bool Close=false)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends the specified data.  <a href="./docs/#a774cf56516f213cbfffd65eac791208a"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a75d65edf8d1286d175eff4f70534e64e">SendRaw</a> (byte[] <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Data</a>)</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends raw data.  <a href="./docs/#a75d65edf8d1286d175eff4f70534e64e"></a><br></td></tr>
-<tr><td colspan="2"><h2><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1_data_frame.html">Alchemy.Server.Handlers.WebSocket.DataFrame</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#af4ab034d722236d3169796ea5ba9d7ac">DataFrame</a> = null</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The data Frame that this client is currently processing.  <a href="./docs/#af4ab034d722236d3169796ea5ba9d7ac"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">UTF8Encoding&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ae63669d547e36a14d6b569092733e899">Encoding</a> = new UTF8Encoding()</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">What character encoding to use.  <a href="./docs/#ae63669d547e36a14d6b569092733e899"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">Object&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Data</a> = null</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">User defined data. Can be anything.  <a href="./docs/#aa3ecdf7e172bf06c879f30d1b4ab1886"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a6f827721424a145960c5bae387191d92">RequestPath</a> = "/"</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The path of this request.  <a href="./docs/#a6f827721424a145960c5bae387191d92"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">EndPoint&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a59b59169c1532ec98bdb3e421d20460c">ClientAddress</a> = null</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The remote endpoint address.  <a href="./docs/#a59b59169c1532ec98bdb3e421d20460c"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server_1_1_classes.html#ad94f802a0292b339989bf84226ad1ec1">Protocol</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7415d669954a1ad139c8cc6e3b2fb3a0">Protocol</a> = Protocol.None</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The type of connection this is.  <a href="./docs/#a7415d669954a1ad139c8cc6e3b2fb3a0"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top">readonly <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_header.html">Header</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa39afdbff9c96642f2a92eb3af15a549">Header</a></td></tr>
-<tr><td colspan="2"><h2><a name="pro-attribs"></a>
-Protected Attributes</h2></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a30a4fc57819a9af3bd720155cf95f932">_OnConnect</a> = (x) =&gt; { }</td></tr>
-<tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">OnEvent Delegates specific to this connection.  <a href="./docs/#a30a4fc57819a9af3bd720155cf95f932"></a><br></td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aca2b261d897c89553235c3009ded3ea1">_OnConnected</a> = (x) =&gt; { }</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a9769806d6eac118c7f40bb1bfb2d2824">_OnDisconnect</a> = (x) =&gt; { }</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a07ec4152aa2b64a585cba1ccece81435">_OnReceive</a> = (x) =&gt; { }</td></tr>
-<tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a060cc740c10fe3df85e68f932b420931">_OnSend</a> = (x) =&gt; { }</td></tr>
-</tbody></table>
-<hr><a name="details" id="details"></a><h2>Detailed Description</h2>
-<div class="textblock"><p>Contains data we will export to the Event Delegates. </p>
+  <div class="contents">
+  <!-- doxytag: class="Alchemy::Server::Classes::UserContext" -->
+  <p>Contains data we will export to the Event Delegates.  
+   <a href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#details">More...</a></p>
 
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00035">35</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-</div><hr><h2>Constructor &amp; Destructor Documentation</h2>
-<a class="anchor" id="a1f443471b8e848e66e97c57d24241df5"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::UserContext" ref="a1f443471b8e848e66e97c57d24241df5" args="(Context AContext)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1f443471b8e848e66e97c57d24241df5">Alchemy.Server.Classes.UserContext.UserContext</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html">Context</a>&nbsp;</td>
-          <td class="paramname"><em>AContext</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Initializes a new instance of the <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html" title="Contains data we will export to the Event Delegates.">UserContext</a> class. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">context</td><td>The user context.</td></tr>
+  <p><a href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context-members.html">List of all members.</a></p>
+  <table class="memberdecls">
+  <tbody><tr><td colspan="2"><h2><a name="pub-methods"></a>
+  Public Member Functions</h2></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1f443471b8e848e66e97c57d24241df5">UserContext</a> (<a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html">Context</a> AContext)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Initializes a new instance of the <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html" title="Contains data we will export to the Event Delegates.">UserContext</a> class.  <a href="./docs/#a1f443471b8e848e66e97c57d24241df5"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1e922fdb44b00347af802c3e26932988">OnConnect</a> ()</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [connect].  <a href="./docs/#a1e922fdb44b00347af802c3e26932988"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a98bda1ba88a98bfd8b46d1a6f7547c91">OnConnected</a> ()</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [connected].  <a href="./docs/#a98bda1ba88a98bfd8b46d1a6f7547c91"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a066cba6e05202a179fcca50dd6f0acbe">OnDisconnect</a> ()</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [disconnect].  <a href="./docs/#a066cba6e05202a179fcca50dd6f0acbe"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ab64f7b27b07942b5ac0e6478fb34dd61">OnSend</a> ()</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [send].  <a href="./docs/#ab64f7b27b07942b5ac0e6478fb34dd61"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a60f625a4cb02819e0d151230bf90a846">OnReceive</a> ()</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Called when [receive].  <a href="./docs/#a60f625a4cb02819e0d151230bf90a846"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7e1766a0caff57ba9eac13a1475b69bd">SetOnConnect</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on connect event.  <a href="./docs/#a7e1766a0caff57ba9eac13a1475b69bd"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7d7da818e61aeb581e50ae27a02e8742">SetOnConnected</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on connected event.  <a href="./docs/#a7d7da818e61aeb581e50ae27a02e8742"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a8e2e4ede3510f07d702e4472a3016278">SetOnDisconnect</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on disconnect event.  <a href="./docs/#a8e2e4ede3510f07d702e4472a3016278"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a3523ef4560854a044d557937aefea4d2">SetOnSend</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on send event.  <a href="./docs/#a3523ef4560854a044d557937aefea4d2"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ace9378592d72c68085aa4d8ebbe42238">SetOnReceive</a> (<a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> ADelegate)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sets the on receive event.  <a href="./docs/#ace9378592d72c68085aa4d8ebbe42238"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a46f114dca0a1e5cc8773800a69575c25">Send</a> (string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Data</a>, bool Close=false)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends the specified data.  <a href="./docs/#a46f114dca0a1e5cc8773800a69575c25"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a774cf56516f213cbfffd65eac791208a">Send</a> (byte[] <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Data</a>, bool Close=false)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends the specified data.  <a href="./docs/#a774cf56516f213cbfffd65eac791208a"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">void&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a75d65edf8d1286d175eff4f70534e64e">SendRaw</a> (byte[] <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Data</a>)</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">Sends raw data.  <a href="./docs/#a75d65edf8d1286d175eff4f70534e64e"></a><br></td></tr>
+  <tr><td colspan="2"><h2><a name="pub-attribs"></a>
+  Public Attributes</h2></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1_data_frame.html">Alchemy.Server.Handlers.WebSocket.DataFrame</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#af4ab034d722236d3169796ea5ba9d7ac">DataFrame</a> = null</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The data Frame that this client is currently processing.  <a href="./docs/#af4ab034d722236d3169796ea5ba9d7ac"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">UTF8Encoding&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ae63669d547e36a14d6b569092733e899">Encoding</a> = new UTF8Encoding()</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">What character encoding to use.  <a href="./docs/#ae63669d547e36a14d6b569092733e899"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">Object&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Data</a> = null</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">User defined data. Can be anything.  <a href="./docs/#aa3ecdf7e172bf06c879f30d1b4ab1886"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">string&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a6f827721424a145960c5bae387191d92">RequestPath</a> = "/"</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The path of this request.  <a href="./docs/#a6f827721424a145960c5bae387191d92"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">EndPoint&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a59b59169c1532ec98bdb3e421d20460c">ClientAddress</a> = null</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The remote endpoint address.  <a href="./docs/#a59b59169c1532ec98bdb3e421d20460c"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server_1_1_classes.html#ad94f802a0292b339989bf84226ad1ec1">Protocol</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7415d669954a1ad139c8cc6e3b2fb3a0">Protocol</a> = Protocol.None</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">The type of connection this is.  <a href="./docs/#a7415d669954a1ad139c8cc6e3b2fb3a0"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top">readonly <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_header.html">Header</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa39afdbff9c96642f2a92eb3af15a549">Header</a></td></tr>
+  <tr><td colspan="2"><h2><a name="pro-attribs"></a>
+  Protected Attributes</h2></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a30a4fc57819a9af3bd720155cf95f932">_OnConnect</a> = (x) =&gt; { }</td></tr>
+  <tr><td class="mdescLeft">&nbsp;</td><td class="mdescRight">OnEvent Delegates specific to this connection.  <a href="./docs/#a30a4fc57819a9af3bd720155cf95f932"></a><br></td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aca2b261d897c89553235c3009ded3ea1">_OnConnected</a> = (x) =&gt; { }</td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a9769806d6eac118c7f40bb1bfb2d2824">_OnDisconnect</a> = (x) =&gt; { }</td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a07ec4152aa2b64a585cba1ccece81435">_OnReceive</a> = (x) =&gt; { }</td></tr>
+  <tr><td class="memItemLeft" align="right" valign="top"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td><td class="memItemRight" valign="bottom"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a060cc740c10fe3df85e68f932b420931">_OnSend</a> = (x) =&gt; { }</td></tr>
   </tbody></table>
-  </dd>
-</dl>
+  <hr><a name="details" id="details"></a><h2>Detailed Description</h2>
+  <div class="textblock"><p>Contains data we will export to the Event Delegates. </p>
 
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00080">80</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            this.Context = AContext;
-            this.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa39afdbff9c96642f2a92eb3af15a549">Header</a> = this.Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a44341764af3e939a4e37efc6f06a7ee6" title="The Header.">Header</a>;
-        }
-</pre></div>
-</div>
-</div>
-<hr><h2>Member Function Documentation</h2>
-<a class="anchor" id="a1e922fdb44b00347af802c3e26932988"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnConnect" ref="a1e922fdb44b00347af802c3e26932988" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1e922fdb44b00347af802c3e26932988">Alchemy.Server.Classes.UserContext.OnConnect</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Called when [connect]. </p>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00089">89</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <span class="keywordflow">try</span>
-            {
-                <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a30a4fc57819a9af3bd720155cf95f932" title="OnEvent Delegates specific to this connection.">_OnConnect</a>(<span class="keyword">this</span>);
-            }
-            <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnConnect"</span>, e); }
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a98bda1ba88a98bfd8b46d1a6f7547c91"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnConnected" ref="a98bda1ba88a98bfd8b46d1a6f7547c91" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a98bda1ba88a98bfd8b46d1a6f7547c91">Alchemy.Server.Classes.UserContext.OnConnected</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Called when [connected]. </p>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00101">101</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <span class="keywordflow">try</span>
-            {
-                <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aca2b261d897c89553235c3009ded3ea1">_OnConnected</a>(<span class="keyword">this</span>);
-            }
-            <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnConnected"</span>, e); }
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a066cba6e05202a179fcca50dd6f0acbe"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnDisconnect" ref="a066cba6e05202a179fcca50dd6f0acbe" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a066cba6e05202a179fcca50dd6f0acbe">Alchemy.Server.Classes.UserContext.OnDisconnect</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Called when [disconnect]. </p>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00113">113</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <span class="keywordflow">try</span>
-            {
-                Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a730ebc924f291ae91ef40c558d54ed7a" title="Whether or not the TCPClient is still connected.">Connected</a> = <span class="keyword">false</span>;
-                <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a9769806d6eac118c7f40bb1bfb2d2824">_OnDisconnect</a>(<span class="keyword">this</span>);
-            }
-            <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnDisconnect"</span>, e); }
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a60f625a4cb02819e0d151230bf90a846"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnReceive" ref="a60f625a4cb02819e0d151230bf90a846" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a60f625a4cb02819e0d151230bf90a846">Alchemy.Server.Classes.UserContext.OnReceive</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Called when [receive]. </p>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00138">138</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <span class="keywordflow">try</span>
-            {
-                <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a07ec4152aa2b64a585cba1ccece81435">_OnReceive</a>(<span class="keyword">this</span>);
-            }
-            <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnReceive"</span>, e); }
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="ab64f7b27b07942b5ac0e6478fb34dd61"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnSend" ref="ab64f7b27b07942b5ac0e6478fb34dd61" args="()" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ab64f7b27b07942b5ac0e6478fb34dd61">Alchemy.Server.Classes.UserContext.OnSend</a> </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Called when [send]. </p>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00126">126</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <span class="keywordflow">try</span>
-            {
-                <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a060cc740c10fe3df85e68f932b420931">_OnSend</a>(<span class="keyword">this</span>);
-            }
-            <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnSend"</span>, e); }
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a46f114dca0a1e5cc8773800a69575c25"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Send" ref="a46f114dca0a1e5cc8773800a69575c25" args="(string Data, bool Close=false)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a46f114dca0a1e5cc8773800a69575c25">Alchemy.Server.Classes.UserContext.Send</a> </td>
-          <td>(</td>
-          <td class="paramtype">string&nbsp;</td>
-          <td class="paramname"><em>Data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&nbsp;</td>
-          <td class="paramname"><em>Close</em> = <code>false</code>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Sends the specified data. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">data</td><td>The data.</td></tr>
-    <tr><td class="paramname">close</td><td>if set to <code>true</code> [close].</td></tr>
-  </tbody></table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00197">197</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a46f114dca0a1e5cc8773800a69575c25" title="Sends the specified data.">Send</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ae63669d547e36a14d6b569092733e899" title="What character encoding to use.">Encoding</a>.GetBytes(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886" title="User defined data. Can be anything.">Data</a>), Close);
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a774cf56516f213cbfffd65eac791208a"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Send" ref="a774cf56516f213cbfffd65eac791208a" args="(byte[] Data, bool Close=false)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a46f114dca0a1e5cc8773800a69575c25">Alchemy.Server.Classes.UserContext.Send</a> </td>
-          <td>(</td>
-          <td class="paramtype">byte[]&nbsp;</td>
-          <td class="paramname"><em>Data</em>, </td>
-        </tr>
-        <tr>
-          <td class="paramkey"></td>
-          <td></td>
-          <td class="paramtype">bool&nbsp;</td>
-          <td class="paramname"><em>Close</em> = <code>false</code>&nbsp;</td>
-        </tr>
-        <tr>
-          <td></td>
-          <td>)</td>
-          <td></td><td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Sends the specified data. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">data</td><td>The data.</td></tr>
-    <tr><td class="paramname">close</td><td>if set to <code>true</code> [close].</td></tr>
-  </tbody></table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00207">207</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#ad3578eda0e0439d43bf210ecfed40268" title="The current connection handler.">Handler</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1_handler.html#a5aedae6a1424dcdb0731059df58d18b0">Send</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886" title="User defined data. Can be anything.">Data</a>, Context, Close);
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a75d65edf8d1286d175eff4f70534e64e"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SendRaw" ref="a75d65edf8d1286d175eff4f70534e64e" args="(byte[] Data)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a75d65edf8d1286d175eff4f70534e64e">Alchemy.Server.Classes.UserContext.SendRaw</a> </td>
-          <td>(</td>
-          <td class="paramtype">byte[]&nbsp;</td>
-          <td class="paramname"><em>Data</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Sends raw data. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">data</td><td>The data.</td></tr>
-  </tbody></table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00216">216</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <a class="code" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1__default_handler.html" title="When the protocol has not yet been determined the system defaults to this request handler...">_defaultHandler</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1__default_handler.html#ab58e4e7b57fc306d26353f98f20496c1">Instance</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1__default_handler.html#a8c32eb6d360b7b1d1ce32ff96d610294" title="Sends the specified data.">Send</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886" title="User defined data. Can be anything.">Data</a>, Context);
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a7e1766a0caff57ba9eac13a1475b69bd"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnConnect" ref="a7e1766a0caff57ba9eac13a1475b69bd" args="(OnEventDelegate ADelegate)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7e1766a0caff57ba9eac13a1475b69bd">Alchemy.Server.Classes.UserContext.SetOnConnect</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
-          <td class="paramname"><em>ADelegate</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Sets the on connect event. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
-  </tbody></table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00151">151</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a30a4fc57819a9af3bd720155cf95f932" title="OnEvent Delegates specific to this connection.">_OnConnect</a> = ADelegate;
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a7d7da818e61aeb581e50ae27a02e8742"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnConnected" ref="a7d7da818e61aeb581e50ae27a02e8742" args="(OnEventDelegate ADelegate)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7d7da818e61aeb581e50ae27a02e8742">Alchemy.Server.Classes.UserContext.SetOnConnected</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
-          <td class="paramname"><em>ADelegate</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Sets the on connected event. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
-  </tbody></table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00160">160</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aca2b261d897c89553235c3009ded3ea1">_OnConnected</a> = ADelegate;
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a8e2e4ede3510f07d702e4472a3016278"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnDisconnect" ref="a8e2e4ede3510f07d702e4472a3016278" args="(OnEventDelegate ADelegate)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a8e2e4ede3510f07d702e4472a3016278">Alchemy.Server.Classes.UserContext.SetOnDisconnect</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
-          <td class="paramname"><em>ADelegate</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Sets the on disconnect event. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
-  </tbody></table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00169">169</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a9769806d6eac118c7f40bb1bfb2d2824">_OnDisconnect</a> = ADelegate;
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="ace9378592d72c68085aa4d8ebbe42238"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnReceive" ref="ace9378592d72c68085aa4d8ebbe42238" args="(OnEventDelegate ADelegate)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ace9378592d72c68085aa4d8ebbe42238">Alchemy.Server.Classes.UserContext.SetOnReceive</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
-          <td class="paramname"><em>ADelegate</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Sets the on receive event. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
-  </tbody></table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00187">187</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a07ec4152aa2b64a585cba1ccece81435">_OnReceive</a> = ADelegate;
-        }
-</pre></div>
-</div>
-</div>
-<a class="anchor" id="a3523ef4560854a044d557937aefea4d2"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnSend" ref="a3523ef4560854a044d557937aefea4d2" args="(OnEventDelegate ADelegate)" -->
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tbody><tr>
-          <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a3523ef4560854a044d557937aefea4d2">Alchemy.Server.Classes.UserContext.SetOnSend</a> </td>
-          <td>(</td>
-          <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
-          <td class="paramname"><em>ADelegate</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </tbody></table>
-</div>
-<div class="memdoc">
-
-<p>Sets the on send event. </p>
-<dl class="params"><dt><b>Parameters:</b></dt><dd>
-  <table class="params">
-    <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
-  </tbody></table>
-  </dd>
-</dl>
-
-<p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00178">178</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-<div class="fragment prettyprint"><pre class="fragment prettyprint">        {
-            <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a060cc740c10fe3df85e68f932b420931">_OnSend</a> = ADelegate;
-        }
-</pre></div>
-</div>
-</div>
-<hr><h2>Member Data Documentation</h2>
-<a class="anchor" id="a30a4fc57819a9af3bd720155cf95f932"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnConnect" ref="a30a4fc57819a9af3bd720155cf95f932" args="" -->
-<div class="memitem">
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00035">35</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  </div><hr><h2>Constructor &amp; Destructor Documentation</h2>
+  <a class="anchor" id="a1f443471b8e848e66e97c57d24241df5"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::UserContext" ref="a1f443471b8e848e66e97c57d24241df5" args="(Context AContext)" -->
+  <div class="memitem">
   <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a30a4fc57819a9af3bd720155cf95f932">Alchemy.Server.Classes.UserContext._OnConnect</a> = (x) =&gt; { }<code> [protected]</code></td>
-        </tr>
-    </tbody></table>
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1f443471b8e848e66e97c57d24241df5">Alchemy.Server.Classes.UserContext.UserContext</a> </td>
+            <td>(</td>
+            <td class="paramtype"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html">Context</a>&nbsp;</td>
+            <td class="paramname"><em>AContext</em></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>OnEvent Delegates specific to this connection. </p>
-
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00068">68</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-
-  </div>
-</div>
-<a class="anchor" id="aca2b261d897c89553235c3009ded3ea1"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnConnected" ref="aca2b261d897c89553235c3009ded3ea1" args="" -->
-<div class="memitem">
-  <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aca2b261d897c89553235c3009ded3ea1">Alchemy.Server.Classes.UserContext._OnConnected</a> = (x) =&gt; { }<code> [protected]</code></td>
-        </tr>
+  <p>Initializes a new instance of the <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html" title="Contains data we will export to the Event Delegates.">UserContext</a> class. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">context</td><td>The user context.</td></tr>
     </tbody></table>
+    </dd>
+  </dl>
+
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00080">80</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              this.Context = AContext;
+              this.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa39afdbff9c96642f2a92eb3af15a549">Header</a> = this.Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a44341764af3e939a4e37efc6f06a7ee6" title="The Header.">Header</a>;
+          }
+  </pre></div>
+  </div>
+  </div>
+  <hr><h2>Member Function Documentation</h2>
+  <a class="anchor" id="a1e922fdb44b00347af802c3e26932988"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnConnect" ref="a1e922fdb44b00347af802c3e26932988" args="()" -->
+  <div class="memitem">
+  <div class="memproto">
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a1e922fdb44b00347af802c3e26932988">Alchemy.Server.Classes.UserContext.OnConnect</a> </td>
+            <td>(</td>
+            <td class="paramname"></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00069">69</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <p>Called when [connect]. </p>
 
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00089">89</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <span class="keywordflow">try</span>
+              {
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a30a4fc57819a9af3bd720155cf95f932" title="OnEvent Delegates specific to this connection.">_OnConnect</a>(<span class="keyword">this</span>);
+              }
+              <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnConnect"</span>, e); }
+          }
+  </pre></div>
   </div>
-</div>
-<a class="anchor" id="a9769806d6eac118c7f40bb1bfb2d2824"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnDisconnect" ref="a9769806d6eac118c7f40bb1bfb2d2824" args="" -->
-<div class="memitem">
+  </div>
+  <a class="anchor" id="a98bda1ba88a98bfd8b46d1a6f7547c91"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnConnected" ref="a98bda1ba88a98bfd8b46d1a6f7547c91" args="()" -->
+  <div class="memitem">
   <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a9769806d6eac118c7f40bb1bfb2d2824">Alchemy.Server.Classes.UserContext._OnDisconnect</a> = (x) =&gt; { }<code> [protected]</code></td>
-        </tr>
-    </tbody></table>
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a98bda1ba88a98bfd8b46d1a6f7547c91">Alchemy.Server.Classes.UserContext.OnConnected</a> </td>
+            <td>(</td>
+            <td class="paramname"></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00070">70</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <p>Called when [connected]. </p>
 
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00101">101</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <span class="keywordflow">try</span>
+              {
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aca2b261d897c89553235c3009ded3ea1">_OnConnected</a>(<span class="keyword">this</span>);
+              }
+              <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnConnected"</span>, e); }
+          }
+  </pre></div>
   </div>
-</div>
-<a class="anchor" id="a07ec4152aa2b64a585cba1ccece81435"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnReceive" ref="a07ec4152aa2b64a585cba1ccece81435" args="" -->
-<div class="memitem">
+  </div>
+  <a class="anchor" id="a066cba6e05202a179fcca50dd6f0acbe"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnDisconnect" ref="a066cba6e05202a179fcca50dd6f0acbe" args="()" -->
+  <div class="memitem">
   <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a07ec4152aa2b64a585cba1ccece81435">Alchemy.Server.Classes.UserContext._OnReceive</a> = (x) =&gt; { }<code> [protected]</code></td>
-        </tr>
-    </tbody></table>
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a066cba6e05202a179fcca50dd6f0acbe">Alchemy.Server.Classes.UserContext.OnDisconnect</a> </td>
+            <td>(</td>
+            <td class="paramname"></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00071">71</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <p>Called when [disconnect]. </p>
 
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00113">113</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <span class="keywordflow">try</span>
+              {
+                  Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a730ebc924f291ae91ef40c558d54ed7a" title="Whether or not the TCPClient is still connected.">Connected</a> = <span class="keyword">false</span>;
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a9769806d6eac118c7f40bb1bfb2d2824">_OnDisconnect</a>(<span class="keyword">this</span>);
+              }
+              <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnDisconnect"</span>, e); }
+          }
+  </pre></div>
   </div>
-</div>
-<a class="anchor" id="a060cc740c10fe3df85e68f932b420931"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnSend" ref="a060cc740c10fe3df85e68f932b420931" args="" -->
-<div class="memitem">
+  </div>
+  <a class="anchor" id="a60f625a4cb02819e0d151230bf90a846"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnReceive" ref="a60f625a4cb02819e0d151230bf90a846" args="()" -->
+  <div class="memitem">
   <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a060cc740c10fe3df85e68f932b420931">Alchemy.Server.Classes.UserContext._OnSend</a> = (x) =&gt; { }<code> [protected]</code></td>
-        </tr>
-    </tbody></table>
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a60f625a4cb02819e0d151230bf90a846">Alchemy.Server.Classes.UserContext.OnReceive</a> </td>
+            <td>(</td>
+            <td class="paramname"></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00072">72</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <p>Called when [receive]. </p>
 
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00138">138</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <span class="keywordflow">try</span>
+              {
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a07ec4152aa2b64a585cba1ccece81435">_OnReceive</a>(<span class="keyword">this</span>);
+              }
+              <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnReceive"</span>, e); }
+          }
+  </pre></div>
   </div>
-</div>
-<a class="anchor" id="a59b59169c1532ec98bdb3e421d20460c"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::ClientAddress" ref="a59b59169c1532ec98bdb3e421d20460c" args="" -->
-<div class="memitem">
+  </div>
+  <a class="anchor" id="ab64f7b27b07942b5ac0e6478fb34dd61"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::OnSend" ref="ab64f7b27b07942b5ac0e6478fb34dd61" args="()" -->
+  <div class="memitem">
   <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname">EndPoint <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a59b59169c1532ec98bdb3e421d20460c">Alchemy.Server.Classes.UserContext.ClientAddress</a> = null</td>
-        </tr>
-    </tbody></table>
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ab64f7b27b07942b5ac0e6478fb34dd61">Alchemy.Server.Classes.UserContext.OnSend</a> </td>
+            <td>(</td>
+            <td class="paramname"></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>The remote endpoint address. </p>
+  <p>Called when [send]. </p>
 
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00060">60</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00126">126</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <span class="keywordflow">try</span>
+              {
+                  <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a060cc740c10fe3df85e68f932b420931">_OnSend</a>(<span class="keyword">this</span>);
+              }
+              <span class="keywordflow">catch</span> (Exception e) { Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#a92a0e455abd184dff2cc19c2c12584b5" title="A link to the server listener instance this client is currently hosted on.">Server</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325">Log</a>.Error(<span class="stringliteral">"Fatal Error in user specified OnSend"</span>, e); }
+          }
+  </pre></div>
   </div>
-</div>
-<a class="anchor" id="aa3ecdf7e172bf06c879f30d1b4ab1886"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Data" ref="aa3ecdf7e172bf06c879f30d1b4ab1886" args="" -->
-<div class="memitem">
+  </div>
+  <a class="anchor" id="a46f114dca0a1e5cc8773800a69575c25"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Send" ref="a46f114dca0a1e5cc8773800a69575c25" args="(string Data, bool Close=false)" -->
+  <div class="memitem">
   <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname">Object <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Alchemy.Server.Classes.UserContext.Data</a> = null</td>
-        </tr>
-    </tbody></table>
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a46f114dca0a1e5cc8773800a69575c25">Alchemy.Server.Classes.UserContext.Send</a> </td>
+            <td>(</td>
+            <td class="paramtype">string&nbsp;</td>
+            <td class="paramname"><em>Data</em>, </td>
+          </tr>
+          <tr>
+            <td class="paramkey"></td>
+            <td></td>
+            <td class="paramtype">bool&nbsp;</td>
+            <td class="paramname"><em>Close</em> = <code>false</code>&nbsp;</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>)</td>
+            <td></td><td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>User defined data. Can be anything. </p>
-
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00052">52</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-
-  </div>
-</div>
-<a class="anchor" id="af4ab034d722236d3169796ea5ba9d7ac"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::DataFrame" ref="af4ab034d722236d3169796ea5ba9d7ac" args="" -->
-<div class="memitem">
-  <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1_data_frame.html">Alchemy.Server.Handlers.WebSocket.DataFrame</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#af4ab034d722236d3169796ea5ba9d7ac">Alchemy.Server.Classes.UserContext.DataFrame</a> = null</td>
-        </tr>
+  <p>Sends the specified data. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">data</td><td>The data.</td></tr>
+      <tr><td class="paramname">close</td><td>if set to <code>true</code> [close].</td></tr>
     </tbody></table>
+    </dd>
+  </dl>
+
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00197">197</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a46f114dca0a1e5cc8773800a69575c25" title="Sends the specified data.">Send</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ae63669d547e36a14d6b569092733e899" title="What character encoding to use.">Encoding</a>.GetBytes(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886" title="User defined data. Can be anything.">Data</a>), Close);
+          }
+  </pre></div>
+  </div>
+  </div>
+  <a class="anchor" id="a774cf56516f213cbfffd65eac791208a"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Send" ref="a774cf56516f213cbfffd65eac791208a" args="(byte[] Data, bool Close=false)" -->
+  <div class="memitem">
+  <div class="memproto">
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a46f114dca0a1e5cc8773800a69575c25">Alchemy.Server.Classes.UserContext.Send</a> </td>
+            <td>(</td>
+            <td class="paramtype">byte[]&nbsp;</td>
+            <td class="paramname"><em>Data</em>, </td>
+          </tr>
+          <tr>
+            <td class="paramkey"></td>
+            <td></td>
+            <td class="paramtype">bool&nbsp;</td>
+            <td class="paramname"><em>Close</em> = <code>false</code>&nbsp;</td>
+          </tr>
+          <tr>
+            <td></td>
+            <td>)</td>
+            <td></td><td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>The data Frame that this client is currently processing. </p>
-
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00044">44</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-
-  </div>
-</div>
-<a class="anchor" id="ae63669d547e36a14d6b569092733e899"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Encoding" ref="ae63669d547e36a14d6b569092733e899" args="" -->
-<div class="memitem">
-  <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname">UTF8Encoding <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ae63669d547e36a14d6b569092733e899">Alchemy.Server.Classes.UserContext.Encoding</a> = new UTF8Encoding()</td>
-        </tr>
+  <p>Sends the specified data. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">data</td><td>The data.</td></tr>
+      <tr><td class="paramname">close</td><td>if set to <code>true</code> [close].</td></tr>
     </tbody></table>
+    </dd>
+  </dl>
+
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00207">207</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              Context.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_context.html#ad3578eda0e0439d43bf210ecfed40268" title="The current connection handler.">Handler</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1_handler.html#a5aedae6a1424dcdb0731059df58d18b0">Send</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886" title="User defined data. Can be anything.">Data</a>, Context, Close);
+          }
+  </pre></div>
+  </div>
+  </div>
+  <a class="anchor" id="a75d65edf8d1286d175eff4f70534e64e"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SendRaw" ref="a75d65edf8d1286d175eff4f70534e64e" args="(byte[] Data)" -->
+  <div class="memitem">
+  <div class="memproto">
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a75d65edf8d1286d175eff4f70534e64e">Alchemy.Server.Classes.UserContext.SendRaw</a> </td>
+            <td>(</td>
+            <td class="paramtype">byte[]&nbsp;</td>
+            <td class="paramname"><em>Data</em></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>What character encoding to use. </p>
-
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00048">48</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-
-  </div>
-</div>
-<a class="anchor" id="aa39afdbff9c96642f2a92eb3af15a549"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Header" ref="aa39afdbff9c96642f2a92eb3af15a549" args="" -->
-<div class="memitem">
-  <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname">readonly <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_header.html">Header</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa39afdbff9c96642f2a92eb3af15a549">Alchemy.Server.Classes.UserContext.Header</a></td>
-        </tr>
+  <p>Sends raw data. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">data</td><td>The data.</td></tr>
     </tbody></table>
+    </dd>
+  </dl>
+
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00216">216</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <a class="code" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1__default_handler.html" title="When the protocol has not yet been determined the system defaults to this request handler...">_defaultHandler</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1__default_handler.html#ab58e4e7b57fc306d26353f98f20496c1">Instance</a>.<a class="code" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1__default_handler.html#a8c32eb6d360b7b1d1ce32ff96d610294" title="Sends the specified data.">Send</a>(<a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886" title="User defined data. Can be anything.">Data</a>, Context);
+          }
+  </pre></div>
+  </div>
+  </div>
+  <a class="anchor" id="a7e1766a0caff57ba9eac13a1475b69bd"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnConnect" ref="a7e1766a0caff57ba9eac13a1475b69bd" args="(OnEventDelegate ADelegate)" -->
+  <div class="memitem">
+  <div class="memproto">
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7e1766a0caff57ba9eac13a1475b69bd">Alchemy.Server.Classes.UserContext.SetOnConnect</a> </td>
+            <td>(</td>
+            <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
+            <td class="paramname"><em>ADelegate</em></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00074">74</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-
-  </div>
-</div>
-<a class="anchor" id="a7415d669954a1ad139c8cc6e3b2fb3a0"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Protocol" ref="a7415d669954a1ad139c8cc6e3b2fb3a0" args="" -->
-<div class="memitem">
-  <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server_1_1_classes.html#ad94f802a0292b339989bf84226ad1ec1">Protocol</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7415d669954a1ad139c8cc6e3b2fb3a0">Alchemy.Server.Classes.UserContext.Protocol</a> = Protocol.None</td>
-        </tr>
+  <p>Sets the on connect event. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
     </tbody></table>
+    </dd>
+  </dl>
+
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00151">151</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a30a4fc57819a9af3bd720155cf95f932" title="OnEvent Delegates specific to this connection.">_OnConnect</a> = ADelegate;
+          }
+  </pre></div>
+  </div>
+  </div>
+  <a class="anchor" id="a7d7da818e61aeb581e50ae27a02e8742"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnConnected" ref="a7d7da818e61aeb581e50ae27a02e8742" args="(OnEventDelegate ADelegate)" -->
+  <div class="memitem">
+  <div class="memproto">
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7d7da818e61aeb581e50ae27a02e8742">Alchemy.Server.Classes.UserContext.SetOnConnected</a> </td>
+            <td>(</td>
+            <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
+            <td class="paramname"><em>ADelegate</em></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>The type of connection this is. </p>
-
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00064">64</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-
-  </div>
-</div>
-<a class="anchor" id="a6f827721424a145960c5bae387191d92"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::RequestPath" ref="a6f827721424a145960c5bae387191d92" args="" -->
-<div class="memitem">
-  <div class="memproto">
-    <table class="memname">
-      <tbody><tr>
-          <td class="memname">string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a6f827721424a145960c5bae387191d92">Alchemy.Server.Classes.UserContext.RequestPath</a> = "/"</td>
-        </tr>
+  <p>Sets the on connected event. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
     </tbody></table>
+    </dd>
+  </dl>
+
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00160">160</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aca2b261d897c89553235c3009ded3ea1">_OnConnected</a> = ADelegate;
+          }
+  </pre></div>
+  </div>
+  </div>
+  <a class="anchor" id="a8e2e4ede3510f07d702e4472a3016278"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnDisconnect" ref="a8e2e4ede3510f07d702e4472a3016278" args="(OnEventDelegate ADelegate)" -->
+  <div class="memitem">
+  <div class="memproto">
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a8e2e4ede3510f07d702e4472a3016278">Alchemy.Server.Classes.UserContext.SetOnDisconnect</a> </td>
+            <td>(</td>
+            <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
+            <td class="paramname"><em>ADelegate</em></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
   </div>
   <div class="memdoc">
 
-    <p>The path of this request. </p>
+  <p>Sets the on disconnect event. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
+    </tbody></table>
+    </dd>
+  </dl>
 
-    <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00056">56</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
-
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00169">169</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a9769806d6eac118c7f40bb1bfb2d2824">_OnDisconnect</a> = ADelegate;
+          }
+  </pre></div>
   </div>
-</div>
-<hr>The documentation for this class was generated from the following file:<ul>
-  <li>Classes/<a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a></li>
-</ul>
+  </div>
+  <a class="anchor" id="ace9378592d72c68085aa4d8ebbe42238"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnReceive" ref="ace9378592d72c68085aa4d8ebbe42238" args="(OnEventDelegate ADelegate)" -->
+  <div class="memitem">
+  <div class="memproto">
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ace9378592d72c68085aa4d8ebbe42238">Alchemy.Server.Classes.UserContext.SetOnReceive</a> </td>
+            <td>(</td>
+            <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
+            <td class="paramname"><em>ADelegate</em></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
+  </div>
+  <div class="memdoc">
+
+  <p>Sets the on receive event. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
+    </tbody></table>
+    </dd>
+  </dl>
+
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00187">187</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a07ec4152aa2b64a585cba1ccece81435">_OnReceive</a> = ADelegate;
+          }
+  </pre></div>
+  </div>
+  </div>
+  <a class="anchor" id="a3523ef4560854a044d557937aefea4d2"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::SetOnSend" ref="a3523ef4560854a044d557937aefea4d2" args="(OnEventDelegate ADelegate)" -->
+  <div class="memitem">
+  <div class="memproto">
+        <table class="memname">
+          <tbody><tr>
+            <td class="memname">void <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a3523ef4560854a044d557937aefea4d2">Alchemy.Server.Classes.UserContext.SetOnSend</a> </td>
+            <td>(</td>
+            <td class="paramtype"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a>&nbsp;</td>
+            <td class="paramname"><em>ADelegate</em></td><td>)</td>
+            <td></td>
+          </tr>
+        </tbody></table>
+  </div>
+  <div class="memdoc">
+
+  <p>Sets the on send event. </p>
+  <dl class="params"><dt><b>Parameters:</b></dt><dd>
+    <table class="params">
+      <tbody><tr><td class="paramname">ADelegate</td><td>The Event Delegate.</td></tr>
+    </tbody></table>
+    </dd>
+  </dl>
+
+  <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00178">178</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+  <div class="fragment prettyprint"><pre class="fragment prettyprint">        {
+              <a class="code" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a060cc740c10fe3df85e68f932b420931">_OnSend</a> = ADelegate;
+          }
+  </pre></div>
+  </div>
+  </div>
+  <hr><h2>Member Data Documentation</h2>
+  <a class="anchor" id="a30a4fc57819a9af3bd720155cf95f932"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnConnect" ref="a30a4fc57819a9af3bd720155cf95f932" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a30a4fc57819a9af3bd720155cf95f932">Alchemy.Server.Classes.UserContext._OnConnect</a> = (x) =&gt; { }<code> [protected]</code></td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>OnEvent Delegates specific to this connection. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00068">68</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="aca2b261d897c89553235c3009ded3ea1"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnConnected" ref="aca2b261d897c89553235c3009ded3ea1" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aca2b261d897c89553235c3009ded3ea1">Alchemy.Server.Classes.UserContext._OnConnected</a> = (x) =&gt; { }<code> [protected]</code></td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00069">69</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="a9769806d6eac118c7f40bb1bfb2d2824"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnDisconnect" ref="a9769806d6eac118c7f40bb1bfb2d2824" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a9769806d6eac118c7f40bb1bfb2d2824">Alchemy.Server.Classes.UserContext._OnDisconnect</a> = (x) =&gt; { }<code> [protected]</code></td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00070">70</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="a07ec4152aa2b64a585cba1ccece81435"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnReceive" ref="a07ec4152aa2b64a585cba1ccece81435" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a07ec4152aa2b64a585cba1ccece81435">Alchemy.Server.Classes.UserContext._OnReceive</a> = (x) =&gt; { }<code> [protected]</code></td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00071">71</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="a060cc740c10fe3df85e68f932b420931"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::_OnSend" ref="a060cc740c10fe3df85e68f932b420931" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server.html#ac50c7b6bc6c5247638c8ac77be1e80bf">OnEventDelegate</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a060cc740c10fe3df85e68f932b420931">Alchemy.Server.Classes.UserContext._OnSend</a> = (x) =&gt; { }<code> [protected]</code></td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00072">72</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="a59b59169c1532ec98bdb3e421d20460c"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::ClientAddress" ref="a59b59169c1532ec98bdb3e421d20460c" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname">EndPoint <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a59b59169c1532ec98bdb3e421d20460c">Alchemy.Server.Classes.UserContext.ClientAddress</a> = null</td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>The remote endpoint address. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00060">60</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="aa3ecdf7e172bf06c879f30d1b4ab1886"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Data" ref="aa3ecdf7e172bf06c879f30d1b4ab1886" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname">Object <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa3ecdf7e172bf06c879f30d1b4ab1886">Alchemy.Server.Classes.UserContext.Data</a> = null</td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>User defined data. Can be anything. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00052">52</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="af4ab034d722236d3169796ea5ba9d7ac"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::DataFrame" ref="af4ab034d722236d3169796ea5ba9d7ac" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname"><a class="el" href="./docs/class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1_data_frame.html">Alchemy.Server.Handlers.WebSocket.DataFrame</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#af4ab034d722236d3169796ea5ba9d7ac">Alchemy.Server.Classes.UserContext.DataFrame</a> = null</td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>The data Frame that this client is currently processing. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00044">44</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="ae63669d547e36a14d6b569092733e899"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Encoding" ref="ae63669d547e36a14d6b569092733e899" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname">UTF8Encoding <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#ae63669d547e36a14d6b569092733e899">Alchemy.Server.Classes.UserContext.Encoding</a> = new UTF8Encoding()</td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>What character encoding to use. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00048">48</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="aa39afdbff9c96642f2a92eb3af15a549"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Header" ref="aa39afdbff9c96642f2a92eb3af15a549" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname">readonly <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_header.html">Header</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#aa39afdbff9c96642f2a92eb3af15a549">Alchemy.Server.Classes.UserContext.Header</a></td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00074">74</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="a7415d669954a1ad139c8cc6e3b2fb3a0"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::Protocol" ref="a7415d669954a1ad139c8cc6e3b2fb3a0" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname"><a class="el" href="./docs/namespace_alchemy_1_1_server_1_1_classes.html#ad94f802a0292b339989bf84226ad1ec1">Protocol</a> <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a7415d669954a1ad139c8cc6e3b2fb3a0">Alchemy.Server.Classes.UserContext.Protocol</a> = Protocol.None</td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>The type of connection this is. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00064">64</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <a class="anchor" id="a6f827721424a145960c5bae387191d92"></a><!-- doxytag: member="Alchemy::Server::Classes::UserContext::RequestPath" ref="a6f827721424a145960c5bae387191d92" args="" -->
+  <div class="memitem">
+    <div class="memproto">
+      <table class="memname">
+        <tbody><tr>
+            <td class="memname">string <a class="el" href="./docs/class_alchemy_1_1_server_1_1_classes_1_1_user_context.html#a6f827721424a145960c5bae387191d92">Alchemy.Server.Classes.UserContext.RequestPath</a> = "/"</td>
+          </tr>
+      </tbody></table>
+    </div>
+    <div class="memdoc">
+
+      <p>The path of this request. </p>
+
+      <p>Definition at line <a class="el" href="./docs/_user_context_8cs_source.html#l00056">56</a> of file <a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a>.</p>
+
+    </div>
+  </div>
+  <hr>The documentation for this class was generated from the following file:<ul>
+    <li>Classes/<a class="el" href="./docs/_user_context_8cs_source.html">UserContext.cs</a></li>
+  </ul>
+  </div>
 </div>
