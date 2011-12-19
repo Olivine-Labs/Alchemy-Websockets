@@ -2,11 +2,6 @@
  * Variables to customize the look and feel of Bootstrap
  * ----------------------------------------------------- */
 
-
-// Links
-@linkColor:         #0069d6;
-@linkColorHover:    darken(@linkColor, 15);
-
 // Grays
 @black:             #000;
 @grayDark:          lighten(@black, 25%);
@@ -25,6 +20,13 @@
 @pink:              #c3325f;
 @purple:            #7a43b6;
 
+// colors from http://www.colourlovers.com/palette/1903468/A_Thousand_Kisses
+@green:             #85C48D;
+@orange:            #FE704C;
+@brown:             #3C2F27;
+@red:               #FF2C22;
+@yellow:            #E0F4C1; // actually light green, hehe
+
 // Baseline grid
 @basefont:          13px;
 @baseline:          18px;
@@ -39,7 +41,7 @@
 
 // Color Scheme
 // Use this to roll your own color schemes if you like (unused by Bootstrap by default)
-@baseColor:         @blue;                  // Set a base color
+@baseColor:         @green;                  // Set a base color
 @complement:        spin(@baseColor, 180);  // Determine a complementary color
 @split1:            spin(@baseColor, 158);  // Split complements
 @split2:            spin(@baseColor, -158);
@@ -49,6 +51,16 @@
 @tetra2:            spin(@baseColor, -90);
 @analog1:           spin(@baseColor, 22);   // Analogs colors
 @analog2:           spin(@baseColor, -22);
+
+@baseColorDark:     darken(@baseColor, 15);
+@baseColorLight:    lighten(@baseColor, 25%);
+@baseColorLighter:    lighten(@baseColor, 50%);
+@complementDark:     darken(@complement, 15);
+@complementLight:    lighten(@complement, 25%);
+
+// Links
+@linkColor:         @baseColorDark;
+@linkColorHover:    darken(@linkColor, 15);
 
 
 
