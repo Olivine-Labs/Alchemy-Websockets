@@ -1,8 +1,6 @@
 Alchemy Websockets
 =============
 
-##Status
-
 **Version 2.0.0**
 
 ### Protocol Support
