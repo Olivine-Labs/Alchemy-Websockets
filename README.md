@@ -3,7 +3,7 @@ Alchemy Websockets
 
 **Version 2.0.0**
 
-### Protocol Support
+## Protocol Support
 
 Alchemy websockets supports:
 
