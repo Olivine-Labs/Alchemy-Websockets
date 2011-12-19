@@ -354,10 +354,11 @@ button.btn::-moz-focus-inner,input[type=submit].btn::-moz-focus-inner{padding:0;
 .media-grid li{display:inline;}
 .media-grid a{float:left;padding:4px;margin:0 0 18px 20px;border:1px solid #ddd;-webkit-border-radius:4px;-moz-border-radius:4px;border-radius:4px;-webkit-box-shadow:0 1px 1px rgba(0, 0, 0, 0.075);-moz-box-shadow:0 1px 1px rgba(0, 0, 0, 0.075);box-shadow:0 1px 1px rgba(0, 0, 0, 0.075);}.media-grid a img{display:block;}
 .media-grid a:hover{border-color:#52aa5d;-webkit-box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);-moz-box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);box-shadow:0 1px 4px rgba(0, 105, 214, 0.25);}
-body{padding-top:40px;background:#f0f0f0 url('../img/struckaxiom.png');font:"Buda","Helvetica Neue",Helvetica,Arial,sans-serif;}
+body{padding-top:40px;background:#f0f0f0 url('../img/struckaxiom.png');}
 h1,h2,h3,h4,h5,h6{margin-bottom:.25em;}
 pre{background:#222222 url('../img/denim.png');}
 .footer{background:#85c48d;padding:1em;color:#ffffff;}.footer a{color:#397758;}
+.footer .container{background:transparent url('../img/olivine-labs.png') top right no-repeat;}
 .hero-unit{text-shadow:1px 1px 1px rgba(0, 0, 0, 0.5);background:#dbeedd url('../img/denim.png');}
 .ir{display:block;border:0;text-indent:-999em;overflow:hidden;background-color:transparent;background-repeat:no-repeat;text-align:left;direction:ltr;}
 .ir br{display:none;}
