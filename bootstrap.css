@@ -6,7 +6,7 @@
  * http://www.apache.org/licenses/LICENSE-2.0
  *
  * Designed and built with all the love in the world @twitter by @mdo and @fat.
- * Date: Sun Dec 18 16:27:54 PST 2011
+ * Date: Mon Dec 19 13:02:37 PST 2011
  */
 /* Reset.less
  * Props to Eric Meyer (meyerweb.com) for his CSS reset file. We're using an adapted version here	that cuts out some of the reset HTML elements we will never need here (i.e., dfn, samp, etc).
@@ -2484,8 +2484,14 @@ pre {
 .footer a {
   color: #397758;
 }
-.footer .container {
-  background: transparent url('../img/olivine-labs.png') top right no-repeat;
+.footer .olivine-labs {
+  background: transparent url('../img/olivine-labs.png') top left no-repeat;
+  float: right;
+  height: 40px;
+  width: 61px;
+}
+.nav iframe {
+  margin: 10px;
 }
 .hero-unit {
   text-shadow: 1px 1px 1px rgba(0, 0, 0, 0.5);

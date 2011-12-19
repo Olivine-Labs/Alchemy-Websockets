@@ -358,7 +358,8 @@ body{padding-top:40px;background:#f0f0f0 url('../img/struckaxiom.png');}
 h1,h2,h3,h4,h5,h6{margin-bottom:.25em;}
 pre{background:#222222 url('../img/denim.png');}
 .footer{background:#85c48d;padding:1em;color:#ffffff;}.footer a{color:#397758;}
-.footer .container{background:transparent url('../img/olivine-labs.png') top right no-repeat;}
+.footer .olivine-labs{background:transparent url('../img/olivine-labs.png') top left no-repeat;float:right;height:40px;width:61px;}
+.nav iframe{margin:10px;}
 .hero-unit{text-shadow:1px 1px 1px rgba(0, 0, 0, 0.5);background:#dbeedd url('../img/denim.png');}
 .ir{display:block;border:0;text-indent:-999em;overflow:hidden;background-color:transparent;background-repeat:no-repeat;text-align:left;direction:ltr;}
 .ir br{display:none;}
