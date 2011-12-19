@@ -66,6 +66,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AccessPolicyServer.cs" />
+    <Compile Include="Classes\Context.cs" />
     <Compile Include="Handlers\Authentication.cs" />
     <Compile Include="Handlers\IAuthentication.cs" />
     <Compile Include="Handlers\WebSocket\DataFrame.cs" />
