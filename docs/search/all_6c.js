@@ -1,9 +1,9 @@
 var searchData=
 [
-  ['length',['Length',['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1_data_frame.html#ad3b845a9d6fe094ccbab8b4a5200d852',1,'Alchemy::Server::Handlers::WebSocket::DataFrame']]],
-  ['listenaddress',['ListenAddress',['../class_alchemy_1_1_server_1_1_t_c_p_server.html#ae41b26d35e0718a775ccb367c0e46ce7',1,'Alchemy::Server::TCPServer']]],
-  ['location',['Location',['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_server_handshake.html#a3bccf18dc5eaa1351abc058b7feee3a3',1,'Alchemy::Server::Handlers::WebSocket::hybi00::ServerHandshake.Location()'],['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_web_socket_authentication.html#aeb6491f1885a65b64b339813781c2988',1,'Alchemy::Server::Handlers::WebSocket::hybi00::WebSocketAuthentication.Location()'],['../class_alchemy_1_1_server_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_web_socket_authentication.html#a86f7677352bbf42ad1ba0d7917ddcc8c',1,'Alchemy::Server::Handlers::WebSocket::hybi10::WebSocketAuthentication.Location()']]],
-  ['log',['Log',['../class_alchemy_1_1_server_1_1_w_s_server.html#add10f505c3c91ca55d131181fe694325',1,'Alchemy::Server::WSServer']]],
-  ['logconfigfile',['LogConfigFile',['../class_alchemy_1_1_server_1_1_w_s_server.html#aea36ba2da3c555e856e1205a3f239a69',1,'Alchemy::Server::WSServer']]],
-  ['loggername',['LoggerName',['../class_alchemy_1_1_server_1_1_w_s_server.html#a2fc9aff1b4b23599810a38d20c05fe65',1,'Alchemy::Server::WSServer']]]
+  ['length',['Length',['../class_alchemy_1_1_handlers_1_1_web_socket_1_1_data_frame.html#a4a80102a3a7df8514fa90031099f8016',1,'Alchemy::Handlers::WebSocket::DataFrame']]],
+  ['listenaddress',['ListenAddress',['../class_alchemy_1_1_tcp_server.html#a7f3d24f252b3821123a82aaf0cadc4e3',1,'Alchemy::TcpServer']]],
+  ['location',['Location',['../class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_authentication.html#a503fed0b076d7c2c166474027a5a6041',1,'Alchemy::Handlers::WebSocket::hybi00::Authentication.Location()'],['../class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_server_handshake.html#a41a9d8e88a7cb059ae9f95f83c9a16ed',1,'Alchemy::Handlers::WebSocket::hybi00::ServerHandshake.Location()'],['../class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_authentication.html#a0ac505d154d919b7ddb984b9a41214eb',1,'Alchemy::Handlers::WebSocket::hybi10::Authentication.Location()']]],
+  ['log',['Log',['../class_alchemy_1_1_web_socket_server.html#a26a9a582ce68a3659d23018884ecf3af',1,'Alchemy::WebSocketServer']]],
+  ['logconfigfile',['LogConfigFile',['../class_alchemy_1_1_web_socket_server.html#a4493b4154608817d712fbf316fd52f11',1,'Alchemy::WebSocketServer']]],
+  ['loggername',['LoggerName',['../class_alchemy_1_1_web_socket_server.html#ab259db61aed081d148b912f96a80822b',1,'Alchemy::WebSocketServer']]]
 ];

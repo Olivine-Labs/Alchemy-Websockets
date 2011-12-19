@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['destinationhost',['DestinationHost',['../class_alchemy_1_1_server_1_1_w_s_server.html#a7931b6a9b509ba0f12832dc0e4a7363c',1,'Alchemy::Server::WSServer']]]
+  ['destinationhost',['DestinationHost',['../class_alchemy_1_1_web_socket_server.html#a16adfcdd9adb5bfaeb6c490ee404d1dd',1,'Alchemy::WebSocketServer']]]
 ];

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['dispose',['Dispose',['../class_alchemy_1_1_server_1_1_classes_1_1_context.html#aed54674294bfb0761bca1e9b2b8c97ee',1,'Alchemy::Server::Classes::Context.Dispose()'],['../class_alchemy_1_1_server_1_1_t_c_p_server.html#ad037397947c9ad223b56011b36b50ea5',1,'Alchemy::Server::TCPServer.Dispose()']]]
+  ['disconnect',['Disconnect',['../class_alchemy_1_1_web_socket_client.html#a05451bf9dfd6cf7a832688cafaebc17e',1,'Alchemy::WebSocketClient']]],
+  ['dispose',['Dispose',['../class_alchemy_1_1_classes_1_1_context.html#af47a06f23942e80f329889e9724105ad',1,'Alchemy::Classes::Context.Dispose()'],['../class_alchemy_1_1_tcp_server.html#a2a0d25083431a234910c0aa2e013b2bc',1,'Alchemy::TcpServer.Dispose()']]]
 ];

@@ -1,0 +1,28 @@
+var annotated =
+[
+    [ "Alchemy.AccessPolicyServer", "class_alchemy_1_1_access_policy_server.html", "class_alchemy_1_1_access_policy_server" ],
+    [ "Alchemy.Handlers.WebSocket.hybi00.Authentication", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_authentication.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_authentication" ],
+    [ "Alchemy.Handlers.Authentication", "class_alchemy_1_1_handlers_1_1_authentication.html", "class_alchemy_1_1_handlers_1_1_authentication" ],
+    [ "Alchemy.Handlers.WebSocket.hybi10.Authentication", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_authentication.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_authentication" ],
+    [ "Alchemy.Handlers.WebSocket.hybi10.ClientHandshake", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_client_handshake.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_client_handshake" ],
+    [ "Alchemy.Handlers.WebSocket.hybi00.ClientHandshake", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_client_handshake.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_client_handshake" ],
+    [ "Alchemy.Classes.Context", "class_alchemy_1_1_classes_1_1_context.html", "class_alchemy_1_1_classes_1_1_context" ],
+    [ "Alchemy.Handlers.WebSocket.hybi10.DataFrame", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_data_frame.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_data_frame" ],
+    [ "Alchemy.Handlers.WebSocket.DataFrame", "class_alchemy_1_1_handlers_1_1_web_socket_1_1_data_frame.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1_data_frame" ],
+    [ "Alchemy.Handlers.WebSocket.hybi00.DataFrame", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_data_frame.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_data_frame" ],
+    [ "Alchemy.Handlers.WebSocket.hybi10.FrameHeader", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_frame_header.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_frame_header" ],
+    [ "Alchemy.Handlers.WebSocket.hybi10.Handler", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_handler.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_handler" ],
+    [ "Alchemy.Handlers.WebSocket.hybi00.Handler", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_handler.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_handler" ],
+    [ "Alchemy.Handlers.Handler", "class_alchemy_1_1_handlers_1_1_handler.html", "class_alchemy_1_1_handlers_1_1_handler" ],
+    [ "Alchemy.Classes.Header", "class_alchemy_1_1_classes_1_1_header.html", "class_alchemy_1_1_classes_1_1_header" ],
+    [ "Alchemy.Handlers.IAuthentication", "interface_alchemy_1_1_handlers_1_1_i_authentication.html", "interface_alchemy_1_1_handlers_1_1_i_authentication" ],
+    [ "Alchemy.Handlers.WebSocket.IWebSocketAuthentication", "interface_alchemy_1_1_handlers_1_1_web_socket_1_1_i_web_socket_authentication.html", "interface_alchemy_1_1_handlers_1_1_web_socket_1_1_i_web_socket_authentication" ],
+    [ "Alchemy.Classes.Response", "class_alchemy_1_1_classes_1_1_response.html", "class_alchemy_1_1_classes_1_1_response" ],
+    [ "Alchemy.Handlers.WebSocket.hybi10.ServerHandshake", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_server_handshake.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi10_1_1_server_handshake" ],
+    [ "Alchemy.Handlers.WebSocket.hybi00.ServerHandshake", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_server_handshake.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1hybi00_1_1_server_handshake" ],
+    [ "Alchemy.TcpServer", "class_alchemy_1_1_tcp_server.html", "class_alchemy_1_1_tcp_server" ],
+    [ "Alchemy.Classes.UserContext", "class_alchemy_1_1_classes_1_1_user_context.html", "class_alchemy_1_1_classes_1_1_user_context" ],
+    [ "Alchemy.WebSocketClient", "class_alchemy_1_1_web_socket_client.html", "class_alchemy_1_1_web_socket_client" ],
+    [ "Alchemy.Handlers.WebSocket.WebSocketHandler", "class_alchemy_1_1_handlers_1_1_web_socket_1_1_web_socket_handler.html", "class_alchemy_1_1_handlers_1_1_web_socket_1_1_web_socket_handler" ],
+    [ "Alchemy.WebSocketServer", "class_alchemy_1_1_web_socket_server.html", "class_alchemy_1_1_web_socket_server" ]
+];

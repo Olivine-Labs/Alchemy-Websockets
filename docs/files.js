@@ -1,0 +1,27 @@
+var files =
+[
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/AccessPolicyServer.cs", "_access_policy_server_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/TCPServer.cs", "_t_c_p_server_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/WebSocketClient.cs", "_web_socket_client_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/WebSocketServer.cs", "_web_socket_server_8cs.html", "_web_socket_server_8cs" ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Classes/Context.cs", "_context_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Classes/Header.cs", "_header_8cs.html", "_header_8cs" ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Classes/Response.cs", "_response_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Classes/UserContext.cs", "_user_context_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/Authentication.cs", "_authentication_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/Handler.cs", "_handler_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/IAuthentication.cs", "_i_authentication_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/DataFrame.cs", "_data_frame_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/IWebSocketAuthentication.cs", "_i_web_socket_authentication_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/WebSocketHandler.cs", "_web_socket_handler_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi00/Authentication.cs", "_web_socket_2hybi00_2_authentication_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi00/DataFrame.cs", "hybi00_2_data_frame_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi00/Handler.cs", "_web_socket_2hybi00_2_handler_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi00/Handshakes.cs", "hybi00_2_handshakes_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi10/Authentication.cs", "_web_socket_2hybi10_2_authentication_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi10/DataFrame.cs", "hybi10_2_data_frame_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi10/FrameHeader.cs", "_frame_header_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi10/Handler.cs", "_web_socket_2hybi10_2_handler_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Handlers/WebSocket/hybi10/Handshakes.cs", "hybi10_2_handshakes_8cs.html", null ],
+    [ "/Users/jlawson/Projects/Alchemy-Websockets/src/Alchemy/Properties/AssemblyInfo.cs", "_assembly_info_8cs.html", null ]
+];
