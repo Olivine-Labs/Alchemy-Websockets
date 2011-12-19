@@ -56,6 +56,15 @@ namespace Alchemy.Classes
         public string RequestPath = "/";
 
         /// <summary>
+        /// The maximum frame size
+        /// </summary>
+        public UInt64 MaxFrameSize
+        {
+            get { return _context.MaxFrameSize; }
+            set { _context.MaxFrameSize = value; }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="UserContext"/> class.
         /// </summary>
         /// <param name="context">The user context.</param>

@@ -22,6 +22,11 @@ namespace Alchemy.Classes
             public byte[] Buffer;
 
             /// <summary>
+            /// The max frame that we will accept from the client
+            /// </summary>
+            public UInt64 MaxFrameSize;
+
+            /// <summary>
             /// Whether or not the TCPClient is still connected.
             /// </summary>
             public bool Connected = true;
