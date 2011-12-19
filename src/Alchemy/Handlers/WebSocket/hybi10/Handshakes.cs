@@ -18,10 +18,10 @@ namespace Alchemy.Handlers.WebSocket.hybi10
         private const String Handshake =
             "GET {0} HTTP/1.1\r\n" +
             "Host: {2}\r\n" +
+            "Origin: {1}\r\n" +
             "Upgrade: websocket\r\n" +
             "Connection: Upgrade\r\n" +
             "Sec-WebSocket-Key: {4}\r\n" +
-            "Sec-WebSocket-Origin: {1}\r\n" +
             "Sec-WebSocket-Protocol: {3}\r\n" +
             "Sec-WebSocket-Version: 8\r\n" +
             "{5}";
@@ -30,6 +30,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
         public string Key = String.Empty;
         public string Origin = String.Empty;
         public string ResourcePath = String.Empty;
+
+        public ClientHandshake()
+        { }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientHandshake"/> class.
@@ -117,6 +120,20 @@ namespace Alchemy.Handlers.WebSocket.hybi10
         public string SubProtocol { get; set; }
 
         public Dictionary<string, string> AdditionalFields { get; set; }
+
+        public ServerHandshake()
+        {
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ServerHandshake"/> class.
+        /// </summary>
+        /// <param name="header">The header.</param>
+        public ServerHandshake(Header header)
+        {
+            Accept = header["Sec-WebSocket-Accept"];
+            SubProtocol = header["Sec-WebSocket-Protocol"];
+        }
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents this instance.

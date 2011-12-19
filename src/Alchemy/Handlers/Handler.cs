@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
 using System.Threading;
@@ -116,13 +117,15 @@ namespace Alchemy.Handlers
             context.SendReady.Wait();
             try
             {
-                context.Connection.Client.BeginSend(raw ? dataFrame.AsRaw() : dataFrame.AsFrame(), SocketFlags.None,
+                List<ArraySegment<byte>> list = raw ? dataFrame.AsRaw() : dataFrame.AsFrame();
+                context.Connection.Client.BeginSend(list, SocketFlags.None,
                                                     callback,
                                                     context);
             }
-            catch
+            catch(Exception e)
             {
                 context.SendReady.Release();
+                Console.WriteLine(e);
             }
         }
 

@@ -24,7 +24,7 @@ namespace Alchemy.Classes
         /// Regular expression to parse http header
         /// </summary>
         public static string Pattern =
-            @"^(?<connect>[^\s]+)\s(?<path>[^\s]+)\sHTTP\/1\.1\r\n" + // HTTP Request
+            @"^(?<connect>[^\s]+)?\s?(?<path>[^\s]+)?\s?HTTP\/1\.1(.*?)?\r\n" + // HTTP Request
             @"((?<field_name>[^:\r\n]+):(?<field_value>[^\r\n]+)\r\n)+";
 
         // HTTP Header Fields (<Field_Name>: <Field_Value> CR LF)

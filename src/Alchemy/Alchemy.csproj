@@ -86,6 +86,7 @@
     <Compile Include="Handlers\WebSocket\IWebSocketAuthentication.cs" />
     <Compile Include="Handlers\WebSocket\WebSocketHandler.cs" />
     <Compile Include="TcpServer.cs" />
+    <Compile Include="WebSocketClient.cs" />
     <Compile Include="WebSocketServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

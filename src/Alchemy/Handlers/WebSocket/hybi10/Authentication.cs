@@ -51,7 +51,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                         }
                     }
                     // Generate response handshake for the client
-                    ServerHandshake serverShake = GenerateResponseHandshake(handshake, context);
+                    ServerHandshake serverShake = GenerateResponseHandshake(handshake);
                     serverShake.SubProtocol = handshake.SubProtocol;
                     // Send the response handshake
                     SendServerHandshake(serverShake, context);
@@ -61,9 +61,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             return false;
         }
 
-        private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake, Context context)
+        private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake)
         {
-            var responseHandshake = new ServerHandshake {Accept = GenerateAccept(handshake.Key, context)};
+            var responseHandshake = new ServerHandshake {Accept = GenerateAccept(handshake.Key)};
             return responseHandshake;
         }
 
@@ -75,13 +75,20 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             context.UserContext.Send(handshakeBytes, true);
         }
 
-        private static string GenerateAccept(string key, Context context)
+        public static string GenerateAccept(string key)
         {
-            string rawAnswer = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
+            if (!String.IsNullOrEmpty(key))
+            {
+                string rawAnswer = key + "258EAFA5-E914-47DA-95CA-C5AB0DC85B11";
 
-            // Create a hash of the rawAnswer and return it
-            SHA1 hasher = SHA1.Create();
-            return Convert.ToBase64String(hasher.ComputeHash(Encoding.UTF8.GetBytes(rawAnswer)));
+                // Create a hash of the rawAnswer and return it
+                SHA1 hasher = SHA1.Create();
+                return Convert.ToBase64String(hasher.ComputeHash(Encoding.UTF8.GetBytes(rawAnswer)));
+            }
+            else
+            {
+                return String.Empty;
+            }
         }
     }
 }

@@ -20,7 +20,7 @@ namespace Alchemy
         /// This is the Flash Access Policy Server. It allows us to facilitate flash socket connections much more quickly in most cases.
         /// Don't mess with it through here. It's only public so we can access it later from all the IOCPs.
         /// </summary>
-        public AccessPolicyServer AccessPolicyServer;
+        internal AccessPolicyServer AccessPolicyServer;
 
         /// <summary>
         /// These are the default OnEvent delegates for the server. By default, all new UserContexts will use these events.
@@ -45,8 +45,6 @@ namespace Alchemy
         /// 
         /// </summary>
         public ILog Log = LogManager.GetLogger("Alchemy.Log");
-
-        public int MaxPingsInSequence;
 
         /// <summary>
         /// Configuration for the above heartbeat setup.

@@ -24,7 +24,7 @@ namespace Alchemy.Classes
             /// <summary>
             /// The max frame that we will accept from the client
             /// </summary>
-            public UInt64 MaxFrameSize;
+            public UInt64 MaxFrameSize = Int64.MaxValue;
 
             /// <summary>
             /// Whether or not the TCPClient is still connected.
