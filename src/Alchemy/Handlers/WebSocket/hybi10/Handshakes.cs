@@ -31,8 +31,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
         public string Origin = String.Empty;
         public string ResourcePath = String.Empty;
 
-        public ClientHandshake()
-        { }
+        public ClientHandshake() {}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientHandshake"/> class.
@@ -116,14 +115,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             "Sec-WebSocket-Accept: {0}\r\n" +
             "{1}";
 
-        public string Accept { get; set; }
-        public string SubProtocol { get; set; }
-
-        public Dictionary<string, string> AdditionalFields { get; set; }
-
-        public ServerHandshake()
-        {
-        }
+        public ServerHandshake() {}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ServerHandshake"/> class.
@@ -134,6 +126,11 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             Accept = header["Sec-WebSocket-Accept"];
             SubProtocol = header["Sec-WebSocket-Protocol"];
         }
+
+        public string Accept { get; set; }
+        public string SubProtocol { get; set; }
+
+        public Dictionary<string, string> AdditionalFields { get; set; }
 
         /// <summary>
         /// Returns a <see cref="System.String"/> that represents this instance.

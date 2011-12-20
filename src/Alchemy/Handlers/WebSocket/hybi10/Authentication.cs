@@ -85,10 +85,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 SHA1 hasher = SHA1.Create();
                 return Convert.ToBase64String(hasher.ComputeHash(Encoding.UTF8.GetBytes(rawAnswer)));
             }
-            else
-            {
-                return String.Empty;
-            }
+            return String.Empty;
         }
     }
 }

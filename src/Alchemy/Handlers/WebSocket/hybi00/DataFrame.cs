@@ -30,8 +30,8 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                 // wrap the array with the wrapper bytes
                 var startBytes = new byte[1];
                 var endBytes = new byte[1];
-                Payload.Insert(0, new ArraySegment<byte>(startBytes));//Add header byte
-                Payload.Add(new ArraySegment<byte>(endBytes));//put termination byte at end
+                Payload.Insert(0, new ArraySegment<byte>(startBytes)); //Add header byte
+                Payload.Add(new ArraySegment<byte>(endBytes)); //put termination byte at end
                 Format = DataFormat.Frame;
             }
             return Payload;
@@ -44,8 +44,8 @@ namespace Alchemy.Handlers.WebSocket.hybi00
         {
             if (Format == DataFormat.Frame)
             {
-                Payload.RemoveAt(0);//remove header byte
-                Payload.RemoveAt(Payload.Count - 1);//remove termination byte
+                Payload.RemoveAt(0); //remove header byte
+                Payload.RemoveAt(Payload.Count - 1); //remove termination byte
                 Format = DataFormat.Raw;
             }
             return Payload;

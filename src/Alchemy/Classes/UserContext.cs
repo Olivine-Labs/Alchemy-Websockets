@@ -33,18 +33,12 @@ namespace Alchemy.Classes
         /// OnEvent Delegates specific to this connection.
         /// </summary>
         protected OnEventDelegate OnConnectDelegate = x => { };
+
         protected OnEventDelegate OnConnectedDelegate = x => { };
         protected OnEventDelegate OnDisconnectDelegate = x => { };
         protected OnEventDelegate OnReceiveDelegate = x => { };
         protected OnEventDelegate OnSendDelegate = x => { };
 
-        /// <summary>
-        /// The internal context connection header
-        /// </summary>
-        public Header Header
-        {
-            get { return _context.Header; }
-        }
         /// <summary>
         /// The type of connection this is
         /// </summary>
@@ -56,21 +50,29 @@ namespace Alchemy.Classes
         public string RequestPath = "/";
 
         /// <summary>
-        /// The maximum frame size
-        /// </summary>
-        public UInt64 MaxFrameSize
-        {
-            get { return _context.MaxFrameSize; }
-            set { _context.MaxFrameSize = value; }
-        }
-
-        /// <summary>
         /// Initializes a new instance of the <see cref="UserContext"/> class.
         /// </summary>
         /// <param name="context">The user context.</param>
         public UserContext(Context context)
         {
             _context = context;
+        }
+
+        /// <summary>
+        /// The internal context connection header
+        /// </summary>
+        public Header Header
+        {
+            get { return _context.Header; }
+        }
+
+        /// <summary>
+        /// The maximum frame size
+        /// </summary>
+        public UInt64 MaxFrameSize
+        {
+            get { return _context.MaxFrameSize; }
+            set { _context.MaxFrameSize = value; }
         }
 
         /// <summary>

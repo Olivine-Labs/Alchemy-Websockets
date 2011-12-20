@@ -117,15 +117,14 @@ namespace Alchemy.Handlers
             context.SendReady.Wait();
             try
             {
-                List<ArraySegment<byte>> list = raw ? dataFrame.AsRaw() : dataFrame.AsFrame();
-                context.Connection.Client.BeginSend(list, SocketFlags.None,
+                List<ArraySegment<byte>> data = raw ? dataFrame.AsRaw() : dataFrame.AsFrame();
+                context.Connection.Client.BeginSend(data, SocketFlags.None,
                                                     callback,
                                                     context);
             }
-            catch(Exception e)
+            catch (Exception)
             {
                 context.SendReady.Release();
-                Console.WriteLine(e);
             }
         }
 

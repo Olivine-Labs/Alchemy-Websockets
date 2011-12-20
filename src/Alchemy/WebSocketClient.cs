@@ -4,50 +4,58 @@ using System.Text;
 using System.Threading;
 using Alchemy.Classes;
 using Alchemy.Handlers.WebSocket.hybi10;
-using DataFrame = Alchemy.Handlers.WebSocket.DataFrame;
 
 namespace Alchemy
 {
     public class WebSocketClient
     {
-        private TcpClient _client;
+        public TimeSpan ConnectTimeout = new TimeSpan(0, 0, 0, 10);
         public string Host = "localhost";
-        public int Port = 81;
-        public String Path = "/";
-        public String Origin = "localhost";
 
-        private ClientHandshake _handshake;
+        public bool IsAuthenticated;
 
-        public bool IsAuthenticated = false;
-
-        public OnEventDelegate OnReceive = x => {};
-        public OnEventDelegate OnSend = x => { };
         public OnEventDelegate OnConnect = x => { };
         public OnEventDelegate OnConnected = x => { };
         public OnEventDelegate OnDisconnect = x => { };
+        public OnEventDelegate OnReceive = x => { };
+        public OnEventDelegate OnSend = x => { };
+        public String Origin = "localhost";
+        public String Path = "/";
+        public int Port = 81;
+        private TcpClient _client;
 
+        private bool _connecting;
         private Context _context;
+        private ClientHandshake _handshake;
 
         public Boolean Connected
         {
             get
             {
                 if (_client != null)
+                {
                     return _client.Connected;
+                }
                 return false;
             }
         }
 
         public void Connect()
         {
-            if(_client == null)
+            if (_client == null)
             {
                 try
                 {
                     _client = new TcpClient();
+                    _connecting = true;
                     _client.BeginConnect(Host, Port, OnRunClient, null);
-                    while(!IsAuthenticated)
-                        Thread.Sleep(10);
+                    var waiting = new TimeSpan();
+                    while (_connecting && waiting < ConnectTimeout)
+                    {
+                        var timeSpan = new TimeSpan(0, 0, 0, 0, 100);
+                        waiting = waiting.Add(timeSpan);
+                        Thread.Sleep(timeSpan.Milliseconds);
+                    }
                 }
                 catch (Exception)
                 {
@@ -64,7 +72,7 @@ namespace Alchemy
         {
             try
             {
-              _client.EndConnect(result);
+                _client.EndConnect(result);
             }
             catch (Exception)
             {
@@ -76,28 +84,30 @@ namespace Alchemy
                 _context.Connection = _client;
                 _context.BufferSize = 512;
                 _context.UserContext.ClientAddress = _context.Connection.Client.RemoteEndPoint;
-                _context.UserContext.DataFrame = new Handlers.WebSocket.hybi10.DataFrame();
+                _context.UserContext.DataFrame = new DataFrame();
                 _context.UserContext.SetOnConnect(OnConnect);
                 _context.UserContext.SetOnConnected(OnConnected);
                 _context.UserContext.SetOnDisconnect(OnDisconnect);
                 _context.UserContext.SetOnSend(OnSend);
                 _context.UserContext.SetOnReceive(OnReceive);
                 _context.UserContext.OnConnect();
-                
+
                 try
                 {
                     while (_context.Connection.Connected)
                     {
                         _context.ReceiveReady.Wait();
-                            _context.Connection.Client.BeginReceive(_context.Buffer, 0, _context.Buffer.Length,
-                                                                   SocketFlags.None, DoReceive, _context);
-                        if(!IsAuthenticated)
+                        _context.Connection.Client.BeginReceive(_context.Buffer, 0, _context.Buffer.Length,
+                                                                SocketFlags.None, DoReceive, _context);
+                        if (!IsAuthenticated)
+                        {
                             Authenticate();
+                        }
                     }
                 }
-                catch (Exception e)
+                catch (Exception)
                 {
-                    Console.WriteLine("Server Forcefully Disconnected"+ e);
+                    Disconnect();
                 }
             }
         }
@@ -114,16 +124,17 @@ namespace Alchemy
             String receivedData = context.UserContext.DataFrame.ToString();
             var header = new Header(receivedData);
             var handshake = new ServerHandshake(header);
-            if (Handlers.WebSocket.hybi10.Authentication.GenerateAccept(_handshake.Key) == handshake.Accept)
+            if (Authentication.GenerateAccept(_handshake.Key) == handshake.Accept)
             {
                 IsAuthenticated = true;
+                _connecting = false;
                 context.UserContext.OnConnected();
             }
         }
 
         private void ReceiveData(Context context)
         {
-            if(!IsAuthenticated)
+            if (!IsAuthenticated)
             {
                 var someBytes = new byte[context.ReceivedByteCount];
                 Array.Copy(context.Buffer, 0, someBytes, 0, context.ReceivedByteCount);
@@ -134,7 +145,7 @@ namespace Alchemy
             else
             {
                 context.UserContext.DataFrame.Append(context.Buffer, true);
-                if(context.UserContext.DataFrame.State == DataFrame.DataState.Complete)
+                if (context.UserContext.DataFrame.State == Handlers.WebSocket.DataFrame.DataState.Complete)
                 {
                     context.UserContext.OnReceive();
                     context.UserContext.DataFrame.Reset();
@@ -144,7 +155,7 @@ namespace Alchemy
 
         private void DoReceive(IAsyncResult result)
         {
-            var context = (Context)result.AsyncState;
+            var context = (Context) result.AsyncState;
             context.Reset();
             try
             {
@@ -171,18 +182,19 @@ namespace Alchemy
         {
             var bytes = new byte[16];
             var random = new Random();
-            for(int index = 0; index < bytes.Length; index++)
+            for (int index = 0; index < bytes.Length; index++)
             {
-                bytes[index] = (byte)random.Next(0, 255);
+                bytes[index] = (byte) random.Next(0, 255);
             }
-            return System.Convert.ToBase64String(bytes);
+            return Convert.ToBase64String(bytes);
         }
 
         public void Disconnect()
         {
-            if(_client != null)
+            _connecting = false;
+            if (_client != null)
             {
-                DataFrame dataFrame = new Handlers.WebSocket.hybi10.DataFrame();
+                var dataFrame = new DataFrame();
                 dataFrame.Append(new byte[0]);
 
                 byte[] bytes = dataFrame.AsFrame()[0].Array;

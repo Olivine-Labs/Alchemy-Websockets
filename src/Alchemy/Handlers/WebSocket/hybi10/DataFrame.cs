@@ -44,12 +44,13 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 switch (State)
                 {
                     case DataState.Pong:
-                        _header.OpCode = OpCode.Pong;//Setup Opcode for Pong frame if application has specified that we're sending a pong.
+                        _header.OpCode = OpCode.Pong;
+                        //Setup Opcode for Pong frame if application has specified that we're sending a pong.
                         break;
                 }
                 byte[] headerBytes = _header.ToBytes();
-                Mask();//Uses _header, must call ToBytes before calling Mask
-                Payload.Insert(0, new ArraySegment<byte>(headerBytes));//put header at first position
+                Mask(); //Uses _header, must call ToBytes before calling Mask
+                Payload.Insert(0, new ArraySegment<byte>(headerBytes)); //put header at first position
                 Format = DataFormat.Frame;
             }
             return Payload;
@@ -62,8 +63,8 @@ namespace Alchemy.Handlers.WebSocket.hybi10
         {
             if (Format == DataFormat.Frame)
             {
-                Payload.RemoveAt(0);//Remove header bytes
-                Mask();//unmask data
+                Payload.RemoveAt(0); //Remove header bytes
+                Mask(); //unmask data
                 Format = DataFormat.Raw;
             }
             return Payload;

@@ -31,8 +31,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
         public string Origin = String.Empty;
         public string ResourcePath = String.Empty;
 
-        public ClientHandshake()
-        {}
+        public ClientHandshake() {}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ClientHandshake"/> class.

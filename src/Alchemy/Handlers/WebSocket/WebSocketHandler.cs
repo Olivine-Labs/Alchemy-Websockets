@@ -43,7 +43,7 @@ namespace Alchemy.Handlers.WebSocket
                 }
                 else
                 {
-                    context.Dispose();//Disconnect if over MaxFrameSize
+                    context.Dispose(); //Disconnect if over MaxFrameSize
                 }
             }
             else

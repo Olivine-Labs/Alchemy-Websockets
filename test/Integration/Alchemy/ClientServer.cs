@@ -10,15 +10,16 @@ namespace Alchemy
     {
         private WebSocketServer _server;
         private WebSocketClient _client;
-        private bool _clientSendDataPassed = false;
+        private bool _forever;
+        private bool _clientDataPass = true;
+
         [TestFixtureSetUp]
         public void SetUp()
         {
-            _server = new WebSocketServer(54321, IPAddress.Loopback);
-            _server.DefaultOnReceive = new OnEventDelegate(OnServerReceive);
+            _server = new WebSocketServer(54321, IPAddress.Loopback) {DefaultOnReceive = OnServerReceive};
             _server.Start();
-            _client = new WebSocketClient {Host = "127.0.0.1", Port = 54321, Origin = "localhost"};
-            _client.OnReceive = new OnEventDelegate(OnClientReceive);
+            _client = new WebSocketClient
+            {Host = "127.0.0.1", Port = 54321, Origin = "localhost", OnReceive = OnClientReceive};
             _client.Connect();
         }
 
@@ -31,24 +32,6 @@ namespace Alchemy
             _server = null;
         }
 
-        [Test]
-        public void ClientConnect()
-        {
-            Assert.IsTrue(_client.Connected);
-        }
-
-        [Test]
-        public void ClientSendData()
-        {
-            if (_client.Connected)
-            {
-                _client.Send("Test");
-                Thread.Sleep(1000);
-            }
-
-            Assert.IsTrue(_clientSendDataPassed);
-        }
-
         private void OnServerReceive(UserContext context)
         {
             string data = context.DataFrame.ToString();
@@ -58,10 +41,62 @@ namespace Alchemy
         private void OnClientReceive(UserContext context)
         {
             string data = context.DataFrame.ToString();
-            if(data == "Test")
+            if (data == "Test")
             {
-                _clientSendDataPassed = true;
+                if (_forever && _clientDataPass)
+                {
+                    context.Send(data);
+                }
             }
+            else
+            {
+                _clientDataPass = false;
+            }
+        }
+
+        [Test]
+        public void ClientConnect()
+        {
+            Assert.IsTrue(_client.Connected);
+        }
+
+        [Test]
+        public void ClientSendData()
+        {
+            _forever = false;
+            if (_client.Connected)
+            {
+                _client.Send("Test");
+                Thread.Sleep(1000);
+            }
+            Assert.IsTrue(_clientDataPass);
+        }
+
+        [Test]
+        public void ClientSendDataConcurrent()
+        {
+            _forever = true;
+            if (_client.Connected)
+            {
+                var client2 = new WebSocketClient
+                {Host = "127.0.0.1", Port = 54321, Origin = "localhost", OnReceive = OnClientReceive};
+                client2.Connect();
+                if (client2.Connected)
+                {
+                    _client.Send("Test");
+                    client2.Send("Test");
+                }
+                else
+                {
+                    _clientDataPass = false;
+                }
+                Thread.Sleep(5000);
+            }
+            else
+            {
+                _clientDataPass = false;
+            }
+            Assert.IsTrue(_clientDataPass);
         }
     }
 }
