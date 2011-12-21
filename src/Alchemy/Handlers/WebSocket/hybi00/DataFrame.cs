@@ -78,6 +78,9 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                     if ((start != -1) && (start < end))
                         // Make sure the start is before the end and that we actually found a match.
                     {
+                        byte[] startBytes = new byte[1];
+                        startBytes[0] = StartByte;
+                        Payload.Add(new ArraySegment<byte>(startBytes));
                         start++; // Do not include the Start Byte
                     }
                     else //If no match found, default.
@@ -88,6 +91,12 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                     var temp = new byte[end - start];
                     Array.Copy(data, start, temp, 0, end - start);
                     Payload.Add(new ArraySegment<byte>(temp));
+                    if(State == DataState.Complete)
+                    {
+                        byte[] endBytes = new byte[1];
+                        endBytes[0] = EndByte;
+                        Payload.Add(new ArraySegment<byte>(endBytes));
+                    }
                 }
             }
             else
