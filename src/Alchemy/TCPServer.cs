@@ -141,7 +141,15 @@ namespace Alchemy
             TcpClient connection = null;
             if (_listener != null)
             {
-                connection = _listener.EndAcceptTcpClient(result);
+                try
+                {
+                    connection = _listener.EndAcceptTcpClient(result);
+                }
+                catch (Exception)
+                {
+
+                    connection = null;
+                }
             }
             _connectReady.Release();
             if (connection != null)
