@@ -116,9 +116,10 @@ namespace Alchemy
         /// <summary>
         /// Fires when a client connects.
         /// </summary>
-        /// <param name="connection">The TCP Connection.</param>
-        protected override void OnRunClient(TcpClient connection)
+        /// <param name="data">The TCP Connection.</param>
+        protected override void OnRunClient(object data)
         {
+            var connection = (TcpClient)data;
             using (var context = new Context(this, connection))
             {
                 context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;

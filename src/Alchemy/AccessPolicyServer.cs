@@ -44,9 +44,10 @@ namespace Alchemy
         /// <summary>
         /// Fires when a client connects.
         /// </summary>
-        /// <param name="connection">The TCP Connection.</param>
-        protected override void OnRunClient(TcpClient connection)
+        /// <param name="data">The TCP Connection.</param>
+        protected override void OnRunClient(object data)
         {
+            var connection = (TcpClient) data;
             try
             {
                 connection.Client.Receive(new byte[32]);

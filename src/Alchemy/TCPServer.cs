@@ -58,7 +58,7 @@ namespace Alchemy
         /// <summary>
         /// Gets the client count.
         /// </summary>
-        public int ClientCount
+        public int Clients
         {
             get { return _clients; }
         }
@@ -150,7 +150,7 @@ namespace Alchemy
                 _clients++;
                 _clientLock.Release();
 
-                OnRunClient(connection);
+                ThreadPool.QueueUserWorkItem(OnRunClient, connection);
 
                 _clientLock.Wait();
                 _clients--;
@@ -158,7 +158,7 @@ namespace Alchemy
             }
         }
 
-        protected abstract void OnRunClient(TcpClient connection);
+        protected abstract void OnRunClient(object connection);
 
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
