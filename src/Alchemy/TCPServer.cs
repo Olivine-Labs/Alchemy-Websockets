@@ -82,17 +82,8 @@ namespace Alchemy
         {
             if (_listener == null)
             {
-                try
-                {
-                    _listener = new TcpListener(_listenAddress, _port);
-                    ThreadPool.QueueUserWorkItem(Listen, null);
-                }
-                    // ReSharper disable EmptyGeneralCatchClause
-                catch
-                    // ReSharper restore EmptyGeneralCatchClause
-                {
-                    /* Ignore */
-                }
+                _listener = new TcpListener(_listenAddress, _port);
+                ThreadPool.QueueUserWorkItem(Listen, null);
             }
         }
 
@@ -103,16 +94,7 @@ namespace Alchemy
         {
             if (_listener != null)
             {
-                try
-                {
-                    _listener.Stop();
-                }
-                    // ReSharper disable EmptyGeneralCatchClause
-                catch
-                    // ReSharper restore EmptyGeneralCatchClause
-                {
-                    /* Ignore */
-                }
+                _listener.Stop();
             }
             _listener = null;
         }
@@ -139,9 +121,7 @@ namespace Alchemy
                 {
                     _listener.BeginAcceptTcpClient(RunClient, null);
                 }
-                    // ReSharper disable EmptyGeneralCatchClause
-                catch
-                    // ReSharper restore EmptyGeneralCatchClause
+                catch (SocketException)
                 {
                     /* Ignore */
                 }
@@ -159,20 +139,10 @@ namespace Alchemy
         private void RunClient(IAsyncResult result)
         {
             TcpClient connection = null;
-            try
+            if (_listener != null)
             {
-                if (_listener != null)
-                {
-                    connection = _listener.EndAcceptTcpClient(result);
-                }
+                connection = _listener.EndAcceptTcpClient(result);
             }
-                // ReSharper disable EmptyGeneralCatchClause
-            catch
-                // ReSharper restore EmptyGeneralCatchClause
-            {
-                /* Ignore*/
-            }
-
             _connectReady.Release();
             if (connection != null)
             {

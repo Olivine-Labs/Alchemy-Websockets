@@ -4,6 +4,21 @@ namespace Alchemy.Handlers
 {
     internal abstract class Authentication : IAuthentication
     {
+        private static string _origin = string.Empty;
+        private static string _destination = string.Empty;
+
+        public static string Origin
+        {
+            get { return _origin; }
+            set { _origin = value; }
+        }
+
+        public static string Destination
+        {
+            get { return _destination; }
+            set { _destination = value; }
+        }
+
         #region IAuthentication Members
 
         /// <summary>
@@ -23,7 +38,7 @@ namespace Alchemy.Handlers
             }
             else
             {
-                context.Dispose();
+                context.Disconnect();
             }
         }
 

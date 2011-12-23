@@ -79,11 +79,9 @@ namespace Alchemy
                 Disconnect();
             }
 
-            using (_context = new Context())
+            using (_context = new Context(null, _client))
             {
-                _context.Connection = _client;
                 _context.BufferSize = 512;
-                _context.UserContext.ClientAddress = _context.Connection.Client.RemoteEndPoint;
                 _context.UserContext.DataFrame = new DataFrame();
                 _context.UserContext.SetOnConnect(OnConnect);
                 _context.UserContext.SetOnConnected(OnConnected);
@@ -92,24 +90,26 @@ namespace Alchemy
                 _context.UserContext.SetOnReceive(OnReceive);
                 _context.UserContext.OnConnect();
 
-                try
+
+                while (_context.Connection.Connected)
                 {
-                    while (_context.Connection.Connected)
+                    _context.ReceiveReady.Wait();
+                    try
                     {
-                        _context.ReceiveReady.Wait();
                         _context.Connection.Client.BeginReceive(_context.Buffer, 0, _context.Buffer.Length,
                                                                 SocketFlags.None, DoReceive, _context);
-                        if (!IsAuthenticated)
-                        {
-                            Authenticate();
-                        }
+                    }
+                    catch (Exception)
+                    {
+                        break;
+                    }
+                    if (!IsAuthenticated)
+                    {
+                        Authenticate();
                     }
                 }
-                catch (Exception)
-                {
-                    Disconnect();
-                }
             }
+            Disconnect();
         }
 
         private void Authenticate()
@@ -163,7 +163,7 @@ namespace Alchemy
             }
             catch (Exception)
             {
-                Disconnect();
+                context.ReceivedByteCount = 0;
             }
 
             if (context.ReceivedByteCount > 0)
@@ -173,8 +173,7 @@ namespace Alchemy
             }
             else
             {
-                context.Dispose();
-                context.ReceiveReady.Release();
+                context.Disconnect();
             }
         }
 

@@ -24,11 +24,12 @@ namespace Alchemy.Handlers
         {
             get
             {
-                CreateLock.Wait();
-                if (_instance == null)
+                if (_instance != null)
                 {
-                    _instance = new Handler();
+                    return _instance;
                 }
+                CreateLock.Wait();
+                _instance = new Handler();
                 CreateLock.Release();
                 return _instance;
             }
@@ -44,7 +45,7 @@ namespace Alchemy.Handlers
         {
             if (context.IsSetup)
             {
-                context.Dispose();
+                context.Disconnect();
             }
             else
             {
@@ -62,15 +63,9 @@ namespace Alchemy.Handlers
             //Check first to see if this is a flash socket XML request.
             if (data == "<policy-file-request/>\0")
             {
-                try
-                {
-                    //if it is, we access the Access Policy Server instance to send the appropriate response.
-                    context.Server.AccessPolicyServer.SendResponse(context.Connection);
-                }
-                    // ReSharper disable EmptyGeneralCatchClause
-                catch {}
-                // ReSharper restore EmptyGeneralCatchClause
-                context.Dispose();
+                //if it is, we access the Access Policy Server instance to send the appropriate response.
+                context.Server.AccessPolicyServer.SendResponse(context.Connection);
+                context.Disconnect();
             }
             else //If it isn't, process http/websocket header as normal.
             {
@@ -109,22 +104,25 @@ namespace Alchemy.Handlers
         /// <param name="close">if set to <c>true</c> [close].</param>
         public void Send(DataFrame dataFrame, Context context, bool raw = false, bool close = false)
         {
-            AsyncCallback callback = EndSend;
-            if (close)
+            if (context.Connected)
             {
-                callback = EndSendAndClose;
-            }
-            context.SendReady.Wait();
-            try
-            {
-                List<ArraySegment<byte>> data = raw ? dataFrame.AsRaw() : dataFrame.AsFrame();
-                context.Connection.Client.BeginSend(data, SocketFlags.None,
-                                                    callback,
-                                                    context);
-            }
-            catch (Exception)
-            {
-                context.SendReady.Release();
+                AsyncCallback callback = EndSend;
+                if (close)
+                {
+                    callback = EndSendAndClose;
+                }
+                context.SendReady.Wait();
+                try
+                {
+                    List<ArraySegment<byte>> data = raw ? dataFrame.AsRaw() : dataFrame.AsFrame();
+                    context.Connection.Client.BeginSend(data, SocketFlags.None,
+                                                        callback,
+                                                        context);
+                }
+                catch
+                {
+                    context.Disconnect();
+                }
             }
         }
 
@@ -142,7 +140,7 @@ namespace Alchemy.Handlers
             }
             catch
             {
-                context.SendReady.Release();
+                context.Disconnect();
             }
             context.UserContext.OnSend();
         }
@@ -154,17 +152,8 @@ namespace Alchemy.Handlers
         public void EndSendAndClose(IAsyncResult result)
         {
             var context = (Context) result.AsyncState;
-            try
-            {
-                context.Connection.Client.EndSend(result);
-                context.SendReady.Release();
-            }
-            catch
-            {
-                context.SendReady.Release();
-            }
-            context.UserContext.OnSend();
-            context.Dispose();
+            EndSend(result);
+            context.Disconnect();
         }
     }
 }

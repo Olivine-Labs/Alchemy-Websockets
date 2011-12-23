@@ -56,10 +56,6 @@
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="log4net, Version=1.2.10.0, Culture=neutral, PublicKeyToken=1b44e1d426115821, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\lib\log4net.dll</HintPath>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Web" />
     <Reference Include="System.XML" />
@@ -83,7 +79,6 @@
     <Compile Include="Handlers\WebSocket\hybi10\Authentication.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\Handshakes.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\Handler.cs" />
-    <Compile Include="Handlers\WebSocket\IWebSocketAuthentication.cs" />
     <Compile Include="Handlers\WebSocket\WebSocketHandler.cs" />
     <Compile Include="TcpServer.cs" />
     <Compile Include="WebSocketClient.cs" />

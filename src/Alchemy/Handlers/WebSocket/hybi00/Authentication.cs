@@ -11,19 +11,6 @@ namespace Alchemy.Handlers.WebSocket.hybi00
     /// </summary>
     internal class Authentication : Handlers.Authentication
     {
-        public static string Origin = string.Empty;
-        public static string Location = string.Empty;
-
-        public void SetOrigin(string origin)
-        {
-            Origin = origin;
-        }
-
-        public void SetLocation(string location)
-        {
-            Location = location;
-        }
-
         protected override bool CheckAuthentication(Context context)
         {
             if (context.ReceivedByteCount > 8)
@@ -42,9 +29,9 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                             return false;
                         }
                     }
-                    if (Location != string.Empty)
+                    if (Destination != string.Empty)
                     {
-                        if (handshake.Host != Location + ":" + context.Server.Port.ToString())
+                        if (handshake.Host != Destination + ":" + context.Server.Port.ToString())
                         {
                             return false;
                         }

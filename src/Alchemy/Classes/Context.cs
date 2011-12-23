@@ -73,10 +73,12 @@ namespace Alchemy.Classes
         /// <summary>
         /// Initializes a new instance of the <see cref="Context"/> class.
         /// </summary>
-        public Context()
+        public Context(WebSocketServer server, TcpClient connection)
         {
+            Server = server;
+            Connection = connection;
             Buffer = new byte[_bufferSize];
-            UserContext = new UserContext(this);
+            UserContext = new UserContext(this) {ClientAddress = connection.Client.RemoteEndPoint};
         }
 
         /// <summary>
@@ -102,26 +104,19 @@ namespace Alchemy.Classes
         /// </summary>
         public void Dispose()
         {
-            try
-            {
-                Connection.Client.Close();
-                Connection = null;
-            }
-            catch (Exception e)
-            {
-                Server.Log.Debug("Client Already Disconnected", e);
-            }
-            finally
-            {
-                if (Connected)
-                {
-                    Connected = false;
-                }
-                UserContext.OnDisconnect();
-            }
+            Connected = false;
+            UserContext.OnDisconnect();
         }
 
         #endregion
+
+        /// <summary>
+        /// Disconnects the client
+        /// </summary>
+        public void Disconnect()
+        {
+            Connected = false;
+        }
 
         /// <summary>
         /// Resets this instance.

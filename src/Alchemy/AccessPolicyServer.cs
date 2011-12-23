@@ -53,9 +53,7 @@ namespace Alchemy
                 SendResponse(connection);
                 connection.Client.Close();
             }
-                // ReSharper disable EmptyGeneralCatchClause
-            catch
-                // ReSharper restore EmptyGeneralCatchClause
+            catch (SocketException)
             {
                 /* Ignore */
             }
@@ -67,8 +65,15 @@ namespace Alchemy
         /// <param name="connection">The TCP Connection.</param>
         public void SendResponse(TcpClient connection)
         {
-            connection.Client.Send(
-                Encoding.UTF8.GetBytes(String.Format(Response, _allowedHost, _allowedPort.ToString())));
+            try
+            {
+                connection.Client.Send(
+                    Encoding.UTF8.GetBytes(String.Format(Response, _allowedHost, _allowedPort.ToString())));
+            }
+            catch (SocketException)
+            {
+                //Ignore
+            }
         }
     }
 }

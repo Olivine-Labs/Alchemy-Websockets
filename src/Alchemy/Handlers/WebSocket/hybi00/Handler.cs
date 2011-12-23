@@ -16,11 +16,12 @@
         {
             get
             {
-                CreateLock.Wait();
-                if (_instance == null)
+                if (_instance != null)
                 {
-                    _instance = new Handler();
+                    return _instance;
                 }
+                CreateLock.Wait();
+                _instance = new Handler();
                 CreateLock.Release();
                 return _instance;
             }

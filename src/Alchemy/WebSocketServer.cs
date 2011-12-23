@@ -1,11 +1,8 @@
 ﻿using System;
-using System.IO;
 using System.Net;
 using System.Net.Sockets;
 using Alchemy.Classes;
-using Alchemy.Handlers.WebSocket.hybi10;
-using log4net;
-using log4net.Config;
+using Alchemy.Handlers;
 
 namespace Alchemy
 {
@@ -40,12 +37,6 @@ namespace Alchemy
         /// </summary>
         public bool FlashAccessPolicyEnabled = true;
 
-
-        /// <summary>
-        /// 
-        /// </summary>
-        public ILog Log = LogManager.GetLogger("Alchemy.Log");
-
         /// <summary>
         /// Configuration for the above heartbeat setup.
         /// TimeOut : How long until a connection drops when it doesn't receive anything.
@@ -53,19 +44,13 @@ namespace Alchemy
         /// </summary>
         public TimeSpan TimeOut = TimeSpan.FromMinutes(1);
 
-        private string _destinationHost = String.Empty;
-        private string _originHost = String.Empty;
+        private string _destination = String.Empty;
+        private string _origin = String.Empty;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="WebSocketServer"/> class.
         /// </summary>
-        /// <param name="listenPort">The listen port.</param>
-        /// <param name="listenAddress">The listen ip.</param>
-        public WebSocketServer(int listenPort = 0, IPAddress listenAddress = null) : base(listenPort, listenAddress)
-        {
-            LogConfigFile = "Alchemy.config";
-            LoggerName = "Alchemy.Log";
-        }
+        public WebSocketServer(int listenPort = 0, IPAddress listenAddress = null) : base(listenPort, listenAddress) {}
 
         /// <summary>
         /// Gets or sets the origin host.
@@ -73,12 +58,12 @@ namespace Alchemy
         /// <value>
         /// The origin host.
         /// </value>
-        public string OriginHost
+        public string Origin
         {
-            get { return _originHost; }
+            get { return _origin; }
             set
             {
-                _originHost = value;
+                _origin = value;
                 Authentication.Origin = value;
             }
         }
@@ -89,36 +74,14 @@ namespace Alchemy
         /// <value>
         /// The destination host.
         /// </value>
-        public string DestinationHost
+        public string Destination
         {
-            get { return _destinationHost; }
+            get { return _destination; }
             set
             {
-                _destinationHost = value;
-                Authentication.Location = value;
+                _destination = value;
+                Authentication.Destination = value;
             }
-        }
-
-        /// <summary>
-        /// Sets the name of the logger.
-        /// </summary>
-        /// <value>
-        /// The name of the logger.
-        /// </value>
-        public string LoggerName
-        {
-            set { Log = LogManager.GetLogger(value); }
-        }
-
-        /// <summary>
-        /// Sets the log config file name.
-        /// </summary>
-        /// <value>
-        /// The log config file name.
-        /// </value>
-        public string LogConfigFile
-        {
-            set { XmlConfigurator.Configure(new FileInfo(value)); }
         }
 
         /// <summary>
@@ -129,23 +92,13 @@ namespace Alchemy
             base.Start();
             if (AccessPolicyServer == null)
             {
-                try
-                {
-                    AccessPolicyServer = new AccessPolicyServer(ListenAddress, OriginHost, Port);
+                AccessPolicyServer = new AccessPolicyServer(ListenAddress, Origin, Port);
 
-                    if (FlashAccessPolicyEnabled)
-                    {
-                        AccessPolicyServer.Start();
-                    }
-                }
-                    // ReSharper disable EmptyGeneralCatchClause
-                catch
-                    // ReSharper restore EmptyGeneralCatchClause
+                if (FlashAccessPolicyEnabled)
                 {
-                    /* Ignore */
+                    AccessPolicyServer.Start();
                 }
             }
-            Log.Info("Alchemy Server Started");
         }
 
         /// <summary>
@@ -153,21 +106,11 @@ namespace Alchemy
         /// </summary>
         public override void Stop()
         {
-            try
+            if ((AccessPolicyServer != null) && (FlashAccessPolicyEnabled))
             {
-                if ((AccessPolicyServer != null) && (FlashAccessPolicyEnabled))
-                {
-                    AccessPolicyServer.Stop();
-                }
+                AccessPolicyServer.Stop();
+                AccessPolicyServer = null;
             }
-                // ReSharper disable EmptyGeneralCatchClause
-            catch
-                // ReSharper restore EmptyGeneralCatchClause
-            {
-                /* Ignore */
-            }
-            AccessPolicyServer = null;
-            Log.Info("Alchemy Server Stopped");
         }
 
         /// <summary>
@@ -176,10 +119,8 @@ namespace Alchemy
         /// <param name="connection">The TCP Connection.</param>
         protected override void OnRunClient(TcpClient connection)
         {
-            using (var context = new Context())
+            using (var context = new Context(this, connection))
             {
-                context.Server = this;
-                context.Connection = connection;
                 context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;
                 context.UserContext.SetOnConnect(DefaultOnConnect);
                 context.UserContext.SetOnConnected(DefaultOnConnected);
@@ -188,24 +129,24 @@ namespace Alchemy
                 context.UserContext.SetOnReceive(DefaultOnReceive);
                 context.BufferSize = DefaultBufferSize;
                 context.UserContext.OnConnect();
-                try
+                while (context.Connected)
                 {
-                    while (context.Connection.Connected)
+                    if (context.ReceiveReady.Wait(TimeOut))
                     {
-                        if (context.ReceiveReady.Wait(TimeOut))
+                        try
                         {
                             context.Connection.Client.BeginReceive(context.Buffer, 0, context.Buffer.Length,
                                                                    SocketFlags.None, DoReceive, context);
                         }
-                        else
+                        catch (SocketException)
                         {
                             break;
                         }
                     }
-                }
-                catch (Exception e)
-                {
-                    Log.Debug("Client Forcefully Disconnected", e);
+                    else
+                    {
+                        break;
+                    }
                 }
             }
         }
@@ -222,9 +163,9 @@ namespace Alchemy
             {
                 context.ReceivedByteCount = context.Connection.Client.EndReceive(result);
             }
-            catch (Exception e)
+            catch
             {
-                Log.Debug("Client Forcefully Disconnected", e);
+                context.ReceivedByteCount = 0;
             }
 
             if (context.ReceivedByteCount > 0)
@@ -234,7 +175,7 @@ namespace Alchemy
             }
             else
             {
-                context.Dispose();
+                context.Disconnect();
                 context.ReceiveReady.Release();
             }
         }

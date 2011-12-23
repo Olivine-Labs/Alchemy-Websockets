@@ -62,34 +62,34 @@ namespace Alchemy.Classes
         /// <param name="data">The data.</param>
         public Header(string data)
         {
-            try
+            // Parse HTTP Header
+            var regex = new Regex(Pattern, RegexOptions.IgnoreCase);
+            Match match = regex.Match(data);
+            GroupCollection someFields = match.Groups;
+            Group fieldNameCollection = someFields["field_name"];
+            Group fieldValueCollection = someFields["field_value"];
+            if (fieldNameCollection != null && fieldValueCollection != null)
             {
-                // Parse HTTP Header
-                var regex = new Regex(Pattern, RegexOptions.IgnoreCase);
-                Match match = regex.Match(data);
-                GroupCollection someFields = match.Groups;
                 // run through every match and save them in the handshake object
-                for (int i = 0; i < someFields["field_name"].Captures.Count; i++)
+                for (int i = 0; i < fieldNameCollection.Captures.Count; i++)
                 {
-                    string name = someFields["field_name"].Captures[i].ToString().ToLower();
-                    string value = someFields["field_value"].Captures[i].ToString().Trim();
+                    string name = fieldNameCollection.Captures[i].ToString().ToLower();
+                    string value = fieldValueCollection.Captures[i].ToString().Trim();
                     switch (name)
                     {
                         case "cookie":
                             string[] cookieArray = value.Split(';');
                             foreach (string cookie in cookieArray)
                             {
-                                try
+                                int cookieIndex = cookie.IndexOf('=');
+                                if (cookieIndex >= 0)
                                 {
-                                    string cookieName = cookie.Remove(cookie.IndexOf('='));
-                                    string cookieValue = cookie.Substring(cookie.IndexOf('=') + 1);
-                                    Cookies.Add(new HttpCookie(cookieName.TrimStart(), cookieValue));
-                                }
-                                    // ReSharper disable EmptyGeneralCatchClause
-                                catch
-                                    // ReSharper restore EmptyGeneralCatchClause
-                                {
-                                    /* Ignore bad cookie */
+                                    string cookieName = cookie.Remove(cookieIndex).TrimStart();
+                                    string cookieValue = cookie.Substring(cookieIndex + 1);
+                                    if (cookieName != string.Empty)
+                                    {
+                                        Cookies.Add(new HttpCookie(cookieName, cookieValue));
+                                    }
                                 }
                             }
                             break;
@@ -98,23 +98,30 @@ namespace Alchemy.Classes
                             break;
                     }
                 }
-
-                RequestPath = someFields["path"].Captures[0].Value.Trim();
-                Method = someFields["connect"].Captures[0].Value.Trim();
-
-                int version;
-                Int32.TryParse(_fields["sec-websocket-version"], out version);
-
-                // ReSharper restore EmptyGeneralCatchClause
-
-                Protocol = version < 8 ? Protocol.WebSocketHybi00 : Protocol.WebSocketHybi10;
             }
-                // ReSharper disable EmptyGeneralCatchClause
-            catch
-                // ReSharper restore EmptyGeneralCatchClause
+
+            Group pathCollection = someFields["path"];
+            Group methodCollection = someFields["connect"];
+
+            if (pathCollection != null)
             {
-                /* Ignore bad header */
+                if (pathCollection.Captures.Count > 0)
+                {
+                    RequestPath = pathCollection.Captures[0].Value.Trim();
+                }
             }
+            if (methodCollection != null)
+            {
+                if (methodCollection.Captures.Count > 0)
+                {
+                    Method = methodCollection.Captures[0].Value.Trim();
+                }
+            }
+
+            int version;
+            Int32.TryParse(_fields["sec-websocket-version"], out version);
+
+            Protocol = version < 8 ? Protocol.WebSocketHybi00 : Protocol.WebSocketHybi10;
         }
 
         /// <summary>

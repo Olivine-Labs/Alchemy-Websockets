@@ -80,14 +80,7 @@ namespace Alchemy.Classes
         /// </summary>
         public void OnConnect()
         {
-            try
-            {
-                OnConnectDelegate(this);
-            }
-            catch (Exception e)
-            {
-                _context.Server.Log.Error("Fatal Error in user specified OnConnect", e);
-            }
+            OnConnectDelegate(this);
         }
 
         /// <summary>
@@ -95,14 +88,7 @@ namespace Alchemy.Classes
         /// </summary>
         public void OnConnected()
         {
-            try
-            {
-                OnConnectedDelegate(this);
-            }
-            catch (Exception e)
-            {
-                _context.Server.Log.Error("Fatal Error in user specified OnConnected", e);
-            }
+            OnConnectedDelegate(this);
         }
 
         /// <summary>
@@ -110,15 +96,8 @@ namespace Alchemy.Classes
         /// </summary>
         public void OnDisconnect()
         {
-            try
-            {
-                _context.Connected = false;
-                OnDisconnectDelegate(this);
-            }
-            catch (Exception e)
-            {
-                _context.Server.Log.Error("Fatal Error in user specified OnDisconnect", e);
-            }
+            _context.Connected = false;
+            OnDisconnectDelegate(this);
         }
 
         /// <summary>
@@ -126,14 +105,7 @@ namespace Alchemy.Classes
         /// </summary>
         public void OnSend()
         {
-            try
-            {
-                OnSendDelegate(this);
-            }
-            catch (Exception e)
-            {
-                _context.Server.Log.Error("Fatal Error in user specified OnSend", e);
-            }
+            OnSendDelegate(this);
         }
 
         /// <summary>
@@ -141,14 +113,7 @@ namespace Alchemy.Classes
         /// </summary>
         public void OnReceive()
         {
-            try
-            {
-                OnReceiveDelegate(this);
-            }
-            catch (Exception e)
-            {
-                _context.Server.Log.Error("Fatal Error in user specified OnReceive", e);
-            }
+            OnReceiveDelegate(this);
         }
 
         /// <summary>

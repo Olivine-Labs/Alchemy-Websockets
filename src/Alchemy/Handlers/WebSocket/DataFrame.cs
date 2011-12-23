@@ -117,8 +117,8 @@ namespace Alchemy.Handlers.WebSocket
         public override string ToString()
         {
             var sb = new StringBuilder();
-            List<ArraySegment<Byte>> list = AsRaw();
-            foreach (var item in list)
+            List<ArraySegment<byte>> data = AsRaw();
+            foreach (var item in data)
             {
                 sb.Append(Encoding.UTF8.GetString(item.Array));
             }

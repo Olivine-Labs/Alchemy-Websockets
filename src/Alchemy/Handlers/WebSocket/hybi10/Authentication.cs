@@ -8,25 +8,8 @@ namespace Alchemy.Handlers.WebSocket.hybi10
     /// <summary>
     /// Handles the handshaking between the client and the host, when a new connection is created
     /// </summary>
-    internal class Authentication : Handlers.Authentication, IWebSocketAuthentication
+    internal class Authentication : Handlers.Authentication
     {
-        public static string Origin = string.Empty;
-        public static string Location = string.Empty;
-
-        #region IWebSocketAuthentication Members
-
-        public void SetOrigin(string origin)
-        {
-            Origin = origin;
-        }
-
-        public void SetLocation(string location)
-        {
-            Location = location;
-        }
-
-        #endregion
-
         protected override bool CheckAuthentication(Context context)
         {
             if (context.ReceivedByteCount > 8)
@@ -43,9 +26,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                             return false;
                         }
                     }
-                    if (!String.IsNullOrEmpty(Location))
+                    if (!String.IsNullOrEmpty(Destination))
                     {
-                        if (handshake.Host != Location + ":" + context.Server.Port.ToString())
+                        if (handshake.Host != Destination + ":" + context.Server.Port.ToString())
                         {
                             return false;
                         }

@@ -93,7 +93,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                     var temp = new byte[end - start];
                     Array.Copy(data, start, temp, 0, end - start);
                     Payload.Add(new ArraySegment<byte>(temp));
-                    if(State == DataState.Complete)
+                    if (State == DataState.Complete)
                     {
                         var endBytes = new byte[1];
                         endBytes[0] = EndByte;
