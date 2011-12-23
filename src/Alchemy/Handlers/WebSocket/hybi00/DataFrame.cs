@@ -29,7 +29,9 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             {
                 // wrap the array with the wrapper bytes
                 var startBytes = new byte[1];
+                startBytes[0] = StartByte;
                 var endBytes = new byte[1];
+                endBytes[0] = EndByte;
                 Payload.Insert(0, new ArraySegment<byte>(startBytes)); //Add header byte
                 Payload.Add(new ArraySegment<byte>(endBytes)); //put termination byte at end
                 Format = DataFormat.Frame;
@@ -78,7 +80,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                     if ((start != -1) && (start < end))
                         // Make sure the start is before the end and that we actually found a match.
                     {
-                        byte[] startBytes = new byte[1];
+                        var startBytes = new byte[1];
                         startBytes[0] = StartByte;
                         Payload.Add(new ArraySegment<byte>(startBytes));
                         start++; // Do not include the Start Byte
@@ -93,7 +95,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                     Payload.Add(new ArraySegment<byte>(temp));
                     if(State == DataState.Complete)
                     {
-                        byte[] endBytes = new byte[1];
+                        var endBytes = new byte[1];
                         endBytes[0] = EndByte;
                         Payload.Add(new ArraySegment<byte>(endBytes));
                     }
