@@ -58,10 +58,7 @@ static void OnConnected(UserContext aContext)
       <pre class="prettyprint">
 static void Main(string[] args)
 {
-  var aClient = new WebSocketClient({
-    Host: "alchemywebsockets.net",
-    Port: 81,
-    Path: "/",
+  var aClient = new WebSocketClient("ws://alchemywebsockets.net:81/chat"){
     DefaultOnReceive = new OnEventDelegate(OnReceive),
     DefaultOnSend = new OnEventDelegate(OnSend),
     DefaultOnConnect = new OnEventDelegate(OnConnected),
@@ -82,6 +79,7 @@ static void OnConnected(UserContext aContext)
 
 //...etc
       </pre>
+
       <h2>Object Documentation</h2>
 
       <p>
@@ -122,7 +120,7 @@ static void OnConnected(UserContext aContext)
         <h3>Status</h3>
 
         <p>
-          Current version is <strong>2.0.0</strong>
+          Current version is <strong>2.1.0</strong>
         </p>
 
         <div class="alert-message block-message warning">
