@@ -44,7 +44,7 @@ static void Main(string[] args)
   aServer.Start();
 }
 
-static void OnConnected(UserContext aContext)
+static void OnConnected(UserContext context)
 {
   Console.WriteLine("Client Connection From : " +
   aContext.ClientAddress.ToString());
@@ -71,10 +71,9 @@ static void Main(string[] args)
   aClient.Disconnect();
 }
 
-static void OnConnected(UserContext aContext)
+static void OnReceive(UserContext context)
 {
-  Console.WriteLine("Client Connection From : " +
-  aContext.ClientAddress.ToString());
+  Console.WriteLine("The server said : " + context.DataFrame.ToString());
 }
 
 //...etc
