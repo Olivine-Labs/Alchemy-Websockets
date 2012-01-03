@@ -18,8 +18,7 @@ namespace Alchemy
         {
             _server = new WebSocketServer(54321, IPAddress.Loopback) {DefaultOnReceive = OnServerReceive};
             _server.Start();
-            _client = new WebSocketClient
-            {Host = "127.0.0.1", Port = 54321, Origin = "localhost", OnReceive = OnClientReceive};
+            _client = new WebSocketClient("ws://127.0.0.1:54321/path") { Origin = "localhost", OnReceive = OnClientReceive };
             _client.Connect();
         }
 
@@ -32,15 +31,15 @@ namespace Alchemy
             _server = null;
         }
 
-        private void OnServerReceive(UserContext context)
+        private static void OnServerReceive(UserContext context)
         {
-            string data = context.DataFrame.ToString();
+            var data = context.DataFrame.ToString();
             context.Send(data);
         }
 
         private void OnClientReceive(UserContext context)
         {
-            string data = context.DataFrame.ToString();
+            var data = context.DataFrame.ToString();
             if (data == "Test")
             {
                 if (_forever && _clientDataPass)
@@ -78,9 +77,9 @@ namespace Alchemy
             _forever = true;
             if (_client.Connected)
             {
-                var client2 = new WebSocketClient
-                {Host = "127.0.0.1", Port = 54321, Origin = "localhost", OnReceive = OnClientReceive};
+                var client2 = new WebSocketClient("ws://127.0.0.1:54321/path") { OnReceive = OnClientReceive };
                 client2.Connect();
+
                 if (client2.Connected)
                 {
                     _client.Send("Test");
