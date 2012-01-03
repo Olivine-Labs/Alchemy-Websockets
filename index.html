@@ -33,11 +33,11 @@ title: Alchemy Websockets
 static void Main(string[] args)
 {
   var aServer = new WebSocketServer(81, IPAddress.Any) {
-    DefaultOnReceive = new OnEventDelegate(OnReceive),
-    DefaultOnSend = new OnEventDelegate(OnSend),
-    DefaultOnConnect = new OnEventDelegate(OnConnected),
-    DefaultOnConnected = new OnEventDelegate(OnConnect),
-    DefaultOnDisconnect = new OnEventDelegate(OnDisconnect),
+    OnReceive = new OnEventDelegate(OnReceive),
+    OnSend = new OnEventDelegate(OnSend),
+    OnConnect = new OnEventDelegate(OnConnected),
+    OnConnected = new OnEventDelegate(OnConnect),
+    OnDisconnect = new OnEventDelegate(OnDisconnect),
     TimeOut = new TimeSpan(0, 5, 0)
   };
 
@@ -120,7 +120,7 @@ static void OnConnected(UserContext aContext)
         <h3>Status</h3>
 
         <p>
-          Current version is <strong>2.1.0</strong>
+          Current version is <strong>2.2.0.238</strong>
         </p>
 
         <div class="alert-message block-message warning">
