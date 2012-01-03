@@ -23,12 +23,12 @@ namespace Alchemy
         /// These are the default OnEvent delegates for the server. By default, all new UserContexts will use these events.
         /// It is up to you whether you want to replace them at runtime or even manually set the events differently per connection in OnReceive.
         /// </summary>
-        public OnEventDelegate DefaultOnConnect = x => { };
+        public OnEventDelegate OnConnect = x => { };
 
-        public OnEventDelegate DefaultOnConnected = x => { };
-        public OnEventDelegate DefaultOnDisconnect = x => { };
-        public OnEventDelegate DefaultOnReceive = x => { };
-        public OnEventDelegate DefaultOnSend = x => { };
+        public OnEventDelegate OnConnected = x => { };
+        public OnEventDelegate OnDisconnect = x => { };
+        public OnEventDelegate OnReceive = x => { };
+        public OnEventDelegate OnSend = x => { };
 
         /// <summary>
         /// Enables or disables the Flash Access Policy Server(APServer).
@@ -123,12 +123,12 @@ namespace Alchemy
             using (var context = new Context(this, connection))
             {
                 context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;
-                context.UserContext.SetOnConnect(DefaultOnConnect);
-                context.UserContext.SetOnConnected(DefaultOnConnected);
-                context.UserContext.SetOnDisconnect(DefaultOnDisconnect);
-                context.UserContext.SetOnSend(DefaultOnSend);
-                context.UserContext.SetOnReceive(DefaultOnReceive);
-                context.BufferSize = DefaultBufferSize;
+                context.UserContext.SetOnConnect(OnConnect);
+                context.UserContext.SetOnConnected(OnConnected);
+                context.UserContext.SetOnDisconnect(OnDisconnect);
+                context.UserContext.SetOnSend(OnSend);
+                context.UserContext.SetOnReceive(OnReceive);
+                context.BufferSize = BufferSize;
                 context.UserContext.OnConnect();
                 while (context.Connected)
                 {

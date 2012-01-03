@@ -17,7 +17,7 @@ namespace Alchemy
         /// </summary>
         private readonly SemaphoreSlim _connectReady = new SemaphoreSlim(10);
 
-        protected int DefaultBufferSize = 512;
+        protected int BufferSize = 512;
 
         /// <summary>
         /// The number of connected clients.
