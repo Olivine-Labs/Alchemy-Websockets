@@ -8,3 +8,6 @@ src/Alchemy/obj
 src/Alchemy/bin
 doxygen
 _site
+test/Integration/Alchemy/bin
+test/Integration/Alchemy/obj
+*.suo
