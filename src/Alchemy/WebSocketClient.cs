@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Net.Sockets;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading;
 using Alchemy.Classes;
 using Alchemy.Handlers.WebSocket.hybi10;
@@ -10,34 +11,49 @@ namespace Alchemy
     public class WebSocketClient
     {
         public TimeSpan ConnectTimeout = new TimeSpan(0, 0, 0, 10);
-        public string Host = "localhost";
-
         public bool IsAuthenticated;
+        public ReadyStates ReadyState = ReadyStates.CLOSED;
+        public string Origin;
 
         public OnEventDelegate OnConnect = x => { };
         public OnEventDelegate OnConnected = x => { };
         public OnEventDelegate OnDisconnect = x => { };
         public OnEventDelegate OnReceive = x => { };
         public OnEventDelegate OnSend = x => { };
-        public String Origin = "localhost";
-        public String Path = "/";
-        public int Port = 81;
-        private TcpClient _client;
 
+        private TcpClient _client;
         private bool _connecting;
         private Context _context;
         private ClientHandshake _handshake;
+
+        private readonly string _path;
+        private readonly int _port;
+        private readonly string _host;
+
+        public enum ReadyStates
+        {
+            CONNECTING,
+            OPEN,
+            CLOSING,
+            CLOSED
+        }
 
         public Boolean Connected
         {
             get
             {
-                if (_client != null)
-                {
-                    return _client.Connected;
-                }
-                return false;
+                return _client != null && _client.Connected;
             }
+        }
+
+        public WebSocketClient(string path)
+        {
+            var r = new Regex("^(wss?)://(.*)\\:([0-9]*)/(.*)$");
+            var matches = r.Match(path);
+
+            _host = matches.Groups[2].Value;
+            _port = Int32.Parse(matches.Groups[3].Value);
+            _path = matches.Groups[4].Value;
         }
 
         public void Connect()
@@ -46,9 +62,12 @@ namespace Alchemy
             {
                 try
                 {
+                    ReadyState = ReadyStates.CONNECTING;
+
                     _client = new TcpClient();
                     _connecting = true;
-                    _client.BeginConnect(Host, Port, OnRunClient, null);
+                    _client.BeginConnect(_host, _port, OnRunClient, null);
+
                     var waiting = new TimeSpan();
                     while (_connecting && waiting < ConnectTimeout)
                     {
@@ -94,42 +113,45 @@ namespace Alchemy
                 while (_context.Connection.Connected)
                 {
                     _context.ReceiveReady.Wait();
+
                     try
                     {
-                        _context.Connection.Client.BeginReceive(_context.Buffer, 0, _context.Buffer.Length,
-                                                                SocketFlags.None, DoReceive, _context);
+                        _context.Connection.Client.BeginReceive(_context.Buffer, 0, _context.Buffer.Length, SocketFlags.None, DoReceive, _context);
                     }
                     catch (Exception)
                     {
                         break;
                     }
+
                     if (!IsAuthenticated)
                     {
                         Authenticate();
                     }
                 }
             }
+
             Disconnect();
         }
 
         private void Authenticate()
         {
-            _handshake = new ClientHandshake
-            {Version = "8", Origin = Origin, Host = Host, Key = GenerateKey(), ResourcePath = Path};
+            _handshake = new ClientHandshake { Version = "8", Origin = Origin, Host = _host, Key = GenerateKey(), ResourcePath = _path };
+
             _client.Client.Send(Encoding.UTF8.GetBytes(_handshake.ToString()));
         }
 
         private void CheckAuthenticationResponse(Context context)
         {
-            String receivedData = context.UserContext.DataFrame.ToString();
+            var receivedData = context.UserContext.DataFrame.ToString();
             var header = new Header(receivedData);
             var handshake = new ServerHandshake(header);
-            if (Authentication.GenerateAccept(_handshake.Key) == handshake.Accept)
-            {
-                IsAuthenticated = true;
-                _connecting = false;
-                context.UserContext.OnConnected();
-            }
+
+            if (Authentication.GenerateAccept(_handshake.Key) != handshake.Accept) return;
+
+            ReadyState = ReadyStates.OPEN;
+            IsAuthenticated = true;
+            _connecting = false;
+            context.UserContext.OnConnected();
         }
 
         private void ReceiveData(Context context)
@@ -157,6 +179,7 @@ namespace Alchemy
         {
             var context = (Context) result.AsyncState;
             context.Reset();
+
             try
             {
                 context.ReceivedByteCount = context.Connection.Client.EndReceive(result);
@@ -177,31 +200,36 @@ namespace Alchemy
             }
         }
 
-        private String GenerateKey()
+        private static String GenerateKey()
         {
             var bytes = new byte[16];
             var random = new Random();
-            for (int index = 0; index < bytes.Length; index++)
+
+            for (var index = 0; index < bytes.Length; index++)
             {
                 bytes[index] = (byte) random.Next(0, 255);
             }
+
             return Convert.ToBase64String(bytes);
         }
 
         public void Disconnect()
         {
             _connecting = false;
-            if (_client != null)
-            {
-                var dataFrame = new DataFrame();
-                dataFrame.Append(new byte[0]);
 
-                byte[] bytes = dataFrame.AsFrame()[0].Array;
-                bytes[0] = 0x88;
-                _context.UserContext.Send(bytes);
-                _client.Close();
-                _client = null;
-            }
+            if (_client == null) return;
+            var dataFrame = new DataFrame();
+            dataFrame.Append(new byte[0]);
+
+            var bytes = dataFrame.AsFrame()[0].Array;
+
+            ReadyState = ReadyStates.CLOSING;
+
+            bytes[0] = 0x88;
+            _context.UserContext.Send(bytes);
+            _client.Close();
+            _client = null;
+            ReadyState = ReadyStates.CLOSED;
         }
 
         public void Send(String data)
