@@ -59,11 +59,11 @@ static void OnConnected(UserContext aContext)
 static void Main(string[] args)
 {
   var aClient = new WebSocketClient("ws://alchemywebsockets.net:81/chat"){
-    DefaultOnReceive = new OnEventDelegate(OnReceive),
-    DefaultOnSend = new OnEventDelegate(OnSend),
-    DefaultOnConnect = new OnEventDelegate(OnConnected),
-    DefaultOnConnected = new OnEventDelegate(OnConnect),
-    DefaultOnDisconnect = new OnEventDelegate(OnDisconnect)
+    OnReceive = new OnEventDelegate(OnReceive),
+    OnSend = new OnEventDelegate(OnSend),
+    OnConnect = new OnEventDelegate(OnConnected),
+    OnConnected = new OnEventDelegate(OnConnect),
+    OnDisconnect = new OnEventDelegate(OnDisconnect)
   });
 
   aClient.Connect();
