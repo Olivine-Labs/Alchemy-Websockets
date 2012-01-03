@@ -11,16 +11,23 @@ title: Alchemy Websockets
       <p>
         Alchemy Websockets is a Visual Studio 2010 project. It can be loaded in the free
         Visual C# Express and Monodevelop as well (and potentially other compatible IDEs.)
-        It runs in Mono and Windows .NET environments.
+        It runs in Mono and Windows .NET environments. It officially supports hybi-00, 
+        hybi-10, and hybi-17 (rcf6455).
       </p>
 
       <p>
-        After compilation, include the dll as a reference into your project. From there,
-        starting a server is as simple as instantiating an WSServer object, opening the 
+        Include Alchemy Websockets as a git submodule in your project, or download and
+        build the solution yourself and include as a dll reference. From there,
+        starting a server is as simple as instantiating an WSServer object, opening the
         connection, and binding events.
       </p>
 
-      <p>Example:</p>
+      <p>
+        You can also use Alchemy Websockets as a client to connect to other WebSocket
+        servers using the rfc6455 protocol.
+      </p>
+
+      <h3>Setting up Alchemy Websockets as a Server</h3>
 
       <pre class="prettyprint">
 static void Main(string[] args)
@@ -46,6 +53,35 @@ static void OnConnected(UserContext aContext)
 //...etc
       </pre>
 
+      <h3>Setting up Alchemy Websockets as a Client</h3>
+
+      <pre class="prettyprint">
+static void Main(string[] args)
+{
+  var aClient = new WebSocketClient({
+    Host: "alchemywebsockets.net",
+    Port: 81,
+    Path: "/",
+    DefaultOnReceive = new OnEventDelegate(OnReceive),
+    DefaultOnSend = new OnEventDelegate(OnSend),
+    DefaultOnConnect = new OnEventDelegate(OnConnected),
+    DefaultOnConnected = new OnEventDelegate(OnConnect),
+    DefaultOnDisconnect = new OnEventDelegate(OnDisconnect)
+  });
+
+  aClient.Connect();
+  aClient.Send("Hey!"); // string or byte[]
+  aClient.Disconnect();
+}
+
+static void OnConnected(UserContext aContext)
+{
+  Console.WriteLine("Client Connection From : " +
+  aContext.ClientAddress.ToString());
+}
+
+//...etc
+      </pre>
       <h2>Object Documentation</h2>
 
       <p>
