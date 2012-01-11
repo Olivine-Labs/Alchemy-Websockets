@@ -1,4 +1,4 @@
-Alchemy Websockets
+﻿Alchemy Websockets
 =============
 
 **Version 2.0.0**
@@ -32,15 +32,19 @@ An example application can be seen on [alchemy-websockets-example](https://githu
 Example:
 
 ```csharp
+//...refs
+using Alchemy;
+using Alchemy.Classes;
+
 static void Main(string[] args)
 {
   var aServer = new WSServer(8100, IPAddress.Any)
   {
-      DefaultOnReceive = new OnEventDelegate(OnReceive),
-      DefaultOnSend = new OnEventDelegate(OnSend),
-      DefaultOnConnect = new OnEventDelegate(OnConnect),
-      DefaultOnConnected = new OnEventDelegate(OnConnected),
-      DefaultOnDisconnect = new OnEventDelegate(OnDisconnect),
+      DefaultOnReceive = OnReceive,
+      DefaultOnSend = OnSend,
+      DefaultOnConnect = OnConnect,
+      DefaultOnConnected = OnConnected,
+      DefaultOnDisconnect = OnDisconnect,
       TimeOut = new TimeSpan(0, 5, 0)
   };
 
