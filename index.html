@@ -30,14 +30,18 @@ title: Alchemy Websockets
       <h3>Setting up Alchemy Websockets as a Server</h3>
 
       <pre class="prettyprint">
+//...refs
+using Alchemy;
+using Alchemy.Classes;
+
 static void Main(string[] args)
 {
   var aServer = new WebSocketServer(81, IPAddress.Any) {
-    OnReceive = new OnEventDelegate(OnReceive),
-    OnSend = new OnEventDelegate(OnSend),
-    OnConnect = new OnEventDelegate(OnConnected),
-    OnConnected = new OnEventDelegate(OnConnect),
-    OnDisconnect = new OnEventDelegate(OnDisconnect),
+    OnReceive = OnReceive,
+    OnSend = OnSend,
+    OnConnect = OnConnected,
+    OnConnected = OnConnect,
+    OnDisconnect = OnDisconnect,
     TimeOut = new TimeSpan(0, 5, 0)
   };
 
@@ -56,14 +60,18 @@ static void OnConnected(UserContext context)
       <h3>Setting up Alchemy Websockets as a Client</h3>
 
       <pre class="prettyprint">
+//...refs
+using Alchemy;
+using Alchemy.Classes;
+
 static void Main(string[] args)
 {
   var aClient = new WebSocketClient("ws://alchemywebsockets.net:81/chat"){
-    OnReceive = new OnEventDelegate(OnReceive),
-    OnSend = new OnEventDelegate(OnSend),
-    OnConnect = new OnEventDelegate(OnConnected),
-    OnConnected = new OnEventDelegate(OnConnect),
-    OnDisconnect = new OnEventDelegate(OnDisconnect)
+    OnReceive = OnReceive,
+    OnSend = OnSend,
+    OnConnect = OnConnected,
+    OnConnected = OnConnect,
+    OnDisconnect = OnDisconnect
   });
 
   aClient.Connect();
