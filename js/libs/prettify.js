@@ -26,3 +26,64 @@ hashComments:3,cStyleComments:!0,multilineStrings:!0,tripleQuotedStrings:!0,rege
 !k){b=n;for(var o=void 0,c=b.firstChild;c;c=c.nextSibling)var i=c.nodeType,o=i===1?o?b:c:i===3?N.test(c.nodeValue)?b:o:o;b=(f=o===b?void 0:o)&&"CODE"===f.tagName}b&&(k=f.className.match(g));k&&(k=k[1]);b=!1;for(o=n.parentNode;o;o=o.parentNode)if((o.tagName==="pre"||o.tagName==="code"||o.tagName==="xmp")&&o.className&&o.className.indexOf("prettyprint")>=0){b=!0;break}b||((b=(b=n.className.match(/\blinenums\b(?::(\d+))?/))?b[1]&&b[1].length?+b[1]:!0:!1)&&D(n,b),d={g:k,h:n,i:b},E(d))}}p<h.length?setTimeout(m,
 250):a&&a()}for(var e=[document.getElementsByTagName("pre"),document.getElementsByTagName("code"),document.getElementsByTagName("xmp")],h=[],k=0;k<e.length;++k)for(var t=0,s=e[k].length;t<s;++t)h.push(e[k][t]);var e=q,l=Date;l.now||(l={now:function(){return+new Date}});var p=0,d,g=/\blang(?:uage)?-([\w.]+)(?!\S)/;m()};window.PR={createSimpleLexer:x,registerLangHandler:k,sourceDecorator:u,PR_ATTRIB_NAME:"atn",PR_ATTRIB_VALUE:"atv",PR_COMMENT:"com",PR_DECLARATION:"dec",PR_KEYWORD:"kwd",PR_LITERAL:"lit",
 PR_NOCODE:"nocode",PR_PLAIN:"pln",PR_PUNCTUATION:"pun",PR_SOURCE:"src",PR_STRING:"str",PR_TAG:"tag",PR_TYPE:"typ"}})();
+
+// Copyright (C) 2008 Google Inc.
+//
+// Licensed under the Apache License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License.
+// You may obtain a copy of the License at
+//
+//      http://www.apache.org/licenses/LICENSE-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+// See the License for the specific language governing permissions and
+// limitations under the License.
+
+
+
+/**
+ * @fileoverview
+ * Registers a language handler for LUA.
+ *
+ *
+ * To use, include prettify.js and this file in your HTML page.
+ * Then put your code in an HTML tag like
+ *      <pre class="prettyprint lang-lua">(my LUA code)</pre>
+ *
+ *
+ * I used http://www.lua.org/manual/5.1/manual.html#2.1
+ * Because of the long-bracket concept used in strings and comments, LUA does
+ * not have a regular lexical grammar, but luckily it fits within the space
+ * of irregular grammars supported by javascript regular expressions.
+ *
+ * @author mikesamuel@gmail.com
+ */
+
+PR.registerLangHandler(
+    PR.createSimpleLexer(
+        [
+         // Whitespace
+         [PR.PR_PLAIN,       /^[\t\n\r \xA0]+/, null, '\t\n\r \xA0'],
+         // A double or single quoted, possibly multi-line, string.
+         [PR.PR_STRING,      /^(?:\"(?:[^\"\\]|\\[\s\S])*(?:\"|$)|\'(?:[^\'\\]|\\[\s\S])*(?:\'|$))/, null, '"\'']
+        ],
+        [
+         // A comment is either a line comment that starts with two dashes, or
+         // two dashes preceding a long bracketed block.
+         [PR.PR_COMMENT, /^--(?:\[(=*)\[[\s\S]*?(?:\]\1\]|$)|[^\r\n]*)/],
+         // A long bracketed block not preceded by -- is a string.
+         [PR.PR_STRING,  /^\[(=*)\[[\s\S]*?(?:\]\1\]|$)/],
+         [PR.PR_KEYWORD, /^(?:and|break|do|else|elseif|end|false|for|function|if|in|local|nil|not|or|repeat|return|then|true|until|while)\b/, null],
+         // A number is a hex integer literal, a decimal real literal, or in
+         // scientific notation.
+         [PR.PR_LITERAL,
+          /^[+-]?(?:0x[\da-f]+|(?:(?:\.\d+|\d+(?:\.\d*)?)(?:e[+\-]?\d+)?))/i],
+         // An identifier
+         [PR.PR_PLAIN, /^[a-z_]\w*/i],
+         // A run of punctuation
+         [PR.PR_PUNCTUATION, /^[^\w\t\n\r \xA0]+/]
+        ]),
+    ['lua']);
+
