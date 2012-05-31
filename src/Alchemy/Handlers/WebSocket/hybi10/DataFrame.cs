@@ -49,7 +49,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                         break;
                 }
                 byte[] headerBytes = _header.ToBytes();
-                Mask(); //Uses _header, must call ToBytes before calling Mask
+                //Mask(); //Uses _header, must call ToBytes before calling Mask
                 Payload.Insert(0, new ArraySegment<byte>(headerBytes)); //put header at first position
                 Format = DataFormat.Frame;
             }

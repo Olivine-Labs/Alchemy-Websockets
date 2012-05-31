@@ -69,7 +69,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             {
                 data = new byte[1];
                 data[0] = (byte) PayloadSize;
-                data[0] = (byte) (data[0] | 0x80); //Tells us that this data is masked
+                //data[0] = (byte) (data[0] | 0x80); //Tells us that this data is masked
                 headerBytes.Add(data);
             }
             else
@@ -78,7 +78,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 {
                     data = new byte[1];
                     data[0] = 126;
-                    data[0] = (byte) (data[0] | 0x80); //Tells us that this data is masked
+                    //data[0] = (byte) (data[0] | 0x80); //Tells us that this data is masked
                     headerBytes.Add(data);
 
                     data = BitConverter.GetBytes(Convert.ToInt16(PayloadSize));
@@ -89,7 +89,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 {
                     data = new byte[1];
                     data[0] = 127;
-                    data[0] = (byte) (data[0] | 0x80); //Tells us that this data is masked
+                    //data[0] = (byte) (data[0] | 0x80); //Tells us that this data is masked
                     headerBytes.Add(data);
                     data = BitConverter.GetBytes(PayloadSize);
                     Array.Reverse(data);
@@ -97,9 +97,9 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 }
             }
 
-            var random = new Random();
-            Mask = random.Next(Int32.MaxValue);
-            headerBytes.Add(BitConverter.GetBytes(Mask));
+            //var random = new Random();
+            //Mask = random.Next(Int32.MaxValue);
+            //headerBytes.Add(BitConverter.GetBytes(Mask));
             return headerBytes.SelectMany(a => a).ToArray();
         }
     }
