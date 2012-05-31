@@ -81,7 +81,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                     //data[0] = (byte) (data[0] | 0x80); //Tells us that this data is masked
                     headerBytes.Add(data);
 
-                    data = BitConverter.GetBytes(Convert.ToInt16(PayloadSize));
+                    data = BitConverter.GetBytes(Convert.ToUInt16(PayloadSize));
                     Array.Reverse(data);
                     headerBytes.Add(data);
                 }
