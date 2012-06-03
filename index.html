@@ -6,28 +6,19 @@ title: Alchemy Websockets
 <div class="row">
   <div class="span10">
     <div class="well">
+      <h2>Build and scale real-time applications</h2>
+
+      <p>
+        Stop using AJAX polling and Comet to replicate a TCP connection, and
+        just use one. Alchemy takes care of the guts of socket programming and
+        leaves you with what you care about - your application. Alchemy handles
+        breaking itself out into threads and scaling, allowing you to handle
+        hundreds of thousands of simultaneous connections on modest hardware;
+        all this, and you only have to care about a few lines of code.
+      </p>
+
       <h2>Usage</h2>
-
-      <p>
-        Alchemy Websockets is <strong><a href="http://nuget.org/packages/Alchemy">available as a NuGet package</a></strong> (as of May 31.)
-        Alternatively, Alchemy Websockets is a Visual Studio 2010 project. It can be loaded in the free
-        Visual C# Express and Monodevelop as well (and potentially other compatible IDEs.)
-      </p>
-
-      <p>
-        Alchemy runs in <strong>Mono</strong> and Windows <strong>.NET environments</strong>. It
-        officially supports <strong>hybi-00, 
-        hybi-10, hybi-17, and the official RFC6455</strong>.
-      </p>
-
-      <p>
-        You can also use Alchemy Websockets as a client to connect to other WebSocket
-        servers using the RFC6455 protocol; this allows you to build servers 
-        communicating with each other.
-      </p>
-
-      <h3>Setting up Alchemy Websockets as a Server</h3>
-
+      
       <pre class="prettyprint">
 //...refs
 using Alchemy;
@@ -35,6 +26,9 @@ using Alchemy.Classes;
 
 static void Main(string[] args)
 {
+  // instantiate a new server - acceptable port and IP range,
+  // and set up your methods.
+
   var aServer = new WebSocketServer(81, IPAddress.Any) {
     OnReceive = OnReceive,
     OnSend = OnSend,
@@ -55,6 +49,29 @@ static void OnConnected(UserContext context)
 
 //...etc
       </pre>
+
+      <p>
+        You can run Alchemy Websockets as a console application, Windows service, Linux
+        daemon under Mono, or any configuration that works best for you.
+      </p>
+
+      <p>
+        Alchemy Websockets is <strong><a href="http://nuget.org/packages/Alchemy">available as a NuGet package</a></strong> (as of May 31.)
+        Alternatively, Alchemy Websockets is a Visual Studio 2010 project. It can be loaded in the free
+        Visual C# Express and Monodevelop as well (and potentially other compatible IDEs.)
+      </p>
+
+      <p>
+        Alchemy Websockets runs in <strong>Mono</strong> and Windows 
+        <strong>.NET environments</strong>. It officially supports 
+        <strong>hybi-00, hybi-10, hybi-17, and the official RFC6455</strong>.
+      </p>
+
+      <p>
+        You can also use Alchemy Websockets as a client to connect to other WebSocket
+        servers using the RFC6455 protocol; this allows you to build servers 
+        communicating with each other.
+      </p>
 
       <h3>Setting up Alchemy Websockets as a Client</h3>
 
@@ -85,6 +102,7 @@ static void OnReceive(UserContext context)
 
 //...etc
       </pre>
+
 
       <h2>Example Project</h2>
 
