@@ -9,22 +9,21 @@ title: Alchemy Websockets
       <h2>Usage</h2>
 
       <p>
-        Alchemy Websockets is a Visual Studio 2010 project. It can be loaded in the free
+        Alchemy Websockets is <strong><a href="http://nuget.org/packages/Alchemy">available as a NuGet package</a></strong> (as of May 31.)
+        Alternatively, Alchemy Websockets is a Visual Studio 2010 project. It can be loaded in the free
         Visual C# Express and Monodevelop as well (and potentially other compatible IDEs.)
-        It runs in Mono and Windows .NET environments. It officially supports hybi-00, 
-        hybi-10, and hybi-17 (rcf6455).
       </p>
 
       <p>
-        Include Alchemy Websockets as a git submodule in your project, or download and
-        build the solution yourself and include as a dll reference. From there,
-        starting a server is as simple as instantiating an WSServer object, opening the
-        connection, and binding events.
+        Alchemy runs in <strong>Mono</strong> and Windows <strong>.NET environments</strong>. It
+        officially supports <strong>hybi-00, 
+        hybi-10, hybi-17, and the official RFC6455</strong>.
       </p>
 
       <p>
         You can also use Alchemy Websockets as a client to connect to other WebSocket
-        servers using the rfc6455 protocol.
+        servers using the RFC6455 protocol; this allows you to build servers 
+        communicating with each other.
       </p>
 
       <h3>Setting up Alchemy Websockets as a Server</h3>
@@ -95,18 +94,14 @@ static void OnReceive(UserContext context)
 
       <p>
         The client library is not necessary; it simply provides a helpful abstraction for older websockets that handles
-        a flash fallback using websocket-js.
-      </p>
-
-      <p>
-        You can download the client javascript library at
+        a flash fallback using websocket-js.  You can download the client javascript library at
         <a href="https://github.com/Olivine-Labs/Alchemy-Websockets-Client-Library">alchemy-websockets-client-library</a>.
       </p>
 
       <h2>License</h2>
 
       <p>
-        Licensed under <a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a>  and
+        Licensed under <a href="http://www.gnu.org/licenses/lgpl.html">LGPL</a> and
         <a href="http://www.opensource.org/licenses/mit-license.php">MIT</a>.
         Copyright 2011, Olivine Labs, LLC.
       </p>
@@ -123,7 +118,7 @@ static void OnReceive(UserContext context)
         </p>
 
         <p>
-          <strong>Latest update</strong>: Fixed Chrome 19 masking issues; created NuGet package
+          <strong>Latest update</strong>: Fixed Chrome 19 masking issues; created NuGet package (5/31/12)
         </p>
 
         <div class="alert-message block-message warning">
@@ -137,8 +132,7 @@ static void OnReceive(UserContext context)
           </div>
         </div>
 
-
-        <h4>Protocol Support</h4>
+        <h4>Protocol and Browser Support</h4>
 
         <ul>
           <li><span class="label success">✓</span> hixie-76 (hybi00)</li>
@@ -148,14 +142,30 @@ static void OnReceive(UserContext context)
 
         <p>
           This covers Chrome current, beta, and alpha channels; Firefox
-          latest, beta, and alpha channels; Safari, and includes support
-          for a flash-based socket fallback for browsers with no sockcet
-          support natively.
+          latest, beta, and alpha channels; Safari; IE 10; Chrome for
+          Android; Windows Phone 7; 
+          <a href="http://remysharp.com/2010/10/04/websockets-in-phonegap-projects/">PhoneGap</a>;
+          and potentially others that support these protocols.
+        </p>
+
+        <p>
+          <a href="https://github.com/gimite/web-socket-js">Web-socket-js</a> is
+          a recommended polyfill for browsers (such as old versions of IE)
+          with no support.
         </p>
 
         <p>
           <a href="http://en.wikipedia.org/wiki/WebSocket#Browser_support" class="btn info">Browser Support List</a>
         </p>
+
+        <h4>Technology Support</h4>
+
+        <p>Alchemy works with:</p>
+
+        <ul>
+          <li><strong>.NET 4+</strong></li>
+          <li><strong>Mono</strong> on Linux</li>
+        </ul>
       </div>
     </div>
   </div>
