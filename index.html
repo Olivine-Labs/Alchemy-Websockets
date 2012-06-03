@@ -32,8 +32,8 @@ static void Main(string[] args)
   var aServer = new WebSocketServer(81, IPAddress.Any) {
     OnReceive = OnReceive,
     OnSend = OnSend,
-    OnConnect = OnConnected,
-    OnConnected = OnConnect,
+    OnConnect = OnConnect,
+    OnConnected = OnConnected,
     OnDisconnect = OnDisconnect,
     TimeOut = new TimeSpan(0, 5, 0)
   };
