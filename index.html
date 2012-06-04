@@ -187,6 +187,30 @@ static void OnReceive(UserContext context)
           <li><strong>.NET 4+</strong></li>
           <li><strong>Mono</strong> on Linux</li>
         </ul>
+
+        <h4>Real-World Uses</h4>
+
+        <h5>Online Gaming</h5>
+
+        <blockquote>
+          For communication between the html 5 client and the game
+          server we use WebSockets (Alchemy). The main reason is 
+          compatibility, and the fact that WebSocket enables bidirectional
+          communication, which will minimise the network traffic.
+          Testing Alchemy I saw that is very nice and simple to 
+          use on the server side (C#) 
+        </blockquote>
+
+        <blockquote>
+          We're rebuilding our online game to use WebSockets instead of ajax
+          polling; it's much simpler and more efficient. We're using Lua to
+          build the game in the back-end because it works with C# so easily;
+          the Alchemy instances communicate with the Lua nodes to return results
+          of game commands, which are then sent back to the html 5 / Backbone.js
+          web clients.
+        </blockquote>
+
+        <h5>iOS and iPhone apps</h5>
       </div>
     </div>
   </div>
