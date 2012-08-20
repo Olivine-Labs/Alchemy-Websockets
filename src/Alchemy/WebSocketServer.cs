@@ -111,6 +111,7 @@ namespace Alchemy
                 AccessPolicyServer.Stop();
                 AccessPolicyServer = null;
             }
+            base.Stop();
         }
 
         /// <summary>
