@@ -48,7 +48,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                         //Setup Opcode for Pong frame if application has specified that we're sending a pong.
                         break;
                 }
-                byte[] headerBytes = _header.ToBytes();
+                byte[] headerBytes = _header.ToBytes(IsByte);
                 //Mask(); //Uses _header, must call ToBytes before calling Mask
                 Payload.Insert(0, new ArraySegment<byte>(headerBytes)); //put header at first position
                 Format = DataFormat.Frame;
@@ -111,7 +111,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                     data =
                         new byte[
                             Math.Min(Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, int.MaxValue)),
-                                     someBytes.Length)];
+                                     someBytes.Length - dataStart)];
                     dataLength = Math.Min(_header.PayloadSizeRemaining, Convert.ToUInt64(someBytes.Length - dataStart));
                     Array.Copy(someBytes, dataStart, data, 0, Convert.ToInt32(dataLength));
                     Format = DataFormat.Frame;
@@ -119,11 +119,8 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                 else
                 {
                     dataLength = Math.Min(Convert.ToUInt64(data.Length), _header.PayloadSizeRemaining);
-                    if (dataLength < Convert.ToUInt64(data.Length))
-                    {
-                        data = new byte[dataLength];
-                        Array.Copy(someBytes, 0, data, 0, Convert.ToInt32(dataLength));
-                    }
+                    data = new byte[dataLength];
+                    Array.Copy(someBytes, 0, data, 0, Convert.ToInt32(dataLength));
                 }
 
                 _header.PayloadSizeRemaining -= dataLength;

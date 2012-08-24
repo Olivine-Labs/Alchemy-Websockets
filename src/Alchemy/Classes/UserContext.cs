@@ -194,6 +194,7 @@ namespace Alchemy.Classes
         public void Send(byte[] someBytes, bool raw = false, bool close = false)
         {
             DataFrame dataFrame = DataFrame.CreateInstance();
+            dataFrame.IsByte = true;
             dataFrame.Append(someBytes);
             _context.Handler.Send(dataFrame, _context, raw, close);
         }
