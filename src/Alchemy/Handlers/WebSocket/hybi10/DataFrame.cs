@@ -48,7 +48,7 @@ namespace Alchemy.Handlers.WebSocket.hybi10
                         //Setup Opcode for Pong frame if application has specified that we're sending a pong.
                         break;
                 }
-                byte[] headerBytes = _header.ToBytes();
+                byte[] headerBytes = _header.ToBytes(IsByte);
                 //Mask(); //Uses _header, must call ToBytes before calling Mask
                 Payload.Insert(0, new ArraySegment<byte>(headerBytes)); //put header at first position
                 Format = DataFormat.Frame;

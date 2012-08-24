@@ -124,5 +124,7 @@ namespace Alchemy.Handlers.WebSocket
             }
             return sb.ToString();
         }
+
+        public bool IsByte { get; set; }
     }
 }
