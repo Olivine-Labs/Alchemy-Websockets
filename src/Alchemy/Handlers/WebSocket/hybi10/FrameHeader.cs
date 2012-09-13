@@ -58,12 +58,17 @@ namespace Alchemy.Handlers.WebSocket.hybi10
             return someBytes;
         }
 
-        public byte[] ToBytes()
+        public byte[] ToBytes(bool IsByte = false)
         {
             // wrap the array with the wrapper bytes
             var headerBytes = new List<Byte[]>();
             var data = new byte[1];
-            data[0] = 0x81;
+            
+            if(IsByte)
+                data[0] = 0x82;
+            else
+                data[0] = 0x81;
+
             headerBytes.Add(data);
             if (PayloadSize <= 125)
             {
