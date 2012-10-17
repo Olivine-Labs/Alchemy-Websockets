@@ -44,6 +44,12 @@ namespace Alchemy
         /// </summary>
         public TimeSpan TimeOut = TimeSpan.FromMinutes(1);
 
+        /// <summary>
+        /// A list of acceptable subprotocols that this server supports.
+        /// See http://tools.ietf.org/html/rfc6455#section-1.9
+        /// </summary>
+        public string[] SubProtocols;
+
         private string _destination = String.Empty;
         private string _origin = String.Empty;
 

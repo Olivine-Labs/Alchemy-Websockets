@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using Alchemy.Classes;
-using Alchemy.Handlers.WebSocket.hybi10;
+using Alchemy.Handlers.WebSocket.rfc6455;
 
 namespace Alchemy
 {
@@ -14,6 +15,8 @@ namespace Alchemy
         public bool IsAuthenticated;
         public ReadyStates ReadyState = ReadyStates.CLOSED;
         public string Origin;
+        public string[] SubProtocols;
+        public string CurrentProtocol { get; private set; }
 
         public OnEventDelegate OnConnect = x => { };
         public OnEventDelegate OnConnected = x => { };
@@ -58,28 +61,27 @@ namespace Alchemy
 
         public void Connect()
         {
-            if (_client == null)
+            if (_client != null) return;
+            
+            try
             {
-                try
-                {
-                    ReadyState = ReadyStates.CONNECTING;
+                ReadyState = ReadyStates.CONNECTING;
 
-                    _client = new TcpClient();
-                    _connecting = true;
-                    _client.BeginConnect(_host, _port, OnRunClient, null);
+                _client = new TcpClient();
+                _connecting = true;
+                _client.BeginConnect(_host, _port, OnRunClient, null);
 
-                    var waiting = new TimeSpan();
-                    while (_connecting && waiting < ConnectTimeout)
-                    {
-                        var timeSpan = new TimeSpan(0, 0, 0, 0, 100);
-                        waiting = waiting.Add(timeSpan);
-                        Thread.Sleep(timeSpan.Milliseconds);
-                    }
-                }
-                catch (Exception)
+                var waiting = new TimeSpan();
+                while (_connecting && waiting < ConnectTimeout)
                 {
-                    Disconnect();
+                    var timeSpan = new TimeSpan(0, 0, 0, 0, 100);
+                    waiting = waiting.Add(timeSpan);
+                    Thread.Sleep(timeSpan.Milliseconds);
                 }
+            }
+            catch (Exception)
+            {
+                Disconnect();
             }
         }
 
@@ -135,23 +137,45 @@ namespace Alchemy
 
         private void Authenticate()
         {
-            _handshake = new ClientHandshake { Version = "8", Origin = Origin, Host = _host, Key = GenerateKey(), ResourcePath = _path };
+            _handshake = new ClientHandshake { Version = "8", Origin = Origin, Host = _host, Key = GenerateKey(), ResourcePath = _path, SubProtocols = SubProtocols};
 
             _client.Client.Send(Encoding.UTF8.GetBytes(_handshake.ToString()));
         }
 
-        private void CheckAuthenticationResponse(Context context)
+        private bool CheckAuthenticationResponse(Context context)
         {
             var receivedData = context.UserContext.DataFrame.ToString();
             var header = new Header(receivedData);
             var handshake = new ServerHandshake(header);
 
-            if (Authentication.GenerateAccept(_handshake.Key) != handshake.Accept) return;
+            if (Authentication.GenerateAccept(_handshake.Key) != handshake.Accept) return false;
+
+            if (SubProtocols != null)
+            {
+                if (header.SubProtocols == null)
+                {
+                    return false;
+                }
+
+                foreach (var s in SubProtocols)
+                {
+                    if (header.SubProtocols.Contains(s) && String.IsNullOrEmpty(CurrentProtocol))
+                    {
+                        CurrentProtocol = s;
+                    }
+
+                }
+                if(String.IsNullOrEmpty(CurrentProtocol))
+                {
+                    return false;
+                }
+            }
 
             ReadyState = ReadyStates.OPEN;
             IsAuthenticated = true;
             _connecting = false;
             context.UserContext.OnConnected();
+            return true;
         }
 
         private void ReceiveData(Context context)
@@ -161,8 +185,13 @@ namespace Alchemy
                 var someBytes = new byte[context.ReceivedByteCount];
                 Array.Copy(context.Buffer, 0, someBytes, 0, context.ReceivedByteCount);
                 context.UserContext.DataFrame.Append(someBytes);
-                CheckAuthenticationResponse(context);
+                var authenticated = CheckAuthenticationResponse(context);
                 context.UserContext.DataFrame.Reset();
+
+                if (!authenticated)
+                {
+                    Disconnect();
+                }
             }
             else
             {

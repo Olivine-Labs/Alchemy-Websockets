@@ -76,9 +76,9 @@ namespace Alchemy.Handlers
                         context.Handler = WebSocket.hybi00.Handler.Instance;
                         context.UserContext.DataFrame = new WebSocket.hybi00.DataFrame();
                         break;
-                    case Protocol.WebSocketHybi10:
-                        context.Handler = WebSocket.hybi10.Handler.Instance;
-                        context.UserContext.DataFrame = new WebSocket.hybi10.DataFrame();
+                    case Protocol.WebSocketRFC6455:
+                        context.Handler = WebSocket.rfc6455.Handler.Instance;
+                        context.UserContext.DataFrame = new WebSocket.rfc6455.DataFrame();
                         break;
                     default:
                         context.Header.Protocol = Protocol.None;

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Alchemy.Handlers.WebSocket.hybi10
+namespace Alchemy.Handlers.WebSocket.rfc6455
 {
     /// <summary>
     /// Simple WebSocket data Frame implementation. 
