@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Web;
 using Alchemy.Classes;
@@ -100,7 +101,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             }
             additionalFields += "\r\n";
 
-            return String.Format(Handshake, ResourcePath, Origin, Host, Key1, Key2, additionalFields);
+            return String.Format(Handshake, ResourcePath, Origin, Host, Key1, Key2, additionalFields).ToString(CultureInfo.InvariantCulture);
         }
     }
 
@@ -154,7 +155,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
 
             additionalFields += "\r\n";
 
-            return String.Format(Handshake, Origin, Location, additionalFields);
+            return String.Format(Handshake, Origin, Location, additionalFields).ToString(CultureInfo.InvariantCulture);
         }
     }
 }

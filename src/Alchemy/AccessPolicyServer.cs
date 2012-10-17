@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
@@ -69,7 +70,7 @@ namespace Alchemy
             try
             {
                 connection.Client.Send(
-                    Encoding.UTF8.GetBytes(String.Format(Response, _allowedHost, _allowedPort.ToString())));
+                    Encoding.UTF8.GetBytes(String.Format(Response, _allowedHost, _allowedPort.ToString(CultureInfo.InvariantCulture))));
             }
             catch (SocketException)
             {
