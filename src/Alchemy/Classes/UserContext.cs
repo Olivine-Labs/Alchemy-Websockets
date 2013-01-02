@@ -12,7 +12,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// AQ Link to the parent User Context
         /// </summary>
-        private readonly Context _context;
+        protected readonly Context Context;
 
         /// <summary>
         /// The remote endpoint address.
@@ -55,7 +55,7 @@ namespace Alchemy.Classes
         /// <param name="context">The user context.</param>
         public UserContext(Context context)
         {
-            _context = context;
+            Context = context;
         }
 
         /// <summary>
@@ -63,7 +63,7 @@ namespace Alchemy.Classes
         /// </summary>
         public Header Header
         {
-            get { return _context.Header; }
+            get { return Context.Header; }
         }
 
         /// <summary>
@@ -71,8 +71,8 @@ namespace Alchemy.Classes
         /// </summary>
         public UInt64 MaxFrameSize
         {
-            get { return _context.MaxFrameSize; }
-            set { _context.MaxFrameSize = value; }
+            get { return Context.MaxFrameSize; }
+            set { Context.MaxFrameSize = value; }
         }
 
         /// <summary>
@@ -96,7 +96,7 @@ namespace Alchemy.Classes
         /// </summary>
         public void OnDisconnect()
         {
-            _context.Connected = false;
+            Context.Connected = false;
             OnDisconnectDelegate(this);
         }
 
@@ -169,7 +169,7 @@ namespace Alchemy.Classes
         /// <param name="close">if set to <c>true</c> [close].</param>
         public void Send(DataFrame dataFrame, bool raw = false, bool close = false)
         {
-            _context.Handler.Send(dataFrame, _context, raw, close);
+            Context.Handler.Send(dataFrame, Context, raw, close);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Alchemy.Classes
         {
             DataFrame dataFrame = DataFrame.CreateInstance();
             dataFrame.Append(aString);
-            _context.Handler.Send(dataFrame, _context, raw, close);
+            Context.Handler.Send(dataFrame, Context, raw, close);
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Alchemy.Classes
             DataFrame dataFrame = DataFrame.CreateInstance();
             dataFrame.IsByte = true;
             dataFrame.Append(someBytes);
-            _context.Handler.Send(dataFrame, _context, raw, close);
+            Context.Handler.Send(dataFrame, Context, raw, close);
         }
     }
 }

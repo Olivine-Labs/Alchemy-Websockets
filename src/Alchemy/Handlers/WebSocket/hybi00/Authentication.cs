@@ -31,13 +31,13 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                     }
                     if (Destination != string.Empty)
                     {
-                        if (handshake.Host != Destination + ":" + context.Server.Port.ToString())
+                        if (handshake.Host != Destination + ":" + context.Server.Port)
                         {
                             return false;
                         }
                     }
                     // Generate response handshake for the client
-                    ServerHandshake serverShake = GenerateResponseHandshake(handshake);
+                    var serverShake = GenerateResponseHandshake(handshake, context.Server);
                     // Send the response handshake
                     SendServerHandshake(serverShake, context);
                     return true;
@@ -46,14 +46,15 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             return false;
         }
 
-        private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake)
+        private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake, WebSocketServer server)
         {
-            var responseHandshake = new ServerHandshake
+            var responseHandshake = new ServerHandshake()
             {
                 Location = "ws://" + handshake.Host + handshake.ResourcePath,
                 Origin = handshake.Origin,
-                SubProtocol = handshake.SubProtocol,
-                AnswerBytes = GenerateAnswerBytes(handshake.Key1, handshake.Key2, handshake.ChallengeBytes)
+                AnswerBytes = GenerateAnswerBytes(handshake.Key1, handshake.Key2, handshake.ChallengeBytes),
+                Server = server,
+                RequestProtocols = server.SubProtocols
             };
 
             return responseHandshake;
@@ -71,7 +72,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
         private static byte[] TranslateKey(string key)
         {
             //  Count total spaces in the keys
-            int keySpaceCount = key.Count(x => x == ' ');
+            var keySpaceCount = key.Count(x => x == ' ');
 
             // Get a number which is a concatenation of all digits in the keys.
             var keyNumberString = new String(key.Where(Char.IsDigit).ToArray());
@@ -97,7 +98,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             Array.Copy(challenge.Array, challenge.Offset, rawAnswer, 8, 8);
 
             // Create a hash of the rawAnswer and return it
-            MD5 hasher = MD5.Create();
+            var hasher = MD5.Create();
             return hasher.ComputeHash(rawAnswer);
         }
     }

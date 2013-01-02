@@ -67,7 +67,7 @@
     <Compile Include="Handlers\IAuthentication.cs" />
     <Compile Include="Handlers\WebSocket\DataFrame.cs" />
     <Compile Include="Handlers\WebSocket\hybi00\DataFrame.cs" />
-    <Compile Include="Handlers\WebSocket\hybi10\DataFrame.cs" />
+    <Compile Include="Handlers\WebSocket\rfc6455\DataFrame.cs" />
     <Compile Include="Classes\Header.cs" />
     <Compile Include="Classes\Response.cs" />
     <Compile Include="Classes\UserContext.cs" />
@@ -75,10 +75,10 @@
     <Compile Include="Handlers\WebSocket\hybi00\Handler.cs" />
     <Compile Include="Handlers\WebSocket\hybi00\Handshakes.cs" />
     <Compile Include="Handlers\WebSocket\hybi00\Authentication.cs" />
-    <Compile Include="Handlers\WebSocket\hybi10\FrameHeader.cs" />
-    <Compile Include="Handlers\WebSocket\hybi10\Authentication.cs" />
-    <Compile Include="Handlers\WebSocket\hybi10\Handshakes.cs" />
-    <Compile Include="Handlers\WebSocket\hybi10\Handler.cs" />
+    <Compile Include="Handlers\WebSocket\rfc6455\FrameHeader.cs" />
+    <Compile Include="Handlers\WebSocket\rfc6455\Authentication.cs" />
+    <Compile Include="Handlers\WebSocket\rfc6455\Handshakes.cs" />
+    <Compile Include="Handlers\WebSocket\rfc6455\Handler.cs" />
     <Compile Include="Handlers\WebSocket\WebSocketHandler.cs" />
     <Compile Include="TcpServer.cs" />
     <Compile Include="WebSocketClient.cs" />

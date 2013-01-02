@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using NUnit.Framework;
 
-namespace Alchemy.Handlers.WebSocket.hybi10
+namespace Alchemy.Handlers.WebSocket.rfc6455
 {
     [TestFixture]
     public class DataFrameTest

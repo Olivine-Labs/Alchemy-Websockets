@@ -11,7 +11,7 @@ namespace Alchemy.Classes
     public enum Protocol
     {
         None = -1,
-        WebSocketHybi10 = 0,
+        WebSocketRFC6455 = 0,
         WebSocketHybi00 = 1
     }
 
@@ -56,6 +56,11 @@ namespace Alchemy.Classes
         public string RequestPath = string.Empty;
 
         /// <summary>
+        /// The subprotocols specified by the header.
+        /// </summary>
+        public string[] SubProtocols;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Header"/> class.
         /// Accepts a string that represents an HTTP header.
         /// </summary>
@@ -64,32 +69,35 @@ namespace Alchemy.Classes
         {
             // Parse HTTP Header
             var regex = new Regex(Pattern, RegexOptions.IgnoreCase);
-            Match match = regex.Match(data);
-            GroupCollection someFields = match.Groups;
-            Group fieldNameCollection = someFields["field_name"];
-            Group fieldValueCollection = someFields["field_value"];
+            var match = regex.Match(data);
+            var matchGroups = match.Groups;
+            var fieldNameCollection = matchGroups["field_name"];
+            var fieldValueCollection = matchGroups["field_value"];
+            
             if (fieldNameCollection != null && fieldValueCollection != null)
             {
                 // run through every match and save them in the handshake object
-                for (int i = 0; i < fieldNameCollection.Captures.Count; i++)
+                for (var i = 0; i < fieldNameCollection.Captures.Count; i++)
                 {
-                    string name = fieldNameCollection.Captures[i].ToString().ToLower();
-                    string value = fieldValueCollection.Captures[i].ToString().Trim();
+                    var name = fieldNameCollection.Captures[i].ToString().ToLower();
+                    var value = fieldValueCollection.Captures[i].ToString().Trim();
+
                     switch (name)
                     {
                         case "cookie":
-                            string[] cookieArray = value.Split(';');
-                            foreach (string cookie in cookieArray)
+                            var cookieArray = value.Split(';');
+                            foreach (var cookie in cookieArray)
                             {
-                                int cookieIndex = cookie.IndexOf('=');
-                                if (cookieIndex >= 0)
+                                var cookieIndex = cookie.IndexOf('=');
+                                
+                                if (cookieIndex < 0) continue;
+                                
+                                var cookieName = cookie.Remove(cookieIndex).TrimStart();
+                                
+                                var cookieValue = cookie.Substring(cookieIndex + 1);
+                                if (cookieName != string.Empty)
                                 {
-                                    string cookieName = cookie.Remove(cookieIndex).TrimStart();
-                                    string cookieValue = cookie.Substring(cookieIndex + 1);
-                                    if (cookieName != string.Empty)
-                                    {
-                                        Cookies.Add(new HttpCookie(cookieName, cookieValue));
-                                    }
+                                    Cookies.Add(new HttpCookie(cookieName, cookieValue));
                                 }
                             }
                             break;
@@ -100,8 +108,8 @@ namespace Alchemy.Classes
                 }
             }
 
-            Group pathCollection = someFields["path"];
-            Group methodCollection = someFields["connect"];
+            var pathCollection = matchGroups["path"];
+            var methodCollection = matchGroups["connect"];
 
             if (pathCollection != null)
             {
@@ -110,6 +118,7 @@ namespace Alchemy.Classes
                     RequestPath = pathCollection.Captures[0].Value.Trim();
                 }
             }
+
             if (methodCollection != null)
             {
                 if (methodCollection.Captures.Count > 0)
@@ -121,7 +130,12 @@ namespace Alchemy.Classes
             int version;
             Int32.TryParse(_fields["sec-websocket-version"], out version);
 
-            Protocol = version < 8 ? Protocol.WebSocketHybi00 : Protocol.WebSocketHybi10;
+            if(!String.IsNullOrEmpty(_fields["sec-websocket-protocol"]))
+            {
+                SubProtocols = _fields["sec-websocket-protocol"].Split(',');
+            }
+
+            Protocol = version < 8 ? Protocol.WebSocketHybi00 : Protocol.WebSocketRFC6455;
         }
 
         /// <summary>

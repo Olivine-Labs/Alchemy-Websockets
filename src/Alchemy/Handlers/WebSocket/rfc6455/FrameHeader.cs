@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace Alchemy.Handlers.WebSocket.hybi10
+namespace Alchemy.Handlers.WebSocket.rfc6455
 {
     internal class FrameHeader
     {
@@ -30,22 +30,26 @@ namespace Alchemy.Handlers.WebSocket.hybi10
 
             //Combine bytes to form one large number
             PayloadSize = (byte) (data[1] & 0x7F);
-            if (PayloadSize == 126)
+
+            switch (PayloadSize)
             {
-                Array.Reverse(data, dataBegin, 2);
-                PayloadSize = BitConverter.ToUInt16(data, dataBegin);
-                dataBegin += 2;
+                case 126:
+                    Array.Reverse(data, dataBegin, 2);
+                    PayloadSize = BitConverter.ToUInt16(data, dataBegin);
+                    dataBegin += 2;
+                    break;
+                case 127:
+                    Array.Reverse(data, dataBegin, 8);
+                    PayloadSize = BitConverter.ToUInt64(data, dataBegin);
+                    dataBegin += 8;
+                    break;
             }
-            else if (PayloadSize == 127)
-            {
-                Array.Reverse(data, dataBegin, 8);
-                PayloadSize = BitConverter.ToUInt64(data, dataBegin);
-                dataBegin += 8;
-            }
+
             PayloadSizeRemaining = PayloadSize;
             IsMasked = Convert.ToBoolean((data[1] & 0x80) >> 7);
             Mask = 0;
             CurrentMaskIndex = 0;
+
             if (IsMasked)
             {
                 Mask = BitConverter.ToInt32(data, dataBegin);
