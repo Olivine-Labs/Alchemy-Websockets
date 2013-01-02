@@ -1,6 +1,9 @@
 ﻿using System;
+using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.Net;
 using System.Net.Sockets;
+using System.Threading;
 using Alchemy.Classes;
 using Alchemy.Handlers;
 
@@ -13,6 +16,95 @@ namespace Alchemy
     /// </summary>
     public class WebSocketServer : TcpServer, IDisposable
     {
+
+        private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
+        private static Thread CleanupThread;
+
+        private static ConcurrentQueue<Context> ContextQueue { get; set; }
+        private static Dictionary<Context, WebSocketServer> ContextMapping { get; set; }
+
+        private static List<Context> CurrentConnections { get; set; }
+
+        static WebSocketServer()
+        {
+            ContextQueue = new ConcurrentQueue<Context>();
+            ContextMapping = new Dictionary<Context, WebSocketServer>();
+            CurrentConnections = new List<Context>();
+
+            CleanupThread = new Thread(HandleContextCleanupThread);
+            CleanupThread.Name = "WebSocketServer Cleanup Thread";
+            CleanupThread.Start();
+
+            for(int i = 0; i < ClientThreads.Length; i++){
+                ClientThreads[i] = new Thread(HandleClientThread);
+                ClientThreads[i].Name = "WebSocketServer Client Thread #" + (i + 1);
+                ClientThreads[i].Start();
+            }
+        }
+
+        private static void HandleClientThread()
+        {
+            while (true)
+            {
+                Context context;
+
+                while (ContextQueue.Count == 0)
+                {
+                    Thread.Sleep(10);
+                }
+
+                if (!ContextQueue.TryDequeue(out context))
+                {
+                    continue;
+                }
+
+                lock (ContextMapping)
+                {
+                    WebSocketServer client = ContextMapping[context];
+                    client.SetupContext(context);
+                }
+
+                lock(CurrentConnections){
+                    CurrentConnections.Add(context);
+                }
+            }
+        }
+
+        private static void HandleContextCleanupThread()
+        {
+            while (true)
+            {
+                Thread.Sleep(100);
+
+                List<Context> currentConnections = new List<Context>();
+
+                lock (CurrentConnections)
+                {
+                    currentConnections.AddRange(CurrentConnections);
+                }
+
+                foreach (var connection in currentConnections)
+                {
+                    if (!connection.Connected)
+                    {
+                        lock (CurrentConnections)
+                        {
+                            CurrentConnections.Remove(connection);
+                        }
+
+                        lock (ContextMapping)
+                        {
+                            ContextMapping.Remove(connection);
+                        }
+
+                        connection.Handler.UnregisterContext(connection);
+
+                        connection.Dispose();
+                    }
+                }
+            }
+        }
+
         /// <summary>
         /// This is the Flash Access Policy Server. It allows us to facilitate flash socket connections much more quickly in most cases.
         /// Don't mess with it through here. It's only public so we can access it later from all the IOCPs.
@@ -127,35 +219,25 @@ namespace Alchemy
         protected override void OnRunClient(object data)
         {
             var connection = (TcpClient)data;
-            using (var context = new Context(this, connection))
+            var context = new Context(this, connection);
+
+            context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;
+            context.UserContext.SetOnConnect(OnConnect);
+            context.UserContext.SetOnConnected(OnConnected);
+            context.UserContext.SetOnDisconnect(OnDisconnect);
+            context.UserContext.SetOnSend(OnSend);
+            context.UserContext.SetOnReceive(OnReceive);
+            context.BufferSize = BufferSize;
+            context.UserContext.OnConnect();
+
+            if (context.Connected)
             {
-                context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;
-                context.UserContext.SetOnConnect(OnConnect);
-                context.UserContext.SetOnConnected(OnConnected);
-                context.UserContext.SetOnDisconnect(OnDisconnect);
-                context.UserContext.SetOnSend(OnSend);
-                context.UserContext.SetOnReceive(OnReceive);
-                context.BufferSize = BufferSize;
-                context.UserContext.OnConnect();
-                while (context.Connected)
+                lock (ContextMapping)
                 {
-                    if (context.ReceiveReady.Wait(TimeOut))
-                    {
-                        try
-                        {
-                            context.Connection.Client.BeginReceive(context.Buffer, 0, context.Buffer.Length,
-                                                                   SocketFlags.None, DoReceive, context);
-                        }
-                        catch (SocketException)
-                        {
-                            break;
-                        }
-                    }
-                    else
-                    {
-                        break;
-                    }
+                    ContextMapping[context] = this;
                 }
+
+                ContextQueue.Enqueue(context);
             }
         }
 
@@ -183,6 +265,59 @@ namespace Alchemy
             }
             else
             {
+                context.Disconnect();
+                context.ReceiveReady.Release();
+            }
+        }
+        private void SetupContext(Context _context)
+        {
+            _context.ReceiveEventArgs.UserToken = _context;
+            _context.ReceiveEventArgs.Completed += ReceiveEventArgs_Completed;
+            _context.ReceiveEventArgs.SetBuffer(_context.Buffer, 0, _context.Buffer.Length);
+
+            StartReceive(_context);
+        }
+        private void StartReceive(Context _context)
+        {
+            if (_context.ReceiveReady.Wait(TimeOut))
+            {
+                try
+                {
+                    if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                    {
+                        ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                    }
+                }
+                catch (SocketException ex)
+                {
+                    //logger.Error("SocketException in ReceieveAsync", ex);
+                    _context.Disconnect();
+                }
+            }
+            else
+            {
+                //logger.Error("Timeout waiting for ReceiveReady");
+                _context.Disconnect();
+            }
+        }
+        void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            var context = (Context)e.UserToken;
+            context.Reset();
+            if (e.SocketError != SocketError.Success)
+            {
+            //logger.Error("Socket Error: " + e.SocketError.ToString());
+                context.ReceivedByteCount = 0;
+            } else {
+                context.ReceivedByteCount = e.BytesTransferred;
+            }
+
+            if (context.ReceivedByteCount > 0)
+            {
+                context.Handler.HandleRequest(context);
+                context.ReceiveReady.Release();
+                StartReceive(context);
+            } else {
                 context.Disconnect();
                 context.ReceiveReady.Release();
             }
