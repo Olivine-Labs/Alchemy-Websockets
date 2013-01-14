@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Net.Sockets;
 using System.Text;
@@ -16,21 +17,38 @@ namespace Alchemy.Handlers
     {
         private static Handler _instance;
 
-        protected static SemaphoreSlim CreateLock = new SemaphoreSlim(1);
+        protected static object createLock = new object();
         internal IAuthentication Authentication;
-        protected Handler() {}
+
+         private Thread[] ProcessSendThreads = new Thread[Environment.ProcessorCount];
+
+        private ConcurrentQueue<HandlerMessage> MessageQueue { get; set; }
+
+        protected Handler() {
+
+            MessageQueue = new ConcurrentQueue<HandlerMessage>();
+
+            for (int i = 0; i < ProcessSendThreads.Length; i++)
+            {
+                ProcessSendThreads[i] = new Thread(ProcessSend);
+                ProcessSendThreads[i].Name = "Alchemy Send Handler Thread " + (i + 1);
+                ProcessSendThreads[i].Start();
+            }
+        }
 
         public static Handler Instance
         {
             get
             {
-                if (_instance != null)
+                if (_instance == null)
                 {
-                    return _instance;
+                     lock(createLock){
+                        if(_instance == null){
+                            _instance = new Handler();
+                        }
+                    }
                 }
-                CreateLock.Wait();
-                _instance = new Handler();
-                CreateLock.Release();
+
                 return _instance;
             }
         }
@@ -73,12 +91,16 @@ namespace Alchemy.Handlers
                 switch (context.Header.Protocol)
                 {
                     case Protocol.WebSocketHybi00:
+                        context.Handler.UnregisterContext(context);
                         context.Handler = WebSocket.hybi00.Handler.Instance;
                         context.UserContext.DataFrame = new WebSocket.hybi00.DataFrame();
+                        context.Handler.RegisterContext(context);
                         break;
                     case Protocol.WebSocketRFC6455:
+                        context.Handler.UnregisterContext(context);
                         context.Handler = WebSocket.rfc6455.Handler.Instance;
                         context.UserContext.DataFrame = new WebSocket.rfc6455.DataFrame();
+                        context.Handler.RegisterContext(context);
                         break;
                     default:
                         context.Header.Protocol = Protocol.None;
@@ -95,6 +117,43 @@ namespace Alchemy.Handlers
             }
         }
 
+        private void ProcessSend()
+        {
+            while (true)
+            {
+                while (MessageQueue.IsEmpty)
+                {
+                    Thread.Sleep(10);
+                }
+
+                HandlerMessage message;
+
+                if (!MessageQueue.TryDequeue(out message))
+                {
+                    continue;
+                }
+
+                Send(message);
+            }
+        }
+
+        private void Send(HandlerMessage message)
+        {
+            message.Context.SendEventArgs.UserToken = message;
+            message.Context.SendReady.Wait();
+
+            try
+            {
+                List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
+                message.Context.SendEventArgs.BufferList = data;
+                message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
+            }
+            catch
+            {
+                message.Context.Disconnect();
+            }
+        }
+
         /// <summary>
         /// Sends the specified data.
         /// </summary>
@@ -106,54 +165,46 @@ namespace Alchemy.Handlers
         {
             if (context.Connected)
             {
-                AsyncCallback callback = EndSend;
-                if (close)
-                {
-                    callback = EndSendAndClose;
-                }
-                context.SendReady.Wait();
-                try
-                {
-                    List<ArraySegment<byte>> data = raw ? dataFrame.AsRaw() : dataFrame.AsFrame();
-                    context.Connection.Client.BeginSend(data, SocketFlags.None,
-                                                        callback,
-                                                        context);
-                }
-                catch
-                {
-                    context.Disconnect();
-                }
+                HandlerMessage message = new HandlerMessage { DataFrame = dataFrame, Context = context, IsRaw = raw, DoClose = close };
+                MessageQueue.Enqueue(message);
             }
         }
 
-        /// <summary>
-        /// Ends the send.
-        /// </summary>
-        /// <param name="result">The Async result.</param>
-        public void EndSend(IAsyncResult result)
+        void SendEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
-            var context = (Context) result.AsyncState;
-            try
+            HandlerMessage message = (HandlerMessage)e.UserToken;
+
+            if (e.SocketError != SocketError.Success)
             {
-                context.Connection.Client.EndSend(result);
-                context.SendReady.Release();
+                message.Context.Disconnect();
+                return;
             }
-            catch
+           
+            message.Context.SendReady.Release();
+            message.Context.UserContext.OnSend();
+
+            if (message.DoClose)
             {
-                context.Disconnect();
+                message.Context.Disconnect();
             }
-            context.UserContext.OnSend();
         }
 
-        /// <summary>
-        /// Ends the send and closes the connection.
-        /// </summary>
-        /// <param name="result">The Async result.</param>
-        public void EndSendAndClose(IAsyncResult result)
+        public void RegisterContext(Context context)
         {
-            var context = (Context) result.AsyncState;
-            EndSend(result);
-            context.Disconnect();
+            context.SendEventArgs.Completed += SendEventArgs_Completed;
+        }
+
+         public void UnregisterContext(Context context)
+        {
+            context.SendEventArgs.Completed -= SendEventArgs_Completed;
+        }
+
+        private class HandlerMessage
+        {
+            public DataFrame DataFrame { get; set;}
+            public Context Context { get; set;}
+            public Boolean IsRaw { get; set;}
+            public Boolean DoClose { get; set;}
         }
     }
 }

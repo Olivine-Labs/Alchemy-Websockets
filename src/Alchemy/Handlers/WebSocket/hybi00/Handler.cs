@@ -16,13 +16,17 @@
         {
             get
             {
-                if (_instance != null)
+                if (_instance == null)
                 {
-                    return _instance;
+                    lock (createLock)
+                    {
+                        if (_instance == null)
+                        {
+                            _instance = new Handler();
+                        }
+                    }
                 }
-                CreateLock.Wait();
-                _instance = new Handler();
-                CreateLock.Release();
+
                 return _instance;
             }
         }

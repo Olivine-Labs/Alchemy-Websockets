@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Net.Sockets;
 using System.Threading;
 using Alchemy.Handlers;
@@ -6,11 +6,13 @@ using Alchemy.Handlers.WebSocket;
 
 namespace Alchemy.Classes
 {
-    /// <summary>
-    /// This class contains the required data for each connection to the server.
-    /// </summary>
+/// <summary>
+/// This class contains the required data for each connection to the server.
+/// </summary>
     public class Context : IDisposable
     {
+        //private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
+
         /// <summary>
         /// The exported version of this context.
         /// </summary>
@@ -70,6 +72,10 @@ namespace Alchemy.Classes
 
         private int _bufferSize = 512;
 
+
+        public SocketAsyncEventArgs ReceiveEventArgs { get; set; }
+        public SocketAsyncEventArgs SendEventArgs { get; set; }
+
         /// <summary>
         /// Initializes a new instance of the <see cref="Context"/> class.
         /// </summary>
@@ -78,7 +84,17 @@ namespace Alchemy.Classes
             Server = server;
             Connection = connection;
             Buffer = new byte[_bufferSize];
-            UserContext = new UserContext(this) {ClientAddress = connection.Client.RemoteEndPoint};
+            UserContext = new UserContext(this);
+
+            ReceiveEventArgs = new SocketAsyncEventArgs();
+            SendEventArgs = new SocketAsyncEventArgs();
+
+            Handler.RegisterContext(this);
+
+            if (connection != null)
+            {
+                UserContext.ClientAddress = connection.Client.RemoteEndPoint;
+            }
         }
 
         /// <summary>
@@ -128,6 +144,7 @@ namespace Alchemy.Classes
         /// </summary>
         public void Disconnect()
         {
+            //logger.Debug("Disconnected in " + Environment.StackTrace);
             Connected = false;
         }
 

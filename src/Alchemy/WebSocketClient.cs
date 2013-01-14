@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -33,6 +34,10 @@ namespace Alchemy
         private readonly int _port;
         private readonly string _host;
 
+        private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
+        private static Queue<Context> NewClients { get; set; }
+        private static Dictionary<Context, WebSocketClient> ContextMapping { get; set; }
+
         public enum ReadyStates
         {
             CONNECTING,
@@ -49,6 +54,45 @@ namespace Alchemy
             }
         }
 
+        static WebSocketClient()
+        {
+            NewClients = new Queue<Context>();
+            ContextMapping = new Dictionary<Context, WebSocketClient>();
+
+            for(int i = 0; i < ClientThreads.Length; i++){
+                ClientThreads[i] = new Thread(HandleClientThread);
+                ClientThreads[i].Start();
+            }
+        }
+
+        private static void HandleClientThread()
+        {
+            while (true)
+            {
+                Context context = null;
+
+                while (NewClients.Count == 0)
+                {
+                    Thread.Sleep(10);
+                }
+
+                lock (NewClients)
+                {
+                    if (NewClients.Count == 0)
+                    {
+                        continue;
+                    }
+
+                    context = NewClients.Dequeue();
+                }
+
+                lock (ContextMapping)
+                {
+                    WebSocketClient client = ContextMapping[context];
+                    client.SetupContext(context);
+                }
+            }
+        }
         public WebSocketClient(string path)
         {
             var r = new Regex("^(wss?)://(.*)\\:([0-9]*)/(.*)$");
@@ -91,17 +135,20 @@ namespace Alchemy
         /// <param name="result">null</param>
         protected void OnRunClient(IAsyncResult result)
         {
+            bool connectError = false;
             try
             {
                 _client.EndConnect(result);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 Disconnect();
+                connectError = true;
             }
 
             using (_context = new Context(null, _client))
             {
+                _context = new Context(null, _client);
                 _context.BufferSize = 512;
                 _context.UserContext.DataFrame = new DataFrame();
                 _context.UserContext.SetOnConnect(OnConnect);
@@ -111,28 +158,78 @@ namespace Alchemy
                 _context.UserContext.SetOnReceive(OnReceive);
                 _context.UserContext.OnConnect();
 
-
-                while (_context.Connection.Connected)
+                if (connectError)
                 {
-                    _context.ReceiveReady.Wait();
+                    _context.UserContext.OnDisconnect();
+                    return;
+                }
 
-                    try
-                    {
-                        _context.Connection.Client.BeginReceive(_context.Buffer, 0, _context.Buffer.Length, SocketFlags.None, DoReceive, _context);
-                    }
-                    catch (Exception)
-                    {
-                        break;
-                    }
+                lock (ContextMapping)
+                {
+                    ContextMapping[_context] = this;
+                }
 
-                    if (!IsAuthenticated)
-                    {
-                        Authenticate();
-                    }
+                lock (NewClients)
+                {
+                    NewClients.Enqueue(_context);
                 }
             }
+        }
 
-            Disconnect();
+        private void SetupContext(Context context)
+        {
+            _context.ReceiveEventArgs.UserToken = _context;
+            _context.ReceiveEventArgs.Completed += ReceiveEventArgs_Completed;
+            _context.ReceiveEventArgs.SetBuffer(_context.Buffer, 0, _context.Buffer.Length);
+
+            if (_context.Connection != null && _context.Connection.Connected)
+            {
+                _context.ReceiveReady.Wait();
+
+                if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                {
+                    ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                }
+ 
+
+                if (!IsAuthenticated)
+                {
+
+                    Authenticate();
+                }
+            }
+        }
+
+        void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
+        {
+            var context = (Context)e.UserToken;
+            context.Reset();
+
+            if (e.SocketError != SocketError.Success)
+            {
+                context.ReceivedByteCount = 0;
+            }
+            else
+            {
+                context.ReceivedByteCount = e.BytesTransferred;
+            }
+
+            if (context.ReceivedByteCount > 0)
+            {
+                ReceiveData(context);
+                context.ReceiveReady.Release();
+            }
+            else
+            {
+                context.Disconnect();
+            }
+
+            _context.ReceiveReady.Wait();
+
+            if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+            {
+                ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+            }
         }
 
         private void Authenticate()
