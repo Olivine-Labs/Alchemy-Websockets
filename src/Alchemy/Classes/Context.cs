@@ -106,6 +106,19 @@ namespace Alchemy.Classes
         {
             Connected = false;
             UserContext.OnDisconnect();
+            
+            // close client connection
+            if (Connection != null)
+            {
+                try
+                {
+                    Connection.Close();
+                }
+                catch (Exception)
+                {
+                    // skip
+                }
+            } 
         }
 
         #endregion
