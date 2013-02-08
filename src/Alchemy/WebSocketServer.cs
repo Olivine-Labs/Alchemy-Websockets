@@ -7,6 +7,10 @@ using System.Threading;
 using Alchemy.Classes;
 using Alchemy.Handlers;
 
+// mjb 
+using System.Security.Cryptography.X509Certificates;
+using System.IO;
+
 namespace Alchemy
 {
     public delegate void OnEventDelegate(UserContext context);
@@ -129,6 +133,10 @@ namespace Alchemy
         /// </summary>
         public bool FlashAccessPolicyEnabled = true;
 
+        // mjb 
+        public X509Certificate2 SSLCertificate = null;
+        public bool IsSecure = false;
+
         /// <summary>
         /// Configuration for the above heartbeat setup.
         /// TimeOut : How long until a connection drops when it doesn't receive anything.
@@ -219,7 +227,20 @@ namespace Alchemy
         protected override void OnRunClient(object data)
         {
             var connection = (TcpClient)data;
-            var context = new Context(this, connection);
+            
+            // mjb
+            //var context = new Context(this, connection);
+            Context context = null;
+
+            try
+            {
+                context = new Context(this, connection);
+            }
+            catch
+            {
+                connection.Close();
+                return;
+            }
 
             context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;
             context.UserContext.SetOnConnect(OnConnect);
@@ -283,10 +304,18 @@ namespace Alchemy
             {
                 try
                 {
+                    // mjb 
+                    /*
                     if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
                     {
                         ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                     }
+                     */
+
+                    ReceiveWorker rw = new ReceiveWorker() { context = _context };
+                    Thread tw = new Thread(rw.Receive);
+                    tw.Start();
+
                 }
                 catch (SocketException ex)
                 {
@@ -322,5 +351,58 @@ namespace Alchemy
                 context.ReceiveReady.Release();
             }
         }
+
+        // mjb 
+        private class ReceiveWorker
+        {
+            public Context context;
+
+            // This method will be called when the thread is started.
+            public void Receive()
+            {
+                while (true)
+                {
+                    int BytesTransferred = 0;
+
+                    try
+                    {
+                        //NetworkStream ns = context.Connection.GetStream();
+                        Stream ns = context.NetworkStream;
+                        BytesTransferred = ns.Read(context.Buffer, 0, context.Buffer.Length);
+                    }
+                    catch
+                    {
+                        context.ReceivedByteCount = 0;
+                    }
+
+                    context.Reset();
+                    context.ReceivedByteCount = BytesTransferred;
+
+                    if (context.ReceivedByteCount > 0)
+                    {
+                        context.Handler.HandleRequest(context);
+                        context.ReceiveReady.Release();
+                        //StartReceive(context);
+                        continue;
+                    }
+                    else
+                    {
+                        context.Disconnect();
+                        context.ReceiveReady.Release();
+                        break;
+                    }
+                }
+            }
+
+            //    public void RequestStop()
+            //    {
+            //        _shouldStop = true;
+            //    }
+            //    // Volatile is used as hint to the compiler that this data
+            //    // member will be accessed by multiple threads.
+            //    private volatile bool _shouldStop;
+        }
+
+    
     }
 }
