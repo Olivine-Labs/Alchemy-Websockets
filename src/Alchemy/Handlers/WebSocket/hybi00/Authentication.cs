@@ -48,9 +48,19 @@ namespace Alchemy.Handlers.WebSocket.hybi00
 
         private static ServerHandshake GenerateResponseHandshake(ClientHandshake handshake, WebSocketServer server)
         {
+            // mjb
+            string Protocol = "ws://";
+
+            if (server.IsSecure == true)
+            {
+                Protocol = "wss://";
+            }
+
             var responseHandshake = new ServerHandshake()
             {
-                Location = "ws://" + handshake.Host + handshake.ResourcePath,
+                // mjb Location = "ws://" + handshake.Host + handshake.ResourcePath,
+                Location = Protocol + handshake.Host + handshake.ResourcePath,
+
                 Origin = handshake.Origin,
                 AnswerBytes = GenerateAnswerBytes(handshake.Key1, handshake.Key2, handshake.ChallengeBytes),
                 Server = server,

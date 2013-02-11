@@ -38,6 +38,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                     PayloadSize = BitConverter.ToUInt16(data, dataBegin);
                     dataBegin += 2;
                     break;
+
                 case 127:
                     Array.Reverse(data, dataBegin, 8);
                     PayloadSize = BitConverter.ToUInt64(data, dataBegin);
@@ -89,7 +90,6 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                     data[0] = 126;
                     //data[0] = (byte) (data[0] | 0x80); //Tells us that this data is masked
                     headerBytes.Add(data);
-
                     data = BitConverter.GetBytes(Convert.ToUInt16(PayloadSize));
                     Array.Reverse(data);
                     headerBytes.Add(data);

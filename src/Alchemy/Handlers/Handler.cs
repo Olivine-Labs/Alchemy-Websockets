@@ -6,6 +6,10 @@ using System.Text;
 using System.Threading;
 using Alchemy.Classes;
 using Alchemy.Handlers.WebSocket;
+using System.IO;
+
+// mjb
+using System.Net.Security;
 
 namespace Alchemy.Handlers
 {
@@ -144,9 +148,27 @@ namespace Alchemy.Handlers
 
             try
             {
+                // mjb 
+
+                /*
                 List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
                 message.Context.SendEventArgs.BufferList = data;
                 message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
+                 */
+
+                if (message.Context.SslStream != null)
+                {
+                    SendWorker sw = new SendWorker() { message = message };
+                    Thread wt = new Thread(sw.Send);
+                    wt.Start();
+                }
+                else
+                {
+                    List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
+                    message.Context.SendEventArgs.BufferList = data;
+                    message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
+                }
+
             }
             catch
             {
@@ -206,5 +228,45 @@ namespace Alchemy.Handlers
             public Boolean IsRaw { get; set;}
             public Boolean DoClose { get; set;}
         }
+
+        // mjb 
+        private class SendWorker
+        {
+            public HandlerMessage message;
+
+            // This method will be called when the thread is started.
+            public void Send()
+            {
+                try
+                {
+                    //NetworkStream ns = message.Context.Connection.GetStream();
+                    //Stream ns = message.Context.NetworkStream;
+                    SslStream ns = message.Context.SslStream;
+
+                    List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
+                    ArraySegment<byte>[] buffer1 = data.ToArray();
+                
+                    foreach (ArraySegment<byte> buffer1_item in buffer1)
+                    {
+                        byte[] buffer = buffer1_item.Array;
+                        ns.Write(buffer, 0, buffer.Length);
+                    }
+                }
+                catch
+                {
+                    message.Context.Disconnect();
+                    return;
+                }
+
+                message.Context.SendReady.Release();
+                message.Context.UserContext.OnSend();
+
+                if (message.DoClose)
+                {
+                    message.Context.Disconnect();
+                }
+            }
+        }
+
     }
 }

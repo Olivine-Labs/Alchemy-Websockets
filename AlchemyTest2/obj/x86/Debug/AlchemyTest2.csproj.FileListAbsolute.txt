@@ -1,0 +1,9 @@
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\obj\x86\Debug\ResolveAssemblyReference.cache
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\bin\Debug\AlchemyTest2.exe.config
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\bin\Debug\AlchemyTest2.exe
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\bin\Debug\AlchemyTest2.pdb
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\bin\Debug\Alchemy.dll
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\bin\Debug\Alchemy.pdb
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\obj\x86\Debug\AlchemyTest2.exe
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\obj\x86\Debug\AlchemyTest2.pdb
+C:\AstrosLocal\Alchemy-Websockets-master\AlchemyTest2\bin\Debug\Alchemy.config

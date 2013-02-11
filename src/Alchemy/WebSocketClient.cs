@@ -7,6 +7,10 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using Alchemy.Classes;
 using Alchemy.Handlers.WebSocket.rfc6455;
+using System.IO;
+
+// mjb
+using System.Net.Security;
 
 namespace Alchemy
 {
@@ -186,11 +190,29 @@ namespace Alchemy
             {
                 _context.ReceiveReady.Wait();
 
+                // mjb 
+
+                /*
                 if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
                 {
                     ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                 }
- 
+                 */
+
+                if (_context.SslStream != null)
+                {
+                    ReceiveWorker rw = new ReceiveWorker() { webSocketClient = this, context = _context };
+                    Thread tw = new Thread(rw.Receive);
+                    tw.Start();
+                }
+                else
+                {
+                    if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                    {
+                        ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                    }
+                }
+
 
                 if (!IsAuthenticated)
                 {
@@ -236,7 +258,21 @@ namespace Alchemy
         {
             _handshake = new ClientHandshake { Version = "8", Origin = Origin, Host = _host, Key = GenerateKey(), ResourcePath = _path, SubProtocols = SubProtocols};
 
-            _client.Client.Send(Encoding.UTF8.GetBytes(_handshake.ToString()));
+            // mjb 
+            //_client.Client.Send(Encoding.UTF8.GetBytes(_handshake.ToString()));
+
+
+            if (_context.SslStream != null)
+            {
+                SslStream ns = _context.SslStream;
+                byte[] buffer = Encoding.UTF8.GetBytes(_handshake.ToString());
+                ns.Write(buffer, 0, buffer.Length);
+            }
+            else
+            {
+                _client.Client.Send(Encoding.UTF8.GetBytes(_handshake.ToString()));
+            }
+
         }
 
         private bool CheckAuthenticationResponse(Context context)
@@ -275,7 +311,9 @@ namespace Alchemy
             return true;
         }
 
-        private void ReceiveData(Context context)
+        // mjb
+        //private void ReceiveData(Context context)
+        protected void ReceiveData(Context context)
         {
             if (!IsAuthenticated)
             {
@@ -367,5 +405,47 @@ namespace Alchemy
         {
             _context.UserContext.Send(data);
         }
+
+        // mjb 
+        private class ReceiveWorker
+        {
+            public Context context;
+            public WebSocketClient webSocketClient;
+
+            // This method will be called when the thread is started.
+            public void Receive()
+            {
+                while (true)
+                {
+                    int BytesTransferred = 0;
+
+                    try
+                    {
+                        SslStream ns = context.SslStream;
+                        BytesTransferred = ns.Read(context.Buffer, 0, context.Buffer.Length);
+                    }
+                    catch
+                    {
+                        context.ReceivedByteCount = 0;
+                    }
+
+                    context.Reset();
+                    context.ReceivedByteCount = BytesTransferred;
+
+                    if (context.ReceivedByteCount > 0)
+                    {
+                        webSocketClient.ReceiveData(context);
+                        context.ReceiveReady.Release();
+                    }
+                    else
+                    {
+                        context.Disconnect();
+                    }
+
+                    context.ReceiveReady.Wait();
+                }
+            }
+        }
+    
     }
 }

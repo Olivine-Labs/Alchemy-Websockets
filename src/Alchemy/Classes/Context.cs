@@ -4,6 +4,10 @@ using System.Threading;
 using Alchemy.Handlers;
 using Alchemy.Handlers.WebSocket;
 
+// mjb 
+using System.IO;
+using System.Net.Security;
+
 namespace Alchemy.Classes
 {
 /// <summary>
@@ -71,10 +75,17 @@ namespace Alchemy.Classes
         public WebSocketServer Server;
 
         private int _bufferSize = 512;
-
+        //private int _bufferSize = 8096;
+        //private int _bufferSize = 32768;
+        //private int _bufferSize = 65536;
+        //private int _bufferSize = 512;
 
         public SocketAsyncEventArgs ReceiveEventArgs { get; set; }
         public SocketAsyncEventArgs SendEventArgs { get; set; }
+
+        // mjb
+        //public Stream NetworkStream = null;
+        public SslStream SslStream = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Context"/> class.
@@ -85,6 +96,21 @@ namespace Alchemy.Classes
             Connection = connection;
             Buffer = new byte[_bufferSize];
             UserContext = new UserContext(this);
+
+            // mjb
+            IsSecure = server.IsSecure;
+            if (IsSecure == true)
+            {
+                //SslStream sslStream = new SslStream(connection.GetStream(), false);
+                //sslStream.AuthenticateAsServer(server.SSLCertificate, false, System.Security.Authentication.SslProtocols.Default, false);
+                //NetworkStream = sslStream;
+                SslStream = new SslStream(connection.GetStream(), false);
+                SslStream.AuthenticateAsServer(server.SSLCertificate, false, System.Security.Authentication.SslProtocols.Default, false);
+            }
+            else
+            {
+                //NetworkStream = Connection.GetStream();
+            }
 
             ReceiveEventArgs = new SocketAsyncEventArgs();
             SendEventArgs = new SocketAsyncEventArgs();
@@ -113,6 +139,9 @@ namespace Alchemy.Classes
             }
         }
 
+        // mjb 
+        public bool IsSecure = false;
+
         #region IDisposable Members
 
         /// <summary>
@@ -123,6 +152,16 @@ namespace Alchemy.Classes
             Connected = false;
             UserContext.OnDisconnect();
             
+            // mjb
+            if (SslStream != null)
+            {
+                try
+                {
+                    SslStream.Close();
+                }
+                catch { }
+            }
+
             // close client connection
             if (Connection != null)
             {
