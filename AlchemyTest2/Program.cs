@@ -30,6 +30,7 @@ namespace AlchemyTest2
                 OnSend = OnSend,
                 OnDisconnect = OnDisconnect,
                 OnConnected = OnConnected,
+                FlashAccessPolicyEnabled = true,
                 IsSecure = IsSecure,
                 SSLCertificate = new X509Certificate2(SslFileName, SslPassword)
             };
@@ -68,15 +69,17 @@ namespace AlchemyTest2
             UserContexts.TryAdd(context.ClientAddress.ToString(), context);
             context.Send("Hello from server (" + DateTime.Now.ToString() + ")");
         }
+
+        private static int mCounter = 0;
         public static void OnReceive(UserContext context)
         {
             string data = string.Empty;
 
             try
             {
+                mCounter++;
                 data = context.DataFrame.ToString();
-                Console.WriteLine("Data Received From [" + context.ClientAddress.ToString() + "] - " + context.DataFrame.ToString());
-
+                Console.WriteLine("Data Received From [" + context.ClientAddress.ToString() + "] - " + data + " (" + data.Length.ToString() + " - " + mCounter.ToString() + ")");
             }
             catch (Exception ex)
             {
@@ -87,6 +90,15 @@ namespace AlchemyTest2
             if (data == "PING")
             {
                 context.Send("PONG!");
+            }
+            else if (data == "abc")
+            {
+                string sendData = new string('x', 32768);
+                context.Send(sendData);
+            }
+            else
+            {
+                //context.Send("Echo back: " + data);
             }
         }
         public static void OnSend(UserContext context)

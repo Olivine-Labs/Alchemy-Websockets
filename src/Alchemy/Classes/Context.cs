@@ -75,13 +75,17 @@ namespace Alchemy.Classes
         public WebSocketServer Server;
 
         private int _bufferSize = 512;
-
+        //private int _bufferSize = 8096;
+        //private int _bufferSize = 32768;
+        //private int _bufferSize = 65536;
+        //private int _bufferSize = 512;
 
         public SocketAsyncEventArgs ReceiveEventArgs { get; set; }
         public SocketAsyncEventArgs SendEventArgs { get; set; }
 
         // mjb
-        public Stream NetworkStream = null;
+        //public Stream NetworkStream = null;
+        public SslStream SslStream = null;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Context"/> class.
@@ -97,13 +101,15 @@ namespace Alchemy.Classes
             IsSecure = server.IsSecure;
             if (IsSecure == true)
             {
-                SslStream sslStream = new SslStream(connection.GetStream(), false);
-                sslStream.AuthenticateAsServer(server.SSLCertificate, false, System.Security.Authentication.SslProtocols.Default, false);
-                NetworkStream = sslStream;
+                //SslStream sslStream = new SslStream(connection.GetStream(), false);
+                //sslStream.AuthenticateAsServer(server.SSLCertificate, false, System.Security.Authentication.SslProtocols.Default, false);
+                //NetworkStream = sslStream;
+                SslStream = new SslStream(connection.GetStream(), false);
+                SslStream.AuthenticateAsServer(server.SSLCertificate, false, System.Security.Authentication.SslProtocols.Default, false);
             }
             else
             {
-                NetworkStream = Connection.GetStream();
+                //NetworkStream = Connection.GetStream();
             }
 
             ReceiveEventArgs = new SocketAsyncEventArgs();
@@ -147,11 +153,11 @@ namespace Alchemy.Classes
             UserContext.OnDisconnect();
             
             // mjb
-            if (NetworkStream != null)
+            if (SslStream != null)
             {
                 try
                 {
-                    NetworkStream.Close();
+                    SslStream.Close();
                 }
                 catch { }
             }

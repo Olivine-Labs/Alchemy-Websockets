@@ -51,13 +51,7 @@ namespace Alchemy
             var connection = (TcpClient) data;
             try
             {
-                // mjb
-                //connection.Client.Receive(new byte[32]);
-
-                NetworkStream ns = connection.GetStream();
-                byte[] buffer = new byte[32];
-                ns.Read(buffer, 0, 32);
-
+                connection.Client.Receive(new byte[32]);
                 SendResponse(connection);
                 connection.Client.Close();
             }
@@ -75,14 +69,8 @@ namespace Alchemy
         {
             try
             {
-                // mjb
-                /* connection.Client.Send(
+                connection.Client.Send(
                     Encoding.UTF8.GetBytes(String.Format(Response, _allowedHost, _allowedPort.ToString(CultureInfo.InvariantCulture))));
-                 */
-
-                NetworkStream ns = connection.GetStream();
-                byte[] buffer = Encoding.UTF8.GetBytes(String.Format(Response, _allowedHost, _allowedPort.ToString(CultureInfo.InvariantCulture)));
-                ns.Write(buffer, 0, buffer.Length);
             }
             catch (SocketException)
             {

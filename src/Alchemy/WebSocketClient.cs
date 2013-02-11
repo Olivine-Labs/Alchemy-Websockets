@@ -9,6 +9,9 @@ using Alchemy.Classes;
 using Alchemy.Handlers.WebSocket.rfc6455;
 using System.IO;
 
+// mjb
+using System.Net.Security;
+
 namespace Alchemy
 {
     public class WebSocketClient
@@ -196,9 +199,20 @@ namespace Alchemy
                 }
                  */
 
-                ReceiveWorker rw = new ReceiveWorker() { webSocketClient = this, context = _context };
-                Thread tw = new Thread(rw.Receive);
-                tw.Start();
+                if (_context.SslStream != null)
+                {
+                    ReceiveWorker rw = new ReceiveWorker() { webSocketClient = this, context = _context };
+                    Thread tw = new Thread(rw.Receive);
+                    tw.Start();
+                }
+                else
+                {
+                    if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                    {
+                        ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                    }
+                }
+
 
                 if (!IsAuthenticated)
                 {
@@ -246,11 +260,18 @@ namespace Alchemy
 
             // mjb 
             //_client.Client.Send(Encoding.UTF8.GetBytes(_handshake.ToString()));
-            
-            //NetworkStream ns = _client.GetStream();
-            Stream ns = _context.NetworkStream;
-            byte[] buffer = Encoding.UTF8.GetBytes(_handshake.ToString());
-            ns.Write(buffer, 0, buffer.Length);
+
+
+            if (_context.SslStream != null)
+            {
+                SslStream ns = _context.SslStream;
+                byte[] buffer = Encoding.UTF8.GetBytes(_handshake.ToString());
+                ns.Write(buffer, 0, buffer.Length);
+            }
+            else
+            {
+                _client.Client.Send(Encoding.UTF8.GetBytes(_handshake.ToString()));
+            }
 
         }
 
@@ -400,8 +421,7 @@ namespace Alchemy
 
                     try
                     {
-                        //NetworkStream ns = context.Connection.GetStream();
-                        Stream ns = context.NetworkStream;
+                        SslStream ns = context.SslStream;
                         BytesTransferred = ns.Read(context.Buffer, 0, context.Buffer.Length);
                     }
                     catch
@@ -425,14 +445,6 @@ namespace Alchemy
                     context.ReceiveReady.Wait();
                 }
             }
-
-            //    public void RequestStop()
-            //    {
-            //        _shouldStop = true;
-            //    }
-            //    // Volatile is used as hint to the compiler that this data
-            //    // member will be accessed by multiple threads.
-            //    private volatile bool _shouldStop;
         }
     
     }

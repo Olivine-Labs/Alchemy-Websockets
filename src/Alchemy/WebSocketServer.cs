@@ -10,6 +10,7 @@ using Alchemy.Handlers;
 // mjb 
 using System.Security.Cryptography.X509Certificates;
 using System.IO;
+using System.Net.Security;
 
 namespace Alchemy
 {
@@ -312,9 +313,19 @@ namespace Alchemy
                     }
                      */
 
-                    ReceiveWorker rw = new ReceiveWorker() { context = _context };
-                    Thread tw = new Thread(rw.Receive);
-                    tw.Start();
+                    if (_context.SslStream != null)
+                    {
+                        ReceiveWorker rw = new ReceiveWorker() { context = _context };
+                        Thread tw = new Thread(rw.Receive);
+                        tw.Start();
+                    }
+                    else
+                    {
+                        if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                        {
+                            ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                        }
+                    }
 
                 }
                 catch (SocketException ex)
@@ -366,8 +377,7 @@ namespace Alchemy
 
                     try
                     {
-                        //NetworkStream ns = context.Connection.GetStream();
-                        Stream ns = context.NetworkStream;
+                        SslStream ns = context.SslStream;
                         BytesTransferred = ns.Read(context.Buffer, 0, context.Buffer.Length);
                     }
                     catch
@@ -382,6 +392,7 @@ namespace Alchemy
                     {
                         context.Handler.HandleRequest(context);
                         context.ReceiveReady.Release();
+                        context.Reset();
                         //StartReceive(context);
                         continue;
                     }
@@ -393,14 +404,6 @@ namespace Alchemy
                     }
                 }
             }
-
-            //    public void RequestStop()
-            //    {
-            //        _shouldStop = true;
-            //    }
-            //    // Volatile is used as hint to the compiler that this data
-            //    // member will be accessed by multiple threads.
-            //    private volatile bool _shouldStop;
         }
 
     

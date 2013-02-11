@@ -8,6 +8,9 @@ using Alchemy.Classes;
 using Alchemy.Handlers.WebSocket;
 using System.IO;
 
+// mjb
+using System.Net.Security;
+
 namespace Alchemy.Handlers
 {
     /// <summary>
@@ -153,25 +156,18 @@ namespace Alchemy.Handlers
                 message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
                  */
 
-                SendWorker sw = new SendWorker() { message = message };
-                Thread wt = new Thread(sw.Send);
-                wt.Start();
-                return;
-
-                //NetworkStream ns = message.Context.Connection.GetStream();
-
-                //List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
-                //ArraySegment<byte>[] buffer1 = data.ToArray();
-                ////ArraySegment<byte> buffer1_item;
-
-                
-                //foreach (ArraySegment<byte> buffer1_item in buffer1)
-                //{
-                //    byte[] buffer = buffer1_item.Array;
-                //    ns.Write(buffer, 0, buffer.Length);
-                //}
-
-                //SendEventArgs_Completed(null, message.Context.SendEventArgs);
+                if (message.Context.SslStream != null)
+                {
+                    SendWorker sw = new SendWorker() { message = message };
+                    Thread wt = new Thread(sw.Send);
+                    wt.Start();
+                }
+                else
+                {
+                    List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
+                    message.Context.SendEventArgs.BufferList = data;
+                    message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
+                }
 
             }
             catch
@@ -244,7 +240,8 @@ namespace Alchemy.Handlers
                 try
                 {
                     //NetworkStream ns = message.Context.Connection.GetStream();
-                    Stream ns = message.Context.NetworkStream;
+                    //Stream ns = message.Context.NetworkStream;
+                    SslStream ns = message.Context.SslStream;
 
                     List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
                     ArraySegment<byte>[] buffer1 = data.ToArray();
@@ -269,14 +266,6 @@ namespace Alchemy.Handlers
                     message.Context.Disconnect();
                 }
             }
-
-            //    public void RequestStop()
-            //    {
-            //        _shouldStop = true;
-            //    }
-            //    // Volatile is used as hint to the compiler that this data
-            //    // member will be accessed by multiple threads.
-            //    private volatile bool _shouldStop;
         }
 
     }

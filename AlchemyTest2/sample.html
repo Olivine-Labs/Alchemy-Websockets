@@ -1,8 +1,4 @@
-﻿<!--
-  Lincense: Public Domain
--->
-
-<html><head>
+﻿<html><head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
   <title>Sample of web_socket.js</title>
   
@@ -56,8 +52,76 @@
     function onCloseClick() {
       ws.close();
     }
-    
-    function output(str) {
+
+    function onLargeDataClick()
+    {
+        var data = "";
+
+        //data = "1234";
+
+        //for (var i = 0; i < 65534; i++)
+        for (var i = 0; i < 16384; i++)
+        //for (var i = 0; i < 1024; i++)
+        {
+            //data += i.toString() + " ";
+            data += "x";
+        }
+
+        ws.send(data);
+        output("Sending large data: " + data.length.toString());
+    }
+
+    function onLargeData2Click()
+    {
+        var data = "";
+
+//        for (var i = 0; i < 1900; i++)
+//        {
+//            ws.send("Testing: " + i.toString());
+//        }
+        //for (var i = 0; i < 32768; i++)
+        for (var i = 0; i < 16384; i++)
+        {
+            ws.send("zz");
+        }
+
+        output("Sending large data 2...");
+    }
+
+    function onLargeData3Click()
+    {
+        var data = "";
+
+        mLoopData = data;
+        for (var i = 0; i < (16384 * 2); i++)
+        {
+            mLoopData += "x";
+        }
+
+        mLoopTimer = 0;
+        mLoopTimerId = setInterval(LoopTimer, 1);
+
+        output("Sending large data 3...");
+    }
+
+    var mLoopData = "";
+    var mLoopTimer = 0;
+    var mLoopTimerId;
+    var LoopTimer = function ()
+    {
+        mLoopTimer++;
+        if (mLoopTimer >= 32768)
+        {
+            clearInterval(mLoopTimerId);
+            return;
+        }
+
+        //ws.send("Z");
+        ws.send(mLoopData);
+    };
+
+    function output(str)
+    {
       var log = document.getElementById("log");
       var escaped = str.replace(/&/, "&amp;").replace(/</, "&lt;").
         replace(/>/, "&gt;").replace(/"/, "&quot;"); // "
@@ -70,6 +134,9 @@
     <input type="text" id="input">
     <input type="submit" value="Send">
     <button onclick="onCloseClick(); return false;">close</button>
+    <button onclick="onLargeDataClick(); return false;">large data</button>
+    <button onclick="onLargeData2Click(); return false;">large data2</button>
+    <button onclick="onLargeData3Click(); return false;">large data3</button>
   </form>
   <div id="log"></div>
 </body></html>
