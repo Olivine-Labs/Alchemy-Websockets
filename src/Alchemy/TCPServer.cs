@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Alchemy
 {
-    public abstract class TcpServer
+    public abstract class TcpServer : IDisposable
     {
         /// <summary>
         /// This Semaphore protects our clients variable on increment/decrement when a user connects/disconnects.

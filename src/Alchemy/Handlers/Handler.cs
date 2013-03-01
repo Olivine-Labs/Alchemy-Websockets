@@ -13,16 +13,21 @@ namespace Alchemy.Handlers
     /// When the protocol has not yet been determined the system defaults to this request handler.
     /// Singleton, just like the other handlers.
     /// </summary>
-    public class Handler
+    public class Handler : IDisposable
     {
         private static Handler _instance;
 
         protected static object createLock = new object();
         internal IAuthentication Authentication;
 
-         private Thread[] ProcessSendThreads = new Thread[Environment.ProcessorCount];
+        private Thread[] ProcessSendThreads = new Thread[Environment.ProcessorCount];
 
         private ConcurrentQueue<HandlerMessage> MessageQueue { get; set; }
+
+        /// <summary>
+        /// Cancellation of threads if disposing
+        /// </summary>
+        private static CancellationTokenSource cancellation = new CancellationTokenSource();
 
         protected Handler() {
 
@@ -119,11 +124,12 @@ namespace Alchemy.Handlers
 
         private void ProcessSend()
         {
-            while (true)
+            while (!cancellation.IsCancellationRequested)
             {
                 while (MessageQueue.IsEmpty)
                 {
                     Thread.Sleep(10);
+                    if (cancellation.IsCancellationRequested) return;
                 }
 
                 HandlerMessage message;
@@ -140,7 +146,15 @@ namespace Alchemy.Handlers
         private void Send(HandlerMessage message)
         {
             message.Context.SendEventArgs.UserToken = message;
-            message.Context.SendReady.Wait();
+            
+            try
+            {
+              message.Context.SendReady.Wait(cancellation.Token);
+            }
+            catch (OperationCanceledException)
+            {
+              return;
+            }
 
             try
             {
@@ -206,5 +220,11 @@ namespace Alchemy.Handlers
             public Boolean IsRaw { get; set;}
             public Boolean DoClose { get; set;}
         }
+        
+        public void Dispose()
+        {
+          cancellation.Cancel();      
+        }
+        
     }
 }
