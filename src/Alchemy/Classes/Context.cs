@@ -134,7 +134,9 @@ namespace Alchemy.Classes
                 {
                     // skip
                 }
-            } 
+            }
+            SendReady.Release();
+            ReceiveReady.Release();            
         }
 
         #endregion
