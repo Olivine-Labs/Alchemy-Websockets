@@ -7,13 +7,13 @@ using System.Threading;
 using Alchemy.Classes;
 using Alchemy.Handlers.WebSocket;
 
-namespace Alchemy.Handlers : IDisposable
+namespace Alchemy.Handlers
 {
     /// <summary>
     /// When the protocol has not yet been determined the system defaults to this request handler.
     /// Singleton, just like the other handlers.
     /// </summary>
-    public class Handler
+    public class Handler : IDisposable
     {
         private static Handler _instance;
 
