@@ -20,6 +20,8 @@ namespace Alchemy
         private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
         private static Thread CleanupThread;
 
+        private static CancellationTokenSource cancellation = new CancellationTokenSource();
+
         private static ConcurrentQueue<Context> ContextQueue { get; set; }
         private static Dictionary<Context, WebSocketServer> ContextMapping { get; set; }
 
@@ -44,13 +46,14 @@ namespace Alchemy
 
         private static void HandleClientThread()
         {
-            while (true)
+            while (!cancellation.Token.IsCancellationRequested)
             {
                 Context context;
 
                 while (ContextQueue.Count == 0)
                 {
                     Thread.Sleep(10);
+                    if (cancellation.Token.IsCancellationRequested) return;
                 }
 
                 if (!ContextQueue.TryDequeue(out context))
@@ -72,7 +75,7 @@ namespace Alchemy
 
         private static void HandleContextCleanupThread()
         {
-            while (true)
+            while (!cancellation.IsCancellationRequested)
             {
                 Thread.Sleep(100);
 
@@ -85,6 +88,8 @@ namespace Alchemy
 
                 foreach (var connection in currentConnections)
                 {
+                    if (cancellation.IsCancellationRequested) break;
+                    
                     if (!connection.Connected)
                     {
                         lock (CurrentConnections)
@@ -279,26 +284,30 @@ namespace Alchemy
         }
         private void StartReceive(Context _context)
         {
-            if (_context.ReceiveReady.Wait(TimeOut))
+            try
             {
-                try
+                if (_context.ReceiveReady.Wait(TimeOut, cancellation.Token))
                 {
-                    if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                    try
                     {
-                        ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                        if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                        {
+                            ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                        }
+                    }
+                    catch (SocketException ex)
+                    {
+                        //logger.Error("SocketException in ReceieveAsync", ex);
+                        _context.Disconnect();
                     }
                 }
-                catch (SocketException ex)
+                else
                 {
-                    //logger.Error("SocketException in ReceieveAsync", ex);
+                    //logger.Error("Timeout waiting for ReceiveReady");
                     _context.Disconnect();
                 }
             }
-            else
-            {
-                //logger.Error("Timeout waiting for ReceiveReady");
-                _context.Disconnect();
-            }
+            catch (OperationCanceledException) { }
         }
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
@@ -322,5 +331,12 @@ namespace Alchemy
                 context.ReceiveReady.Release();
             }
         }
+        
+        public void Dispose()
+        {
+            cancellation.Cancel();
+            base.Dispose();
+            Handler.Instance.Dispose();
+        }        
     }
 }

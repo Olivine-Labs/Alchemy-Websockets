@@ -10,7 +10,7 @@ using Alchemy.Handlers.WebSocket.rfc6455;
 
 namespace Alchemy
 {
-    public class WebSocketClient
+    public class WebSocketClient : IDisposable
     {
         public TimeSpan ConnectTimeout = new TimeSpan(0, 0, 0, 10);
         public bool IsAuthenticated;
@@ -35,6 +35,7 @@ namespace Alchemy
         private readonly string _host;
 
         private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
+        private static CancellationTokenSource cancellation = new CancellationTokenSource();
         private static Queue<Context> NewClients { get; set; }
         private static Dictionary<Context, WebSocketClient> ContextMapping { get; set; }
 
@@ -67,13 +68,14 @@ namespace Alchemy
 
         private static void HandleClientThread()
         {
-            while (true)
+            while (!cancellation.IsCancellationRequested)
             {
                 Context context = null;
 
                 while (NewClients.Count == 0)
                 {
                     Thread.Sleep(10);
+                    if (cancellation.IsCancellationRequested) return;
                 }
 
                 lock (NewClients)
@@ -367,5 +369,12 @@ namespace Alchemy
         {
             _context.UserContext.Send(data);
         }
+        
+        public void Dispose()
+        {
+            cancellation.Cancel();
+            Handler.Instance.Dispose();
+        }
+        
     }
 }
