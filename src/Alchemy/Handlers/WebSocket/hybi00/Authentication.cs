@@ -22,14 +22,20 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                 if (handshake.IsValid())
                 {
                     // Optionally check Origin and Location if they're set.
-                    if (Origin != string.Empty)
+                    if (!String.IsNullOrEmpty(Origin))
                     {
-                        if (handshake.Origin != "http://" + Origin)
+                        var expectedOrigin = Origin;
+                        if (!Origin.Contains("://"))
+                        {
+                            expectedOrigin = "http://" + Origin;
+                        }
+
+                        if (!handshake.Origin.Equals(expectedOrigin, StringComparison.InvariantCultureIgnoreCase))
                         {
                             return false;
                         }
                     }
-                    if (Destination != string.Empty)
+                    if (!String.IsNullOrEmpty(Destination))
                     {
                         if (handshake.Host != Destination + ":" + context.Server.Port)
                         {
