@@ -21,7 +21,13 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                     // Optionally check Origin and Location if they're set.
                     if (!String.IsNullOrEmpty(Origin))
                     {
-                        if (handshake.Origin != "http://" + Origin)
+                        var expectedOrigin = Origin;
+                        if (!Origin.Contains("://"))
+                        {
+                            expectedOrigin = "http://" + Origin;
+                        }
+
+                        if (!handshake.Origin.Equals(expectedOrigin, StringComparison.InvariantCultureIgnoreCase))
                         {
                             return false;
                         }
