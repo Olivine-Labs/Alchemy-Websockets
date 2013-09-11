@@ -23,7 +23,10 @@ namespace Alchemy.Handlers.WebSocket
                             context.UserContext.OnReceive();
                             break;
                         case DataFrame.DataState.Closed:
-                            context.UserContext.Send(context.UserContext.DataFrame.CreateInstance(), false, true);
+                            DataFrame closeFrame = context.UserContext.DataFrame.CreateInstance();
+							closeFrame.State = DataFrame.DataState.Closed;
+							closeFrame.Append(new byte[] { 0x8 }, true);
+							context.UserContext.Send(closeFrame, false, true);
                             break;
                         case DataFrame.DataState.Ping:
                             context.UserContext.DataFrame.State = DataFrame.DataState.Complete;
