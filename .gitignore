@@ -11,3 +11,4 @@ _site
 test/Integration/Alchemy/bin
 test/Integration/Alchemy/obj
 *.suo
+*.user
