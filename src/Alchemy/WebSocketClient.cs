@@ -148,33 +148,30 @@ namespace Alchemy
                 connectError = true;
             }
 
-            using (_context = new Context(null, _client))
+            _context = new Context(null, _client);
+            _context.BufferSize = 512;
+            _context.UserContext.DataFrame = new DataFrame();
+            _context.UserContext.SetOnConnect(OnConnect);
+            _context.UserContext.SetOnConnected(OnConnected);
+            _context.UserContext.SetOnDisconnect(OnDisconnect);
+            _context.UserContext.SetOnSend(OnSend);
+            _context.UserContext.SetOnReceive(OnReceive);
+            _context.UserContext.OnConnect();
+
+            if (connectError)
             {
-                _context = new Context(null, _client);
-                _context.BufferSize = 512;
-                _context.UserContext.DataFrame = new DataFrame();
-                _context.UserContext.SetOnConnect(OnConnect);
-                _context.UserContext.SetOnConnected(OnConnected);
-                _context.UserContext.SetOnDisconnect(OnDisconnect);
-                _context.UserContext.SetOnSend(OnSend);
-                _context.UserContext.SetOnReceive(OnReceive);
-                _context.UserContext.OnConnect();
+                _context.UserContext.OnDisconnect();
+                return;
+            }
 
-                if (connectError)
-                {
-                    _context.UserContext.OnDisconnect();
-                    return;
-                }
+            lock (ContextMapping)
+            {
+                ContextMapping[_context] = this;
+            }
 
-                lock (ContextMapping)
-                {
-                    ContextMapping[_context] = this;
-                }
-
-                lock (NewClients)
-                {
-                    NewClients.Enqueue(_context);
-                }
+            lock (NewClients)
+            {
+                NewClients.Enqueue(_context);
             }
         }
 
