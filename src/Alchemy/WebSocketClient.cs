@@ -348,10 +348,13 @@ namespace Alchemy
 
             var bytes = dataFrame.AsFrame()[0].Array;
 
-            ReadyState = ReadyStates.CLOSING;
+            if (_context != null && ReadyState == ReadyStates.OPEN)
+            {
+                ReadyState = ReadyStates.CLOSING;
+                bytes[0] = 0x88;
+                _context.UserContext.Send(bytes);
+            }
 
-            bytes[0] = 0x88;
-            _context.UserContext.Send(bytes);
             _client.Close();
             _client = null;
             ReadyState = ReadyStates.CLOSED;
