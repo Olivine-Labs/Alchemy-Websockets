@@ -148,6 +148,7 @@ namespace Alchemy.Classes
         {
             //logger.Debug("Disconnected in " + Environment.StackTrace);
             Connected = false;
+            UserContext.OnDisconnect(); // 2014-01-16 added for Remact.Net
         }
 
         /// <summary>
