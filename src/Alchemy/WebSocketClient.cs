@@ -95,6 +95,7 @@ namespace Alchemy
                 }
             }
         }
+
         public WebSocketClient(string path)
         {
             var r = new Regex("^(wss?)://(.*)\\:([0-9]*)/(.*)$");
@@ -135,6 +136,7 @@ namespace Alchemy
         /// Fires when a client connects.
         /// </summary>
         /// <param name="result">null</param>
+        #pragma warning disable 168 // warning CS0168: The variable 'ex' is declared but never used
         protected void OnRunClient(IAsyncResult result)
         {
             bool connectError = false;
@@ -174,6 +176,7 @@ namespace Alchemy
                 NewClients.Enqueue(_context);
             }
         }
+        #pragma warning restore 168
 
         private void SetupContext(Context context)
         {
@@ -343,16 +346,20 @@ namespace Alchemy
             _connecting = false;
 
             if (_client == null) return;
-            var dataFrame = new DataFrame();
-            dataFrame.Append(new byte[0]);
-
-            var bytes = dataFrame.AsFrame()[0].Array;
 
             if (_context != null && ReadyState == ReadyStates.OPEN)
             {
                 ReadyState = ReadyStates.CLOSING;
-                bytes[0] = 0x88;
-                _context.UserContext.Send(bytes);
+                // see http://stackoverflow.com/questions/17176827/websocket-close-packet
+                var bytes = new byte[6];
+                bytes[0] = 0x88; // Fin + Close
+                bytes[1] = 0x80; // Mask = 1, Len = 0
+                bytes[2] = 0;
+                bytes[3] = 0;
+                bytes[4] = 0; // Mask = 0
+                bytes[5] = 0; // Mask = 0
+                _context.UserContext.Send(bytes, raw:true, close:true);
+                Thread.Sleep(30); // let the send thread do its work
             }
 
             _client.Close();
