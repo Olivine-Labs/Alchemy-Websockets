@@ -1,115 +1,206 @@
-﻿using Alchemy;
-using Alchemy.Classes;
-using Newtonsoft.Json;
-using openHome.Base;
-using openHome.GUI;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System;
 using System.Net;
-using System.Text;
+using System.Net.Sockets;
 using System.Threading;
-using System.Threading.Tasks;
 
-namespace openHome.Server
+namespace Alchemy
 {
-    public class WebSocketSrv
+    public abstract class TcpServer : IDisposable
     {
+        /// <summary>
+        /// This Semaphore protects our clients variable on increment/decrement when a user connects/disconnects.
+        /// </summary>
+        private readonly SemaphoreSlim _clientLock = new SemaphoreSlim(1);
 
-        // Volatile is used as hint to the compiler that this data
-        // member will be accessed by multiple threads.
-        private volatile bool _shouldStop;
-        private WebSocketServer aServer;
-        private Dictionary<string, UserContext> connectedPeers;
+        /// <summary>
+        /// Limits how many active connect events we have.
+        /// </summary>
+        private readonly SemaphoreSlim _connectReady = new SemaphoreSlim(10);
 
-        public WebSocketSrv()
+        protected int BufferSize = 512;
+
+        /// <summary>
+        /// The number of connected clients.
+        /// </summary>
+        /// 
+        private int _clients;
+
+        private IPAddress _listenAddress = IPAddress.Any;
+
+        private TcpListener _listener;
+
+        private int _port = 80;
+        private int _connectrate = 100;
+
+
+        protected TcpServer(int listenPort, IPAddress listenAddress)
         {
-            this.connectedPeers = new Dictionary<string, UserContext>();
-
-            aServer = new WebSocketServer(81, IPAddress.Any)
+            if (listenPort > 0)
             {
-                OnReceive = OnReceive,
-                OnSend = OnSend,
-                OnConnect = OnConnect,
-                OnConnected = OnConnected,
-                OnDisconnect = OnDisconnect,
-                TimeOut = new TimeSpan(0, 5, 0)
-            };
-
-            aServer.ConnectRateLimit = 10;
-        }
-
-        private void OnDisconnect(Alchemy.Classes.UserContext context)
-        {
-            string peer = context.ClientAddress.ToString();
-            Common.logMessage("WebSockets", peer + " disconnected");
-            if (connectedPeers.ContainsKey(peer))
-                connectedPeers.Remove(peer);
-
-        }
-
-        private void OnConnected(Alchemy.Classes.UserContext context)
-        {
-            string peer = context.ClientAddress.ToString();
-            Common.logMessage("WebSockets", peer + " connected");
-            if (connectedPeers.ContainsKey(peer))
-                connectedPeers[peer] = context;
-            else
-                connectedPeers.Add(peer, context);
-        }
-
-        private void OnConnect(Alchemy.Classes.UserContext context)
-        {
-            return;
-        }
-
-        private void OnSend(Alchemy.Classes.UserContext context)
-        {
-
-
-        }
-
-        private void OnReceive(Alchemy.Classes.UserContext context)
-        {
-            try
-            {
-                context.Send(DateTime.Now.ToString());
-                Common.logMessage("WebSockets", context.ClientAddress.ToString() + " sended " + context.DataFrame.ToString());
+                _port = listenPort;
             }
-            catch { }
-
-        }
-
-        /// <summary>
-        /// Stop the timer 
-        /// </summary>
-        public void RequestStop()
-        {
-            _shouldStop = true;
-        }
-
-        /// <summary>
-        /// Start timer sync to system clock and then start creating events
-        /// </summary>
-        public void startListen()
-        {
-            Common.logMessage("WebSockets", "Starting WebSockets Server...");
-            aServer.Start();
-            GuiQueue gq = GuiQueue.Instance;
-
-            while (!_shouldStop)
+            if (listenAddress != null)
             {
+                _listenAddress = listenAddress;
+            }
+        }
 
-                if (gq.Count > 0)
+        /// <summary>
+        /// Gets or sets the port.
+        /// </summary>
+        /// <value>
+        /// The port.
+        /// </value>
+        public int Port
+        {
+            get { return _port; }
+            set { _port = value; }
+        }
+
+        /// <summary>
+        /// Gets the client count.
+        /// </summary>
+        public int Clients
+        {
+            get { return _clients; }
+        }
+
+        /// <summary>
+        /// Gets or sets the listener address.
+        /// </summary>
+        /// <value>
+        /// The listener address.
+        /// </value>
+        public IPAddress ListenAddress
+        {
+            get { return _listenAddress; }
+            set { _listenAddress = value; }
+        }
+
+        /// <summary>
+        /// Sets the maximum rate for new connections per second.
+        /// </summary>
+        public int ConnectRateLimit
+        {
+            get { return _connectrate; }
+            set { _connectrate = value; }
+        }
+
+        private int _sleepduration = 0;
+
+        /// <summary>
+        /// Starts this instance.
+        /// </summary>
+        public virtual void Start()
+        {
+            if (_listener == null)
+            {
+                _listener = new TcpListener(_listenAddress, _port);
+
+                if (_connectrate > 0)
+                    _sleepduration = 1000 / _connectrate;
+
+                ThreadPool.QueueUserWorkItem(Listen, null);
+            }
+        }
+
+        /// <summary>
+        /// Stops this instance.
+        /// </summary>
+        public virtual void Stop()
+        {
+            if (_listener != null)
+            {
+                _listener.Stop();
+            }
+            _listener = null;
+        }
+
+        /// <summary>
+        /// Restarts this instance.
+        /// </summary>
+        public virtual void Restart()
+        {
+            Stop();
+            Start();
+        }
+
+        /// <summary>
+        /// Listens on the ip and port specified.
+        /// </summary>
+        /// <param name="state">The state.</param>
+        private void Listen(object state)
+        {
+            _listener.Start();
+            while (_listener != null)
+            {
+                if (_listener.Pending())
                 {
-                    WidgetUpdateEvent ev = gq.Dequeue();
-                    foreach (UserContext ctx in connectedPeers.Values)
-                        ctx.Send(JsonConvert.SerializeObject(ev));
+                    try
+                    {
+                        _listener.BeginAcceptTcpClient(RunClient, null);
+                    }
+                    catch (SocketException)
+                    {
+                        /* Ignore */
+                    }
+                    _connectReady.Wait();
+                }
+                else
+                {
+                    if (_sleepduration > 0)
+                        Thread.Sleep(_sleepduration);
                 }
 
-                Thread.Sleep(100);
+
             }
         }
 
+        /// <summary>
+        /// Runs the client.
+        /// Sets up the UserContext.
+        /// Executes in it's own thread.
+        /// Utilizes a semaphore(ReceiveReady) to limit the number of receive events active for this client to 1 at a time.
+        /// </summary>
+        /// <param name="result">The A result.</param>
+        private void RunClient(IAsyncResult result)
+        {
+            TcpClient connection = null;
+            if (_listener != null)
+            {
+                try
+                {
+                    connection = _listener.EndAcceptTcpClient(result);
+                }
+                catch (Exception)
+                {
+
+                    connection = null;
+                }
+            }
+            _connectReady.Release();
+            if (connection != null)
+            {
+                _clientLock.Wait();
+                _clients++;
+                _clientLock.Release();
+
+                ThreadPool.QueueUserWorkItem(OnRunClient, connection);
+
+                _clientLock.Wait();
+                _clients--;
+                _clientLock.Release();
+            }
+        }
+
+        protected abstract void OnRunClient(object connection);
+
+        /// <summary>
+        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// </summary>
+        public void Dispose()
+        {
+            Stop();
+        }
     }
 }
