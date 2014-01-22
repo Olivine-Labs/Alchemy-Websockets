@@ -29,11 +29,26 @@ namespace Alchemy.Handlers
         /// </summary>
         private static CancellationTokenSource cancellation = new CancellationTokenSource();
 
+        /// <summary>
+        /// The default behaviour for Alchemy clients and servers is to start one send-thread per CPU.
+        /// These threads will dequeue messages from a single queue and send it to the sockets opened for each WebSocket partner.
+        /// This scales good for a large number of clients ( > 1000), see issue #52.
+        /// 
+        /// When FastDirectSendingMode is set to true before any Handlers are started up, the send-threads are not started.
+        /// Messages are then sent directly from the multithreaded application to the underlaying socket buffer.
+        /// The Send method may block a short time until the previous send operation has copied its data do the socket buffer.
+        /// There is a considerable speed increase for applications needing fast roundtrip times and have a small number of clients:
+        ///    FastDirectSendingMode = false:   33 request+responses per second - caused by a delay of 10ms in every dequeue operation.
+        ///    FastDirectSendingMode = true:  2500 request+responses per second
+        /// </summary>
+        public static bool FastDirectSendingMode;
+
         protected Handler() {
 
             MessageQueue = new ConcurrentQueue<HandlerMessage>();
 
-            for (int i = 0; i < ProcessSendThreads.Length; i++)
+            int n = FastDirectSendingMode ? 0 : ProcessSendThreads.Length;
+            for (int i = 0; i < n; i++)
             {
                 ProcessSendThreads[i] = new Thread(ProcessSend);
                 ProcessSendThreads[i].Name = "Alchemy Send Handler Thread " + (i + 1);
@@ -158,9 +173,12 @@ namespace Alchemy.Handlers
 
             try
             {
-                List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
-                message.Context.SendEventArgs.BufferList = data;
-                message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
+                if (message.Context.Connected)
+                {
+                    List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
+                    message.Context.SendEventArgs.BufferList = data;
+                    message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
+                }
             }
             catch
             {
@@ -180,7 +198,14 @@ namespace Alchemy.Handlers
             if (context.Connected)
             {
                 HandlerMessage message = new HandlerMessage { DataFrame = dataFrame, Context = context, IsRaw = raw, DoClose = close };
-                MessageQueue.Enqueue(message);
+                if (FastDirectSendingMode)
+                {
+                    Send(message);
+                }
+                else
+                {
+                    MessageQueue.Enqueue(message);
+                }
             }
         }
 
