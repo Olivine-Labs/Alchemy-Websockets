@@ -303,31 +303,6 @@ namespace Alchemy
             }
         }
 
-        private void DoReceive(IAsyncResult result)
-        {
-            var context = (Context) result.AsyncState;
-            context.Reset();
-
-            try
-            {
-                context.ReceivedByteCount = context.Connection.Client.EndReceive(result);
-            }
-            catch (Exception)
-            {
-                context.ReceivedByteCount = 0;
-            }
-
-            if (context.ReceivedByteCount > 0)
-            {
-                ReceiveData(context);
-                context.ReceiveReady.Release();
-            }
-            else
-            {
-                context.Disconnect();
-            }
-        }
-
         private static String GenerateKey()
         {
             var bytes = new byte[16];
@@ -347,19 +322,29 @@ namespace Alchemy
 
             if (_client == null) return;
 
-            if (_context != null && ReadyState == ReadyStates.OPEN)
+            if (_context != null)
             {
-                ReadyState = ReadyStates.CLOSING;
-                // see http://stackoverflow.com/questions/17176827/websocket-close-packet
-                var bytes = new byte[6];
-                bytes[0] = 0x88; // Fin + Close
-                bytes[1] = 0x80; // Mask = 1, Len = 0
-                bytes[2] = 0;
-                bytes[3] = 0;
-                bytes[4] = 0; // Mask = 0
-                bytes[5] = 0; // Mask = 0
-                _context.UserContext.Send(bytes, raw:true, close:true);
-                Thread.Sleep(30); // let the send thread do its work
+                _context.Connected = false;
+                while (_context.SendReady.CurrentCount < 1)
+                {
+                    _context.SendReady.Release(); // release all blocked send threads for this context only
+                    Thread.Sleep(1);
+                }
+
+                if (ReadyState == ReadyStates.OPEN)
+                {
+                    ReadyState = ReadyStates.CLOSING;
+                    // see http://stackoverflow.com/questions/17176827/websocket-close-packet
+                    var bytes = new byte[6];
+                    bytes[0] = 0x88; // Fin + Close
+                    bytes[1] = 0x80; // Mask = 1, Len = 0
+                    bytes[2] = 0;
+                    bytes[3] = 0;
+                    bytes[4] = 0; // Mask = 0
+                    bytes[5] = 0; // Mask = 0
+                    _context.UserContext.Send(bytes, raw: true, close: true);
+                    Thread.Sleep(30); // let the send thread do its work
+                }
             }
 
             _client.Close();
