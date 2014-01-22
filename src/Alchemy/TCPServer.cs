@@ -30,6 +30,8 @@ namespace Alchemy
         private TcpListener _listener;
 
         private int _port = 80;
+        private int _connectrate = 100;
+
 
         protected TcpServer(int listenPort, IPAddress listenAddress)
         {
@@ -76,6 +78,17 @@ namespace Alchemy
         }
 
         /// <summary>
+        /// Sets the maximum rate for new connections per second.
+        /// </summary>
+        public int ConnectRateLimit
+        {
+            get { return _connectrate; }
+            set { _connectrate = value; }
+        }
+
+        private int _sleepduration = 0;
+
+        /// <summary>
         /// Starts this instance.
         /// </summary>
         public virtual void Start()
@@ -83,6 +96,10 @@ namespace Alchemy
             if (_listener == null)
             {
                 _listener = new TcpListener(_listenAddress, _port);
+
+                if (_connectrate > 0)
+                    _sleepduration = 1000 / _connectrate;
+
                 ThreadPool.QueueUserWorkItem(Listen, null);
             }
         }
@@ -117,15 +134,25 @@ namespace Alchemy
             _listener.Start();
             while (_listener != null)
             {
-                try
+                if (_listener.Pending())
                 {
-                    _listener.BeginAcceptTcpClient(RunClient, null);
+                    try
+                    {
+                        _listener.BeginAcceptTcpClient(RunClient, null);
+                    }
+                    catch (SocketException)
+                    {
+                        /* Ignore */
+                    }
+                    _connectReady.Wait();
                 }
-                catch (SocketException)
+                else
                 {
-                    /* Ignore */
+                    if (_sleepduration > 0)
+                        Thread.Sleep(_sleepduration);
                 }
-                _connectReady.Wait();
+
+
             }
         }
 
