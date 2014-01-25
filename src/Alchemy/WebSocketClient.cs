@@ -324,13 +324,6 @@ namespace Alchemy
 
             if (_context != null)
             {
-                _context.Connected = false;
-                while (_context.SendReady.CurrentCount < 1)
-                {
-                    _context.SendReady.Release(); // release all blocked send threads for this context only
-                    Thread.Sleep(1);
-                }
-
                 if (ReadyState == ReadyStates.OPEN)
                 {
                     ReadyState = ReadyStates.CLOSING;
@@ -342,8 +335,16 @@ namespace Alchemy
                     bytes[3] = 0;
                     bytes[4] = 0; // Mask = 0
                     bytes[5] = 0; // Mask = 0
-                    _context.UserContext.Send(bytes, raw: true, close: true);
+                    _context.UserContext.Send(bytes, raw: true);
                     Thread.Sleep(30); // let the send thread do its work
+                }
+
+                _context.Connected = false;
+                ReadyState = ReadyStates.CLOSING;
+                while (_context.SendReady.CurrentCount < 1)
+                {
+                    _context.SendReady.Release(); // release all blocked send threads for this context only
+                    Thread.Sleep(1);
                 }
             }
 
