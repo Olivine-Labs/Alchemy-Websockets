@@ -332,11 +332,24 @@ namespace Alchemy
             }
         }
         
-        public void Dispose()
+        /// <summary>
+        /// Dispose stops all receive and send threads. It only may be called when the application shuts down.
+        /// Use 'Stop' to just end one WebSocketServer instance.
+        /// </summary>
+        public new void Dispose()
+        {
+            base.Dispose();
+            WebSocketServer.Shutdown(); // for compatibility with earlier versions of this library
+        }
+
+        /// <summary>
+        /// Stops all static allocated receive- and send threads.
+        /// Therefore, Shutdown may only be called, when the application shuts down.
+        /// </summary>
+        public static void Shutdown()
         {
             cancellation.Cancel();
-            base.Dispose();
             Handler.Instance.Dispose();
-        }        
+        }
     }
 }

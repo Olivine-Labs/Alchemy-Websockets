@@ -10,7 +10,7 @@ using Alchemy.Handlers.WebSocket.rfc6455;
 
 namespace Alchemy
 {
-    public class WebSocketClient : IDisposable
+    public class WebSocketClient
     {
         public TimeSpan ConnectTimeout = new TimeSpan(0, 0, 0, 10);
         public bool IsAuthenticated;
@@ -362,11 +362,14 @@ namespace Alchemy
             _context.UserContext.Send(data);
         }
         
-        public void Dispose()
+        /// <summary>
+        /// Stops all static allocated receive- and send threads.
+        /// Therefore, Shutdown may only be called, when the application shuts down.
+        /// </summary>
+        public static void Shutdown()
         {
             cancellation.Cancel();
             Handler.Instance.Dispose();
         }
-        
     }
 }

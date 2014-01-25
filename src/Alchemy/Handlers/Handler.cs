@@ -246,10 +246,13 @@ namespace Alchemy.Handlers
             public Boolean DoClose { get; set;}
         }
         
+        /// <summary>
+        /// Dispose stops all send threads of this singleton.
+        /// Therefore, Dispose may only be used, when the application shuts down.
+        /// </summary>
         public void Dispose()
         {
-          cancellation.Cancel();      
+            cancellation.Cancel();
         }
-        
     }
 }
