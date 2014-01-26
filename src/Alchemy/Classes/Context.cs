@@ -54,7 +54,7 @@ namespace Alchemy.Classes
         public UInt64 MaxFrameSize = 102400; //100kb
 
         /// <summary>
-        /// Semaphore that limit receive operations to 1 and a time.
+        /// Semaphore that limits receive operations to 1 at a time.
         /// </summary>
         public SemaphoreSlim ReceiveReady = new SemaphoreSlim(1);
 
@@ -64,7 +64,7 @@ namespace Alchemy.Classes
         public int ReceivedByteCount;
 
         /// <summary>
-        /// Semaphore that limit sends operations to 1 and a time.
+        /// Semaphore that limits sends operations to 1 at a time.
         /// </summary>
         public SemaphoreSlim SendReady = new SemaphoreSlim(1);
 
