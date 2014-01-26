@@ -54,7 +54,7 @@ namespace Alchemy.Classes
         public UInt64 MaxFrameSize = 102400; //100kb
 
         /// <summary>
-        /// Semaphores that limit sends and receives to 1 and a time.
+        /// Semaphore that limit receive operations to 1 and a time.
         /// </summary>
         public SemaphoreSlim ReceiveReady = new SemaphoreSlim(1);
 
@@ -63,7 +63,16 @@ namespace Alchemy.Classes
         /// </summary>
         public int ReceivedByteCount;
 
+        /// <summary>
+        /// Semaphore that limit sends operations to 1 and a time.
+        /// </summary>
         public SemaphoreSlim SendReady = new SemaphoreSlim(1);
+
+        /// <summary>
+        /// Throws OperationCanceledException on threads waiting at a semaphore.
+        /// Is used when a client is disconnected.
+        /// </summary>
+        public CancellationTokenSource Cancellation;
 
         /// <summary>
         /// A link to the server listener instance this client is currently hosted on.
@@ -85,7 +94,9 @@ namespace Alchemy.Classes
             Connection = connection;
             Buffer = new byte[_bufferSize];
             UserContext = new UserContext(this);
-
+            Cancellation = new CancellationTokenSource();
+            Cancellation = CancellationTokenSource.CreateLinkedTokenSource
+                          (Handler.Shutdown.Token, this.Cancellation.Token);
             ReceiveEventArgs = new SocketAsyncEventArgs();
             SendEventArgs = new SocketAsyncEventArgs();
 

@@ -40,6 +40,11 @@ namespace Alchemy.Classes
         protected OnEventDelegate OnSendDelegate = x => { };
 
         /// <summary>
+        /// The latest exception. Usable when OnDisconnect is called.
+        /// </summary>/
+        public Exception LatestException;
+
+        /// <summary>
         /// The type of connection this is
         /// </summary>
         public Protocol Protocol = Protocol.None;

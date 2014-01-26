@@ -27,13 +27,13 @@ namespace Alchemy.Handlers
         /// <summary>
         /// Cancellation of threads if disposing
         /// </summary>
-        private static CancellationTokenSource cancellation = new CancellationTokenSource();
+        public static CancellationTokenSource Shutdown = new CancellationTokenSource();
 
         /// <summary>
         /// The default behaviour for Alchemy clients and servers is to start one send-thread per CPU.
         /// These threads will dequeue messages from a single queue and send it to the sockets opened for each WebSocket partner.
         /// This scales good for a large number of clients ( > 1000), see issue #52.
-        /// 
+        ///
         /// When FastDirectSendingMode is set to true before any Handlers are started up, the send-threads are not started.
         /// Messages are then sent directly from the multithreaded application to the underlaying socket buffer.
         /// The Send method may block a short time until the previous send operation has copied its data do the socket buffer.
@@ -139,12 +139,12 @@ namespace Alchemy.Handlers
 
         private void ProcessSend()
         {
-            while (!cancellation.IsCancellationRequested)
+            while (!Shutdown.IsCancellationRequested)
             {
                 while (MessageQueue.IsEmpty)
                 {
                     Thread.Sleep(10);
-                    if (cancellation.IsCancellationRequested) return;
+                    if (Shutdown.IsCancellationRequested) return;
                 }
 
                 HandlerMessage message;
@@ -161,10 +161,10 @@ namespace Alchemy.Handlers
         private void Send(HandlerMessage message)
         {
             message.Context.SendEventArgs.UserToken = message;
-            
+
             try
             {
-              message.Context.SendReady.Wait(cancellation.Token);
+              message.Context.SendReady.Wait(message.Context.Cancellation.Token);
             }
             catch (OperationCanceledException)
             {
@@ -218,7 +218,7 @@ namespace Alchemy.Handlers
                 message.Context.Disconnect();
                 return;
             }
-           
+
             message.Context.SendReady.Release();
             message.Context.UserContext.OnSend();
 
@@ -245,14 +245,14 @@ namespace Alchemy.Handlers
             public Boolean IsRaw { get; set;}
             public Boolean DoClose { get; set;}
         }
-        
+
         /// <summary>
         /// Dispose stops all send threads of this singleton.
         /// Therefore, Dispose may only be used, when the application shuts down.
         /// </summary>
         public void Dispose()
         {
-            cancellation.Cancel();
+            Shutdown.Cancel();
         }
     }
 }

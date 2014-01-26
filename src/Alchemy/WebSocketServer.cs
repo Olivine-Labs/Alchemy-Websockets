@@ -20,8 +20,6 @@ namespace Alchemy
         private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
         private static Thread CleanupThread;
 
-        private static CancellationTokenSource cancellation = new CancellationTokenSource();
-
         private static ConcurrentQueue<Context> ContextQueue { get; set; }
         private static Dictionary<Context, WebSocketServer> ContextMapping { get; set; }
 
@@ -46,14 +44,14 @@ namespace Alchemy
 
         private static void HandleClientThread()
         {
-            while (!cancellation.Token.IsCancellationRequested)
+            while (!Handler.Shutdown.Token.IsCancellationRequested)
             {
                 Context context;
 
                 while (ContextQueue.Count == 0)
                 {
                     Thread.Sleep(10);
-                    if (cancellation.Token.IsCancellationRequested) return;
+                    if (Handler.Shutdown.IsCancellationRequested) return;
                 }
 
                 if (!ContextQueue.TryDequeue(out context))
@@ -75,7 +73,7 @@ namespace Alchemy
 
         private static void HandleContextCleanupThread()
         {
-            while (!cancellation.IsCancellationRequested)
+            while (!Handler.Shutdown.IsCancellationRequested)
             {
                 Thread.Sleep(100);
 
@@ -88,8 +86,8 @@ namespace Alchemy
 
                 foreach (var connection in currentConnections)
                 {
-                    if (cancellation.IsCancellationRequested) break;
-                    
+                    if (Handler.Shutdown.IsCancellationRequested) break;
+
                     if (!connection.Connected)
                     {
                         lock (CurrentConnections)
@@ -274,6 +272,7 @@ namespace Alchemy
                 context.ReceiveReady.Release();
             }
         }
+
         private void SetupContext(Context _context)
         {
             _context.ReceiveEventArgs.UserToken = _context;
@@ -282,11 +281,12 @@ namespace Alchemy
 
             StartReceive(_context);
         }
+
         private void StartReceive(Context _context)
         {
             try
             {
-                if (_context.ReceiveReady.Wait(TimeOut, cancellation.Token))
+                if (_context.ReceiveReady.Wait(TimeOut, _context.Cancellation.Token))
                 {
                     try
                     {
@@ -298,6 +298,7 @@ namespace Alchemy
                     catch (SocketException ex)
                     {
                         //logger.Error("SocketException in ReceieveAsync", ex);
+                        _context.UserContext.LatestException = ex;
                         _context.Disconnect();
                     }
                 }
@@ -309,6 +310,7 @@ namespace Alchemy
             }
             catch (OperationCanceledException) { }
         }
+
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
             var context = (Context)e.UserToken;
@@ -331,7 +333,7 @@ namespace Alchemy
                 context.ReceiveReady.Release();
             }
         }
-        
+
         /// <summary>
         /// Dispose stops all receive and send threads. It only may be called when the application shuts down.
         /// Use 'Stop' to just end one WebSocketServer instance.
@@ -348,8 +350,7 @@ namespace Alchemy
         /// </summary>
         public static void Shutdown()
         {
-            cancellation.Cancel();
-            Handler.Instance.Dispose();
+            Handler.Shutdown.Cancel();
         }
     }
 }
