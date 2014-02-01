@@ -172,6 +172,7 @@ namespace Alchemy
         /// </summary>
         protected void OnClientConnected(IAsyncResult result)
         {
+            if (_client == null) return;
             try
             {
                 _client.EndConnect(result);
