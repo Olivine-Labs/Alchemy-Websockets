@@ -204,9 +204,7 @@ namespace Alchemy
 
             if (_context.Connection != null && _context.Connection.Connected)
             {
-                _context.ReceiveReady.Wait(_context.Cancellation.Token);
-
-                if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                if (!ReceiveEventArgs_StartAsync())
                 {
                     ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                 }
@@ -218,12 +216,38 @@ namespace Alchemy
             }
         }
 
+        // Starts the ReceiveEventArgs for next incoming data. Does not block.
+        // Returns false, when finished synchronous and data is already available
+        // Examples: http://msdn.microsoft.com/en-us/library/system.net.sockets.socketasynceventargs%28v=vs.110%29.aspx
+        //           http://www.codeproject.com/Articles/22918/How-To-Use-the-SocketAsyncEventArgs-Class
+        //           http://netrsc.blogspot.ch/2010/05/async-socket-server-sample-in-c.html
+        // Only one ReceiveEventArgs exist for one context. Therefore, no concurrency while receiving.
+        // Receiving is on a threadpool thread. Sending is on another thread.
+        // At least under Mono 2.10.8 there is a threading issue (multi core ?) that can be prevented, 
+        // when we thread-lock access to the ReceiveAsync method.
+        private bool ReceiveEventArgs_StartAsync()
+        {
+            bool started;
+            try
+            {
+                _context.ReceiveReady.Wait(_context.Cancellation.Token);
+                started = _context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs);
+            }
+            finally
+            {
+                _context.ReceiveReady.Release();
+            }
+
+            return started;
+        }
+
+
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
             try
             {
                 var context = (Context)e.UserToken;
-                context.Reset();
+                context.Reset(); // only one ReceiveEventArgs exist for this context. Therefore, no concurrency.
 
                 if (e.SocketError != SocketError.Success)
                 {
@@ -236,19 +260,12 @@ namespace Alchemy
 
                 if (context.ReceivedByteCount > 0)
                 {
-                    ReceiveData(context);
-                    context.ReceiveReady.Release();
+                    ReceiveData(context); // process data
+                    ReceiveEventArgs_StartAsync();
                 }
                 else
                 {
                     context.Disconnect();
-                }
-
-                _context.ReceiveReady.Wait(_context.Cancellation.Token);
-
-                if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
-                {
-                    ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                 }
             }
             catch (OperationCanceledException) {}

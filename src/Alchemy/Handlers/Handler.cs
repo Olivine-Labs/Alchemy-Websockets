@@ -160,11 +160,9 @@ namespace Alchemy.Handlers
 
         private void Send(HandlerMessage message)
         {
-            message.Context.SendEventArgs.UserToken = message;
-
             try
             {
-              message.Context.SendReady.Wait(message.Context.Cancellation.Token);
+              message.Context.SendReady.Wait(message.Context.Cancellation.Token); // block until previous message is in the socket buffer
             }
             catch (OperationCanceledException)
             {
@@ -176,6 +174,7 @@ namespace Alchemy.Handlers
                 if (message.Context.Connected)
                 {
                     List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
+                    message.Context.SendEventArgs.UserToken = message; // 2014-02-04 moved here from beginning of method. When SendEventArgs_Completed is called the message must correspond to the one that was sent!
                     message.Context.SendEventArgs.BufferList = data;
                     message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
                 }
