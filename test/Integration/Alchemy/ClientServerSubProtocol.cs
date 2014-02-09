@@ -10,16 +10,8 @@ namespace Alchemy
     {
         private WebSocketServer _server;
         private WebSocketClient _client;
-        private bool _forever;
-        private bool _clientDataPass = true;
 
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-
-        }
-
-        [TestFixtureTearDown]
+        [TearDown]
         public void TearDown()
         {
             _client.Disconnect();
