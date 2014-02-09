@@ -97,33 +97,38 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
             }
         }
 
-        public override void Append(byte[] someBytes, bool asFrame = false)
+        public override int Append(byte[] someBytes, int receivedByteCount = -1, bool asFrame = false)
         {
             byte[] data = someBytes;
+            if (receivedByteCount < 0)
+            {
+                receivedByteCount = someBytes.Length;
+            }
+
+            int readCount;
             if (asFrame)
             {
-                UInt64 dataLength;
+                int dataLength;
                 if (InternalState == DataState.Empty)
                 {
                     byte[] headerBytes = _header.FromBytes(someBytes);
                     Payload.Add(new ArraySegment<byte>(headerBytes));
                     int dataStart = headerBytes.Length;
-                    data =
-                        new byte[
-                            Math.Min(Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, int.MaxValue)),
-                                     someBytes.Length - dataStart)];
-                    dataLength = Math.Min(_header.PayloadSizeRemaining, Convert.ToUInt64(someBytes.Length - dataStart));
-                    Array.Copy(someBytes, dataStart, data, 0, Convert.ToInt32(dataLength));
+                    dataLength = Math.Min(Convert.ToInt32(_header.PayloadSizeRemaining), (receivedByteCount - dataStart));
+                    data = new byte[dataLength];
+                    Array.Copy(someBytes, dataStart, data, 0, dataLength);
                     Format = DataFormat.Frame;
+                    readCount = dataStart + dataLength;
                 }
                 else
                 {
-                    dataLength = Math.Min(Convert.ToUInt64(data.Length), _header.PayloadSizeRemaining);
+                    dataLength = Math.Min(Convert.ToInt32(_header.PayloadSizeRemaining), receivedByteCount);
                     data = new byte[dataLength];
-                    Array.Copy(someBytes, 0, data, 0, Convert.ToInt32(dataLength));
+                    Array.Copy(someBytes, 0, data, 0, dataLength);
+                    readCount = dataLength;
                 }
 
-                _header.PayloadSizeRemaining -= dataLength;
+                _header.PayloadSizeRemaining -= Convert.ToUInt64(dataLength);
                 switch (_header.OpCode)
                 {
                     case OpCode.Close:
@@ -143,8 +148,11 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
             else
             {
                 Format = DataFormat.Raw;
+                readCount = data.Length;
             }
+
             Payload.Add(new ArraySegment<byte>(data));
+            return readCount;
         }
     }
 }

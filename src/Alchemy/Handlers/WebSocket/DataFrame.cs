@@ -111,8 +111,10 @@ namespace Alchemy.Handlers.WebSocket
         /// Appends the data
         /// </summary>
         /// <param name="someBytes">Some data.</param>
-        /// /// <param name="asFrame">For internal use inside alchemy.</param>
-        public abstract void Append(byte[] someBytes, bool asFrame = false);
+        /// <param name="receivedByteCount">Count of available bytes in buffer. -1 indicates whole buffer.</param>
+        /// <param name="asFrame">For internal use inside alchemy.</param>
+        /// <returns>Count of bytes copied into the frame buffer.</returns>
+        public abstract int Append(byte[] someBytes, int receivedByteCount = -1, bool asFrame = false);
 
         public override string ToString()
         {

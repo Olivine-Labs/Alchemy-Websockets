@@ -333,11 +333,25 @@ namespace Alchemy
             }
             else
             {
-                context.UserContext.DataFrame.Append(context.Buffer, true);
-                if (context.UserContext.DataFrame.State == Handlers.WebSocket.DataFrame.DataState.Complete)
+                int remaining = context.ReceivedByteCount;
+                while (remaining > 0)
                 {
-                    context.UserContext.OnReceive();
-                    context.UserContext.DataFrame.Reset();
+                    // add bytes to existing or empty frame
+                    int readCount = context.UserContext.DataFrame.Append(context.Buffer, remaining, true);
+
+                    if (context.UserContext.DataFrame.State == Handlers.WebSocket.DataFrame.DataState.Complete)
+                    {
+                        // pass frame to user code and start new frame
+                        context.UserContext.OnReceive();
+                        context.UserContext.DataFrame.Reset();
+                    }
+
+                    remaining -= readCount; // process rest of received bytes, TODO: splitted header
+                    if (remaining > 0)
+                    {
+                        // move remaining bytes to beginning of array
+                        Array.Copy(context.Buffer, readCount, context.Buffer, 0, remaining);
+                    }
                 }
             }
         }
