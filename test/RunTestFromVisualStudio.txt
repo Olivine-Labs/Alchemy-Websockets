@@ -1,0 +1,21 @@
+How to run and debug unit tests from VisualStudio
+-------------------------------------------------
+see http://erraticdev.blogspot.ch/2012/01/running-or-debugging-nunit-tests-from.html
+see http://www.brothersincode.com/post/Goodbye-Nunit-agentexe.aspx
+
+In VisualStudio go to the unit test project settings / Debug tab / Configuration = Debug:
+
+	Start external program     = <your path>\Alchemy-Websockets\packages\NUnit.2.5.10.11092\tools\nunit.exe
+        Working directory      e.g = <your path>\Alchemy-Websockets\test\Integration\Alchemy\bin\Debug
+        Command line arguments e.g = AlchemyIntegrationTest.dll /run
+
+These settings are not stored in the solution file and therefore will not be in the git repository.
+
+Now you can start the project from visual studio.
+This will start nunit gui and run the tests with breakpoint support.
+
+When installing a new nunit version, edit the nunit.exe.config file to enable breakpoints and disable the nunit-agent process:
+
+  <startup>
+	<requiredRuntime version="v4.0.30319" />
+  </startup>
