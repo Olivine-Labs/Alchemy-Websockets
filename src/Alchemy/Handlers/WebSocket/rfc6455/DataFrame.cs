@@ -111,9 +111,14 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                 int dataLength;
                 if (InternalState == DataState.Empty)
                 {
-                    byte[] headerBytes = _header.FromBytes(someBytes);
+                    int dataStart;
+                    byte[] headerBytes = _header.FromBytes(someBytes, receivedByteCount, out dataStart);
+                    if (headerBytes == null)
+                    {
+                        return 0; // not all header bytes received
+                    }
+
                     Payload.Add(new ArraySegment<byte>(headerBytes));
-                    int dataStart = headerBytes.Length;
                     dataLength = Math.Min(Convert.ToInt32(_header.PayloadSizeRemaining), (receivedByteCount - dataStart));
                     data = new byte[dataLength];
                     Array.Copy(someBytes, dataStart, data, 0, dataLength);

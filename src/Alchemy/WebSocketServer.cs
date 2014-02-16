@@ -61,8 +61,8 @@ namespace Alchemy
 
                 lock (ContextMapping)
                 {
-                    WebSocketServer client = ContextMapping[context];
-                    client.SetupContext(context);
+                    WebSocketServer server = ContextMapping[context];
+                    server.SetupContext(context);
                 }
 
                 lock(CurrentConnections){
@@ -106,6 +106,14 @@ namespace Alchemy
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the client count.
+        /// </summary>
+        public int Clients
+        {
+            get { return CurrentConnections.Count; }
         }
 
         /// <summary>
@@ -241,35 +249,6 @@ namespace Alchemy
                 }
 
                 ContextQueue.Enqueue(context);
-            }
-        }
-
-        /// <summary>
-        /// The root receive event for each client. Executes in it's own thread.
-        /// </summary>
-        /// <param name="result">The Async result.</param>
-        private void DoReceive(IAsyncResult result)
-        {
-            var context = (Context) result.AsyncState;
-            context.Reset();
-            try
-            {
-                context.ReceivedByteCount = context.Connection.Client.EndReceive(result);
-            }
-            catch
-            {
-                context.ReceivedByteCount = 0;
-            }
-
-            if (context.ReceivedByteCount > 0)
-            {
-                context.Handler.HandleRequest(context);
-                context.ReceiveReady.Release();
-            }
-            else
-            {
-                context.Disconnect();
-                context.ReceiveReady.Release();
             }
         }
 

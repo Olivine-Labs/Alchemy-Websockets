@@ -201,9 +201,11 @@ namespace Alchemy
             _context.ReceiveEventArgs.UserToken = _context;
             _context.ReceiveEventArgs.Completed += ReceiveEventArgs_Completed;
             _context.ReceiveEventArgs.SetBuffer(_context.Buffer, 0, _context.Buffer.Length);
+            IsAuthenticated = false;
 
             if (_context.Connection != null && _context.Connection.Connected)
             {
+                _context.Connected = true;
                 if (!ReceiveEventArgs_StartAsync())
                 {
                     ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
@@ -338,15 +340,18 @@ namespace Alchemy
                 {
                     // add bytes to existing or empty frame
                     int readCount = context.UserContext.DataFrame.Append(context.Buffer, remaining, true);
-
-                    if (context.UserContext.DataFrame.State == Handlers.WebSocket.DataFrame.DataState.Complete)
+                    if (readCount <= 0)
+                    {
+                        break; // partial header
+                    }
+                    else if (context.UserContext.DataFrame.State == Handlers.WebSocket.DataFrame.DataState.Complete)
                     {
                         // pass frame to user code and start new frame
                         context.UserContext.OnReceive();
                         context.UserContext.DataFrame.Reset();
                     }
 
-                    remaining -= readCount; // process rest of received bytes, TODO: splitted header
+                    remaining -= readCount; // process rest of received bytes
                     if (remaining > 0)
                     {
                         // move remaining bytes to beginning of array
@@ -395,10 +400,12 @@ namespace Alchemy
                 _context.Connected = false;
                 ReadyState = ReadyStates.CLOSING;
                 _context.Cancellation.Cancel();
+                _context.Connection = null;
             }
 
             _client.Close();
             _client = null;
+            IsAuthenticated = false;
             ReadyState = ReadyStates.CLOSED;
         }
 

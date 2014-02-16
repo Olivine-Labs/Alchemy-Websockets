@@ -36,7 +36,7 @@ namespace Alchemy
         }
 
         [Test]
-        public void ClientShoulConnectWithValidProtocol()
+        public void ClientShouldConnectWithValidProtocol()
         {
             _server = new WebSocketServer(54321, IPAddress.Loopback) { SubProtocols = new[] { "test" }};
             _server.Start();
@@ -49,7 +49,7 @@ namespace Alchemy
         }
 
         [Test]
-        public void ClientShoulConnectWithSecondaryValidProtocol()
+        public void ClientShouldConnectWithSecondaryValidProtocol()
         {
             _server = new WebSocketServer(54321, IPAddress.Loopback) { SubProtocols = new[] { "test2" } };
             _server.Start();

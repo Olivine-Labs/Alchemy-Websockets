@@ -12,15 +12,21 @@ namespace Alchemy.Handlers.WebSocket
         /// <param name="context">The user context.</param>
         public override void HandleRequest(Context context)
         {
+            int count = 0;
             if (context.IsSetup)
             {
                 int remaining = context.ReceivedByteCount;
                 while (remaining > 0)
                 {
+                    count++;
                     // add bytes to existing or empty frame
                     int readCount = context.UserContext.DataFrame.Append(context.Buffer, remaining, true);
 
-                    if (context.UserContext.DataFrame.Length >= context.MaxFrameSize)
+                    if (readCount <= 0)
+                    {
+                        break; // partial header
+                    }
+                    else if (context.UserContext.DataFrame.Length >= context.MaxFrameSize)
                     {
                         context.Disconnect(); //Disconnect if over MaxFrameSize
                         break;
@@ -33,10 +39,10 @@ namespace Alchemy.Handlers.WebSocket
                                 context.UserContext.OnReceive();
                                 break;
                             case DataFrame.DataState.Closed:
-                                DataFrame closeFrame = context.UserContext.DataFrame.CreateInstance();
-							    closeFrame.State = DataFrame.DataState.Closed;
-							    closeFrame.Append(new byte[] { 0x8 }, 1, true);
-							    context.UserContext.Send(closeFrame, false, true);
+                                context.UserContext.DataFrame.State = DataFrame.DataState.Complete;
+                                // see http://stackoverflow.com/questions/17176827/websocket-close-packet, DataState.Closed is only set by rfc6455
+                                var closeFrame = new byte[] { 0x88, 0x00 };
+                                context.UserContext.Send(closeFrame, raw:true, close:true);
                                 break;
                             case DataFrame.DataState.Ping:
                                 context.UserContext.DataFrame.State = DataFrame.DataState.Complete;
@@ -54,10 +60,10 @@ namespace Alchemy.Handlers.WebSocket
                                 break;
                         }
 
-                        remaining -= readCount; // process rest of received bytes, TODO: splitted header
+                        remaining -= readCount; // process rest of received bytes
                         if (remaining > 0)
                         {
-                            context.Reset();
+                            context.Reset(); // starts new message when DataState.Complete
                             // move remaining bytes to beginning of array
                             Array.Copy(context.Buffer, readCount, context.Buffer, 0, remaining);
                         }
