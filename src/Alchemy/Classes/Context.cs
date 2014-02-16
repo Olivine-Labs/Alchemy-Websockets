@@ -124,6 +124,31 @@ namespace Alchemy.Classes
             }
         }
 
+        // Starts the ReceiveEventArgs for next incoming data on server- or client side. Does not block.
+        // Returns false, when finished synchronous and data is already available
+        // Examples: http://msdn.microsoft.com/en-us/library/system.net.sockets.socketasynceventargs%28v=vs.110%29.aspx
+        //           http://www.codeproject.com/Articles/22918/How-To-Use-the-SocketAsyncEventArgs-Class
+        //           http://netrsc.blogspot.ch/2010/05/async-socket-server-sample-in-c.html
+        // Only one ReceiveEventArgs exist for one context. Therefore, no concurrency while receiving.
+        // Receiving is on a threadpool thread. Sending is on another thread.
+        // At least under Mono 2.10.8 there is a threading issue (multi core ?) that can be prevented,
+        // when we thread-lock access to the ReceiveAsync method.
+        internal bool ReceiveEventArgs_StartAsync()
+        {
+            bool started;
+            try
+            {
+                ReceiveReady.Wait(Cancellation.Token);
+                started = Connection.Client.ReceiveAsync(ReceiveEventArgs);
+            }
+            finally
+            {
+                ReceiveReady.Release();
+            }
+
+            return started;
+        }
+
         #region IDisposable Members
 
         /// <summary>

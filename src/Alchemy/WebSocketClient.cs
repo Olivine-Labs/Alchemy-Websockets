@@ -35,10 +35,6 @@ namespace Alchemy
         private readonly int _port;
         private readonly string _host;
 
-        private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
-        private static Queue<Context> NewClients { get; set; }
-        private static Dictionary<Context, WebSocketClient> ContextMapping { get; set; }
-
         public enum ReadyStates
         {
             CONNECTING,
@@ -55,55 +51,9 @@ namespace Alchemy
             }
         }
 
-        static WebSocketClient()
-        {
-            NewClients = new Queue<Context>();
-            ContextMapping = new Dictionary<Context, WebSocketClient>();
-
-            for(int i = 0; i < ClientThreads.Length; i++){
-                ClientThreads[i] = new Thread(HandleClientThread);
-                ClientThreads[i].Name = "WebSocketClient Setup Thread #" + (i + 1);
-                ClientThreads[i].Start();
-            }
-        }
-
         public static void Log (string text)
         {
             Trace.Write(string.Format ("--{0:HH:mm:ss.fff}, {1}\r\n", DateTime.Now, text));
-        }
-
-        private static void HandleClientThread()
-        {
-            while (!Handler.Shutdown.IsCancellationRequested)
-            {
-                try
-                {
-                    Context context = null;
-
-                    while (NewClients.Count == 0)
-                    {
-                        Thread.Sleep(10);
-                        if (Handler.Shutdown.IsCancellationRequested) return;
-                    }
-
-                    lock (NewClients)
-                    {
-                        if (NewClients.Count == 0)
-                        {
-                            continue;
-                        }
-
-                        context = NewClients.Dequeue();
-                    }
-
-                    lock (ContextMapping)
-                    {
-                        WebSocketClient client = ContextMapping[context];
-                        client.SetupContext(context);
-                    }
-                }
-                catch (OperationCanceledException) {}
-            }
         }
 
         public WebSocketClient(string path)
@@ -185,18 +135,10 @@ namespace Alchemy
                 return;
             }
 
-            lock (ContextMapping)
-            {
-                ContextMapping[_context] = this;
-            }
-
-            lock (NewClients)
-            {
-                NewClients.Enqueue(_context);
-            }
+            SetupContext();
         }
 
-        private void SetupContext(Context context)
+        private void SetupContext()
         {
             _context.ReceiveEventArgs.UserToken = _context;
             _context.ReceiveEventArgs.Completed += ReceiveEventArgs_Completed;
@@ -206,7 +148,7 @@ namespace Alchemy
             if (_context.Connection != null && _context.Connection.Connected)
             {
                 _context.Connected = true;
-                if (!ReceiveEventArgs_StartAsync())
+                if (!_context.ReceiveEventArgs_StartAsync())
                 {
                     ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                 }
@@ -217,32 +159,6 @@ namespace Alchemy
                 }
             }
         }
-
-        // Starts the ReceiveEventArgs for next incoming data. Does not block.
-        // Returns false, when finished synchronous and data is already available
-        // Examples: http://msdn.microsoft.com/en-us/library/system.net.sockets.socketasynceventargs%28v=vs.110%29.aspx
-        //           http://www.codeproject.com/Articles/22918/How-To-Use-the-SocketAsyncEventArgs-Class
-        //           http://netrsc.blogspot.ch/2010/05/async-socket-server-sample-in-c.html
-        // Only one ReceiveEventArgs exist for one context. Therefore, no concurrency while receiving.
-        // Receiving is on a threadpool thread. Sending is on another thread.
-        // At least under Mono 2.10.8 there is a threading issue (multi core ?) that can be prevented, 
-        // when we thread-lock access to the ReceiveAsync method.
-        private bool ReceiveEventArgs_StartAsync()
-        {
-            bool started;
-            try
-            {
-                _context.ReceiveReady.Wait(_context.Cancellation.Token);
-                started = _context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs);
-            }
-            finally
-            {
-                _context.ReceiveReady.Release();
-            }
-
-            return started;
-        }
-
 
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
@@ -263,7 +179,11 @@ namespace Alchemy
                 if (context.ReceivedByteCount > 0)
                 {
                     ReceiveData(context); // process data
-                    ReceiveEventArgs_StartAsync();
+
+                    if (!_context.ReceiveEventArgs_StartAsync())
+                    {
+                        ReceiveEventArgs_Completed(sender, e);
+                    }
                 }
                 else
                 {

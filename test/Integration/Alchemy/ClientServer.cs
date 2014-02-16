@@ -16,6 +16,7 @@ namespace Alchemy
         private static int _requestId2;
         private static int _responseId;
         private static int _responseId2;
+        private static int _expectedLength;
 
         [TestFixtureSetUp]
         public void SetUp()
@@ -39,11 +40,11 @@ namespace Alchemy
         {
             Thread.Sleep(1);
             var data = context.DataFrame.ToString();
-            if (data.StartsWith("Test" + _requestId.ToString()))
+            if (data.StartsWith("Test" + _requestId.ToString()) && _expectedLength == data.Length)
             {
                 _requestId++;
             }
-            else if (data.StartsWith("Hallo" + _requestId2.ToString()))
+            else if (data.StartsWith("Halo" + _requestId2.ToString()) && _expectedLength == data.Length)
             {
                 _requestId2++;
             }
@@ -54,7 +55,7 @@ namespace Alchemy
         private void OnClientReceive(UserContext context)
         {
             var data = context.DataFrame.ToString();
-            if (data.StartsWith("Test" + _responseId.ToString()))
+            if (data.StartsWith("Test" + _responseId.ToString()) && _expectedLength == data.Length)
             {
                 _responseId++;
                 if (_forever && _clientDataPass)
@@ -71,12 +72,12 @@ namespace Alchemy
         private void OnClientReceive2(UserContext context)
         {
             var data = context.DataFrame.ToString();
-            if (data.StartsWith("Hallo" + _responseId2.ToString()))
+            if (data.StartsWith("Halo" + _responseId2.ToString()) && _expectedLength == data.Length)
             {
                 _responseId2++;
                 if (_forever && _clientDataPass)
                 {
-                    context.Send("Hallo" + _responseId2.ToString());
+                    context.Send("Halo" + _responseId2.ToString());
                 }
             }
             else
@@ -99,6 +100,7 @@ namespace Alchemy
             Alchemy.Handlers.Handler.FastDirectSendingMode = false;
             _requestId = 1;
             _responseId = 1;
+            _expectedLength = 5;
             if (_client.Connected)
             {
                 _client.Send("Test1");
@@ -119,6 +121,7 @@ namespace Alchemy
             _responseId = 1000;
             _requestId2 = 2000;
             _responseId2 = 2000;
+            _expectedLength = 8;
             var client2 = new WebSocketClient("ws://127.0.0.1:54321/path") { OnReceive = OnClientReceive2 };
             if (_client.Connected)
             {
@@ -127,7 +130,7 @@ namespace Alchemy
                 if (client2.Connected)
                 {
                     _client.Send("Test1000");
-                    client2.Send("Hallo2000");
+                    client2.Send("Halo2000");
                 }
                 else
                 {
@@ -164,12 +167,13 @@ namespace Alchemy
             _responseId = 10;
             Assert.IsTrue(_client.Connected);
             var longstring = " ".PadRight(500, '*'); // splitted header when 500 bytes !
+            _expectedLength = 6 + longstring.Length;
 
             for (int i = 10; i < 20; i++)
             {
                 _client.Send("Test" + i.ToString() + longstring);
             }
-            Thread.Sleep(100);
+            Thread.Sleep(200);
 
             Assert.IsTrue(_clientDataPass);
             Assert.AreEqual(20, _requestId);
@@ -177,12 +181,13 @@ namespace Alchemy
 
 
             longstring = longstring.PadRight(400, 'X'); // 800 bytes ( > buffersize)
+            _expectedLength = 6 + longstring.Length;
 
             for (int i = 20; i < 30; i++)
             {
                 _client.Send("Test" + i.ToString() + longstring);
             }
-            Thread.Sleep(100);
+            Thread.Sleep(200);
 
             Assert.IsTrue(_clientDataPass);
             Assert.AreEqual(30, _requestId);

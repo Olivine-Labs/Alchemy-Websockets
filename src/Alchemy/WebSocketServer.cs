@@ -265,29 +265,18 @@ namespace Alchemy
         {
             try
             {
-                if (_context.ReceiveReady.Wait(TimeOut, _context.Cancellation.Token))
+                if (!_context.ReceiveEventArgs_StartAsync())
                 {
-                    try
-                    {
-                        if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
-                        {
-                            ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
-                        }
-                    }
-                    catch (SocketException ex)
-                    {
-                        //logger.Error("SocketException in ReceieveAsync", ex);
-                        _context.UserContext.LatestException = ex;
-                        _context.Disconnect();
-                    }
-                }
-                else
-                {
-                    //logger.Error("Timeout waiting for ReceiveReady");
-                    _context.Disconnect();
+                    ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                 }
             }
             catch (OperationCanceledException) { }
+            catch (SocketException ex)
+            {
+                //logger.Error("SocketException in StartReceive", ex);
+                _context.UserContext.LatestException = ex;
+                _context.Disconnect();
+            }
         }
 
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
@@ -296,7 +285,7 @@ namespace Alchemy
             context.Reset();
             if (e.SocketError != SocketError.Success)
             {
-            //logger.Error("Socket Error: " + e.SocketError.ToString());
+                //logger.Error("Socket Error: " + e.SocketError.ToString());
                 context.ReceivedByteCount = 0;
             } else {
                 context.ReceivedByteCount = e.BytesTransferred;
@@ -305,11 +294,9 @@ namespace Alchemy
             if (context.ReceivedByteCount > 0)
             {
                 context.Handler.HandleRequest(context);
-                context.ReceiveReady.Release();
                 StartReceive(context);
             } else {
                 context.Disconnect();
-                context.ReceiveReady.Release();
             }
         }
 
