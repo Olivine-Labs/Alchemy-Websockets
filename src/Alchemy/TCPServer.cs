@@ -7,23 +7,7 @@ namespace Alchemy
 {
     public abstract class TcpServer : IDisposable
     {
-        /// <summary>
-        /// This Semaphore protects our clients variable on increment/decrement when a user connects/disconnects.
-        /// </summary>
-        private readonly SemaphoreSlim _clientLock = new SemaphoreSlim(1);
-
-        /// <summary>
-        /// Limits how many active connect events we have.
-        /// </summary>
-        private readonly SemaphoreSlim _connectReady = new SemaphoreSlim(10);
-
         protected int BufferSize = 512;
-
-        /// <summary>
-        /// The number of connected clients.
-        /// </summary>
-        /// 
-        private int _clients;
 
         private IPAddress _listenAddress = IPAddress.Any;
 
@@ -46,9 +30,6 @@ namespace Alchemy
         /// <summary>
         /// Gets or sets the port.
         /// </summary>
-        /// <value>
-        /// The port.
-        /// </value>
         public int Port
         {
             get { return _port; }
@@ -56,19 +37,8 @@ namespace Alchemy
         }
 
         /// <summary>
-        /// Gets the client count.
-        /// </summary>
-        public int Clients
-        {
-            get { return _clients; }
-        }
-
-        /// <summary>
         /// Gets or sets the listener address.
         /// </summary>
-        /// <value>
-        /// The listener address.
-        /// </value>
         public IPAddress ListenAddress
         {
             get { return _listenAddress; }
@@ -83,7 +53,8 @@ namespace Alchemy
             if (_listener == null)
             {
                 _listener = new TcpListener(_listenAddress, _port);
-                ThreadPool.QueueUserWorkItem(Listen, null);
+                _listener.Start(10);
+                _listener.BeginAcceptTcpClient(RunClient, null);
             }
         }
 
@@ -109,27 +80,6 @@ namespace Alchemy
         }
 
         /// <summary>
-        /// Listens on the ip and port specified.
-        /// </summary>
-        /// <param name="state">The state.</param>
-        private void Listen(object state)
-        {
-            _listener.Start();
-            while (_listener != null)
-            {
-                try
-                {
-                    _listener.BeginAcceptTcpClient(RunClient, null);
-                }
-                catch (SocketException)
-                {
-                    /* Ignore */
-                }
-                _connectReady.Wait();
-            }
-        }
-
-        /// <summary>
         /// Runs the client.
         /// Sets up the UserContext.
         /// Executes in it's own thread.
@@ -147,22 +97,14 @@ namespace Alchemy
                 }
                 catch (Exception)
                 {
-
                     connection = null;
                 }
             }
-            _connectReady.Release();
+
             if (connection != null)
             {
-                _clientLock.Wait();
-                _clients++;
-                _clientLock.Release();
-
                 ThreadPool.QueueUserWorkItem(OnRunClient, connection);
-
-                _clientLock.Wait();
-                _clients--;
-                _clientLock.Release();
+                _listener.BeginAcceptTcpClient(RunClient, null);
             }
         }
 
