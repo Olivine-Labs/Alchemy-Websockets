@@ -79,22 +79,17 @@ namespace Alchemy
             {
                 Thread.Sleep(100);
 
-                List<Context> currentConnections = new List<Context>();
-
-                lock (CurrentConnections)
-                {
-                    currentConnections.AddRange(CurrentConnections);
-                }
-
-                foreach (var connection in currentConnections)
+                for (int count = CurrentConnections.Count-1; count >= 0; count--)
                 {
                     if (cancellation.IsCancellationRequested) break;
-                    
+
+                    var connection = CurrentConnections[count];
+
                     if (!connection.Connected)
                     {
                         lock (CurrentConnections)
                         {
-                            CurrentConnections.Remove(connection);
+                            CurrentConnections.RemoveAt(count);
                         }
 
                         lock (ContextMapping)
