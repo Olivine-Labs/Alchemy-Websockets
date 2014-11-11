@@ -24,6 +24,7 @@ namespace Alchemy
         public void ClientShouldNotConnectWithInvalidProtocol()
         {
             _server = new WebSocketServer(54321, IPAddress.Loopback);
+            _server.FlashAccessPolicyEnabled = false;
             _server.Start();
             _client = new WebSocketClient("ws://127.0.0.1:54321/path")
                           {Origin = "localhost", SubProtocols = new[] {"test", "test2"}};
@@ -39,6 +40,7 @@ namespace Alchemy
         public void ClientShouldConnectWithValidProtocol()
         {
             _server = new WebSocketServer(54321, IPAddress.Loopback) { SubProtocols = new[] { "test" }};
+            _server.FlashAccessPolicyEnabled = false;
             _server.Start();
             _client = new WebSocketClient("ws://127.0.0.1:54321/path") { Origin = "localhost", SubProtocols = new[] { "test", "test2" } };
 
@@ -52,6 +54,7 @@ namespace Alchemy
         public void ClientShouldConnectWithSecondaryValidProtocol()
         {
             _server = new WebSocketServer(54321, IPAddress.Loopback) { SubProtocols = new[] { "test2" } };
+            _server.FlashAccessPolicyEnabled = false;
             _server.Start();
             _client = new WebSocketClient("ws://127.0.0.1:54321/path") { Origin = "localhost", SubProtocols = new[] { "test", "test2" } };
 

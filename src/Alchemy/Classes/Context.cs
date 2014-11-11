@@ -9,7 +9,7 @@ namespace Alchemy.Classes
 /// <summary>
 /// This class contains the required data for each connection to the server.
 /// </summary>
-    public class Context : IDisposable
+    public class Context// : IDisposable
     {
         //private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -51,7 +51,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// The max frame that we will accept from the client
         /// </summary>
-        public UInt64 MaxFrameSize = 102400; //100kb
+        public long MaxFrameSize = 102400; //100kb
 
         /// <summary>
         /// Semaphore that limits receive operations to 1 at a time.
@@ -154,7 +154,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
         /// </summary>
-        public void Dispose()
+        public void Close()
         {
             Connected = false;
             UserContext.OnDisconnect();

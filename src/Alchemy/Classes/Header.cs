@@ -23,7 +23,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// Regular expression to parse http header
         /// </summary>
-        public static string Pattern =
+        internal static string Pattern =
             @"^(?<connect>[^\s]+)?\s?(?<path>[^\s]+)?\s?HTTP\/1\.1(.*?)?\r\n" + // HTTP Request
             @"((?<field_name>[^:\r\n]+):(?<field_value>[^\r\n]+)\r\n)+";
 
@@ -37,28 +37,28 @@ namespace Alchemy.Classes
         /// <summary>
         /// Any cookies sent with the header.
         /// </summary>
-        public HttpCookieCollection Cookies = new HttpCookieCollection();
+        public HttpCookieCollection Cookies {get; internal set;}
 
         /// <summary>
         /// The HTTP Method (GET/POST/PUT, etc.)
         /// </summary>
-        public String Method = String.Empty;
+        public String Method {get; internal set;}
 
         /// <summary>
         /// What protocol this header represents, if any.
         /// </summary>
-        public Protocol Protocol = Protocol.None;
+        public Protocol Protocol {get; internal set;}
 
 
         /// <summary>
         /// The path requested by the header.
         /// </summary>
-        public string RequestPath = string.Empty;
+        public string RequestPath {get; internal set;}
 
         /// <summary>
         /// The subprotocols specified by the header.
         /// </summary>
-        public string[] SubProtocols;
+        public string[] SubProtocols {get; internal set;}
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Header"/> class.
@@ -67,6 +67,11 @@ namespace Alchemy.Classes
         /// <param name="data">The data.</param>
         public Header(string data)
         {
+            Cookies = new HttpCookieCollection();
+            Method = String.Empty;
+            Protocol = Protocol.None;
+            RequestPath = string.Empty;
+
             // Parse HTTP Header
             var regex = new Regex(Pattern, RegexOptions.IgnoreCase);
             var match = regex.Match(data);

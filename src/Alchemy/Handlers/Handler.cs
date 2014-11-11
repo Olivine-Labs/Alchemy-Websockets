@@ -74,7 +74,7 @@ namespace Alchemy.Handlers
         }
 
         /// <summary>
-        /// Handles the initial request.
+        /// Handles the initial request on the service side.
         /// Attempts to process the header that should have been sent.
         /// Otherwise, through magic and wizardry, the client gets disconnected.
         /// </summary>

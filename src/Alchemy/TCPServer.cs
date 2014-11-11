@@ -5,7 +5,7 @@ using System.Threading;
 
 namespace Alchemy
 {
-    public abstract class TcpServer : IDisposable
+    public abstract class TcpServer
     {
         protected int BufferSize = 512;
 
@@ -109,13 +109,5 @@ namespace Alchemy
         }
 
         protected abstract void OnRunClient(object connection);
-
-        /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
-        /// </summary>
-        public void Dispose()
-        {
-            Stop();
-        }
     }
 }

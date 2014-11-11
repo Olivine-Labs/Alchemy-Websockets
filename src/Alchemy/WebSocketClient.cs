@@ -334,9 +334,14 @@ namespace Alchemy
             _context.UserContext.Send(data);
         }
 
-        public void Send(byte[] data)
+        /// <summary>
+        /// Send byteCount bytes from buffer.
+        /// </summary>
+        /// <param name="buffer">Data.</param>
+        /// <param name="byteCount">Count of bytes from beginning of buffer. -1 = all bytes.</param>
+        public void Send(byte[] buffer, int byteCount = -1)
         {
-            _context.UserContext.Send(data);
+            _context.UserContext.Send(buffer, byteCount);
         }
 
         /// <summary>

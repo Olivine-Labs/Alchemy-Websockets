@@ -14,7 +14,7 @@ namespace Alchemy
     /// <summary>
     /// The Main WebSocket Server
     /// </summary>
-    public class WebSocketServer : TcpServer, IDisposable
+    public class WebSocketServer : TcpServer
     {
 
         private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
@@ -25,6 +25,7 @@ namespace Alchemy
 
         private static List<Context> CurrentConnections { get; set; }
 
+        // static constructor
         static WebSocketServer()
         {
             ContextQueue = new ConcurrentQueue<Context>();
@@ -102,16 +103,16 @@ namespace Alchemy
 
                         connection.Handler.UnregisterContext(connection);
 
-                        connection.Dispose();
+                        connection.Close();
                     }
                 }
             }
         }
 
         /// <summary>
-        /// Gets the client count.
+        /// Gets the client count of all servers.
         /// </summary>
-        public int Clients
+        public static int ClientCount
         {
             get { return CurrentConnections.Count; }
         }
@@ -135,7 +136,9 @@ namespace Alchemy
 
         /// <summary>
         /// Enables or disables the Flash Access Policy Server(APServer).
-        /// This is used when you would like your app to only listen on a single port rather than 2.
+        /// When true, an additional TCPServer on port 843 is started. 
+        /// Make sure only one server is active on this port.
+        /// Set to false, when you would like your app to only listen on a single port rather than 2.
         /// Warning, any flash socket connections will have an added delay on connection due to the client looking to port 843 first for the connection restrictions.
         /// </summary>
         public bool FlashAccessPolicyEnabled = true;
@@ -194,33 +197,52 @@ namespace Alchemy
         }
 
         /// <summary>
-        /// Starts this instance.
+        /// Starts this WebSocketServer on the given listenPort.
+        /// When enabled, starts also the FlashAccessPolicy-server on port 843.
         /// </summary>
         public override void Start()
         {
             base.Start();
             if (AccessPolicyServer == null)
             {
+                // every server needs an instance for its clients to send AccessPolicy requests to a remote server
                 AccessPolicyServer = new AccessPolicyServer(ListenAddress, Origin, Port);
-
+                
+                // at most one instance may be enabled
                 if (FlashAccessPolicyEnabled)
                 {
-                    AccessPolicyServer.Start();
+                    try
+                    {
+                    	AccessPolicyServer.Start();
+                    }
+                    catch (Exception ex)
+                    {
+                    	throw new Exception("cannot start the AccessPolicyServer", ex);
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Stops this instance.
+        /// Stops this WebSocketServer.
+        /// When enabled, stops also the FlashAccessPolicy-server.
         /// </summary>
         public override void Stop()
         {
-            if ((AccessPolicyServer != null) && (FlashAccessPolicyEnabled))
-            {
-                AccessPolicyServer.Stop();
-                AccessPolicyServer = null;
-            }
             base.Stop();
+            if (AccessPolicyServer != null && FlashAccessPolicyEnabled)
+            {
+                try
+                {
+                	AccessPolicyServer.Stop();
+               		AccessPolicyServer = null;
+                }
+                catch (Exception ex)
+                {
+                	AccessPolicyServer = null;
+                	throw new Exception("cannot stop the AccessPolicyServer", ex);
+                }
+            }
         }
 
         /// <summary>
@@ -301,18 +323,9 @@ namespace Alchemy
         }
 
         /// <summary>
-        /// Dispose stops all receive and send threads. It only may be called when the application shuts down.
-        /// Use 'Stop' to just end one WebSocketServer instance.
-        /// </summary>
-        public new void Dispose()
-        {
-            base.Dispose();
-            WebSocketServer.Shutdown(); // for compatibility with earlier versions of this library
-        }
-
-        /// <summary>
-        /// Stops all static allocated receive- and send threads.
+        /// Shutdown stops all static allocated receive- and send threads.
         /// Therefore, Shutdown may only be called, when the application shuts down.
+        /// Use 'Stop' to just end one WebSocketServer instance.
         /// </summary>
         public static void Shutdown()
         {

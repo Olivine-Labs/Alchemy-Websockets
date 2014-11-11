@@ -60,7 +60,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
             // generate a byte array representation of the handshake including the answer to the challenge
             string temp = handshake.ToString();
             byte[] handshakeBytes = Encoding.UTF8.GetBytes(temp);
-            context.UserContext.Send(handshakeBytes, true);
+            context.UserContext.Send(handshakeBytes, -1, true);
         }
 
         public static string GenerateAccept(string key)

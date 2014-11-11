@@ -48,7 +48,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                         //Setup Opcode for Pong frame if application has specified that we're sending a pong.
                         break;
                 }
-                byte[] headerBytes = _header.ToBytes(IsByte);
+                byte[] headerBytes = _header.ToBytes(IsBinary);
                 //Mask(); //Uses _header, must call ToBytes before calling Mask
                 Payload.Insert(0, new ArraySegment<byte>(headerBytes)); //put header at first position
                 Format = DataFormat.Frame;
@@ -96,6 +96,13 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                 }
             }
         }
+        
+        
+        public override bool LengthCheck(long maxLength)
+        {
+            return InternalState != DataState.Receiving || (_header.PayloadSize >= 0 && _header.PayloadSize <= maxLength);
+        }
+
 
         public override int Append(byte[] someBytes, int receivedByteCount = -1, bool asFrame = false)
         {
@@ -133,7 +140,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                     readCount = dataLength;
                 }
 
-                _header.PayloadSizeRemaining -= Convert.ToUInt64(dataLength);
+                _header.PayloadSizeRemaining -= (long)dataLength;
                 switch (_header.OpCode)
                 {
                     case OpCode.Close:

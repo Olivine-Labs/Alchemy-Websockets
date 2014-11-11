@@ -7,7 +7,7 @@ namespace Alchemy.Handlers.WebSocket
     internal class WebSocketHandler : Handler
     {
         /// <summary>
-        /// Handles the request.
+        /// Handles the request on the service side.
         /// </summary>
         /// <param name="context">The user context.</param>
         public override void HandleRequest(Context context)
@@ -26,7 +26,7 @@ namespace Alchemy.Handlers.WebSocket
                     {
                         break; // partial header
                     }
-                    else if (context.UserContext.DataFrame.Length >= context.MaxFrameSize)
+                    else if (!context.UserContext.DataFrame.LengthCheck(context.MaxFrameSize))
                     {
                         context.Disconnect(); //Disconnect if over MaxFrameSize
                         break;

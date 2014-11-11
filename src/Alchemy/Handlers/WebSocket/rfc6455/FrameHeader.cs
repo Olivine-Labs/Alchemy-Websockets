@@ -13,8 +13,8 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
         public int Mask;
         public DataFrame.OpCode OpCode = DataFrame.OpCode.Close;
 
-        public UInt64 PayloadSize;
-        public UInt64 PayloadSizeRemaining;
+        public long PayloadSize;
+        public long PayloadSizeRemaining;
 
         private const int MaxHeaderLength = 14;
         private byte[] _headerBuffer = new byte[MaxHeaderLength];
@@ -49,7 +49,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                 case 127:
                     if (byteCount < minCount + 8) return PartialHeader(byteCount);
                     Array.Reverse(_headerBuffer, dataBegin, 8);
-                    PayloadSize = BitConverter.ToUInt64(_headerBuffer, dataBegin);
+                    PayloadSize = BitConverter.ToInt64(_headerBuffer, dataBegin);
                     dataBegin += 8;
                     break;
                 default:
@@ -83,13 +83,13 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
         }
 
         
-        public byte[] ToBytes(bool IsByte = false)
+        public byte[] ToBytes(bool isBinary = false)
         {
             // wrap the array with the wrapper bytes
             var headerBytes = new List<Byte[]>();
             var data = new byte[1];
             
-            if(IsByte)
+            if(isBinary)
                 data[0] = 0x82;
             else
                 data[0] = 0x81;

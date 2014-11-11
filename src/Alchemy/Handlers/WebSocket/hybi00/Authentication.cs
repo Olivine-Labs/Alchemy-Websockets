@@ -72,7 +72,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             byte[] handshakeBytes = Encoding.UTF8.GetBytes(handshake.ToString());
             Array.Copy(handshake.AnswerBytes, 0, handshakeBytes, handshakeBytes.Length - 16, 16);
 
-            context.UserContext.Send(handshakeBytes, true);
+            context.UserContext.Send(handshakeBytes, -1, true);
         }
 
         private static byte[] TranslateKey(string key)

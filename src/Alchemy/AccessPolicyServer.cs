@@ -11,7 +11,7 @@ namespace Alchemy
     /// It manages sending the XML cross domain policy to flash socket clients over port 843.
     /// See http://www.adobe.com/devnet/articles/crossdomain_policy_file_spec.html for details.
     /// </summary>
-    internal class AccessPolicyServer : TcpServer, IDisposable
+    internal class AccessPolicyServer : TcpServer
     {
         /// <summary>
         /// The pre-formatted XML response.

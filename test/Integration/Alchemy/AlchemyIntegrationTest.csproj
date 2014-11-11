@@ -56,7 +56,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Alchemy\Alchemy.csproj">
       <Project>{45486CDE-86A3-4769-952F-E0821BF79493}</Project>
-      <Name>Alchemy %28src\Alchemy%29</Name>
+      <Name>Alchemy</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

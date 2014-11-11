@@ -1,18 +1,15 @@
 *ReSharper*
-bin/*
-obj/*
-test/Unit/Alchemy/bin
-test/Unit/Alchemy/obj
-src/Alchemy/obj
-src/Alchemy/bin
+[Bb]in/
+[Oo]bj/
+test-results/
 doxygen
 _site
-test/Integration/Alchemy/bin
-test/Integration/Alchemy/obj
 *.suo
 *.user
 *.userprefs
 *.pidb
 *.bak
+*.VisualState.xml
+TestResult.xml
 *~
 

@@ -12,47 +12,47 @@ namespace Alchemy.Classes
         /// <summary>
         /// AQ Link to the parent User Context
         /// </summary>
-        protected readonly Context Context;
+        internal Context Context {get; private set;}
 
         /// <summary>
         /// The remote endpoint address.
         /// </summary>
-        public EndPoint ClientAddress;
+        public EndPoint ClientAddress {get; internal set;}
 
         /// <summary>
         /// User defined data. Can be anything.
         /// </summary>
-        public Object Data;
+        public Object Data {get; set;}
 
         /// <summary>
         /// The data Frame that this client is currently processing.
         /// </summary>
-        public DataFrame DataFrame;
+        public DataFrame DataFrame {get; internal set;}
 
         /// <summary>
         /// OnEvent Delegates specific to this connection.
         /// </summary>
-        protected OnEventDelegate OnConnectDelegate = x => { };
-
-        protected OnEventDelegate OnConnectedDelegate = x => { };
-        protected OnEventDelegate OnDisconnectDelegate = x => { };
-        protected OnEventDelegate OnReceiveDelegate = x => { };
-        protected OnEventDelegate OnSendDelegate = x => { };
+        private OnEventDelegate OnConnectDelegate = x => { };
+        private OnEventDelegate OnConnectedDelegate = x => { };
+        private OnEventDelegate OnDisconnectDelegate = x => { };
+        private OnEventDelegate OnReceiveDelegate = x => { };
+        private OnEventDelegate OnSendDelegate = x => { };
 
         /// <summary>
         /// The latest exception. Usable when OnDisconnect is called.
         /// </summary>/
-        public Exception LatestException;
+        public Exception LatestException {get; internal set;}
 
         /// <summary>
-        /// The type of connection this is
+        /// The type of web socket protocol
         /// </summary>
-        public Protocol Protocol = Protocol.None;
+        public Protocol Protocol {get; internal set;}
 
         /// <summary>
         /// The path of this request.
         /// </summary>
-        public string RequestPath = "/";
+        public string RequestPath {get; set;}
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserContext"/> class.
@@ -61,6 +61,8 @@ namespace Alchemy.Classes
         public UserContext(Context context)
         {
             Context = context;
+            Protocol = Protocol.None;
+            RequestPath = "/";
         }
 
         /// <summary>
@@ -74,7 +76,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// The maximum frame size
         /// </summary>
-        public UInt64 MaxFrameSize
+        public long MaxFrameSize
         {
             get { return Context.MaxFrameSize; }
             set { Context.MaxFrameSize = value; }
@@ -83,7 +85,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// Called when [connect].
         /// </summary>
-        public void OnConnect()
+        internal void OnConnect()
         {
             OnConnectDelegate(this);
         }
@@ -91,7 +93,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// Called when [connected].
         /// </summary>
-        public void OnConnected()
+        internal void OnConnected()
         {
             OnConnectedDelegate(this);
         }
@@ -99,7 +101,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// Called when [disconnect].
         /// </summary>
-        public void OnDisconnect()
+        internal void OnDisconnect()
         {
             Context.Connected = false;
             OnDisconnectDelegate(this);
@@ -108,7 +110,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// Called when [send].
         /// </summary>
-        public void OnSend()
+        internal void OnSend()
         {
             OnSendDelegate(this);
         }
@@ -116,7 +118,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// Called when [receive].
         /// </summary>
-        public void OnReceive()
+        internal void OnReceive()
         {
             OnReceiveDelegate(this);
         }
@@ -167,22 +169,22 @@ namespace Alchemy.Classes
         }
 
         /// <summary>
-        /// Sends the specified data.
+        /// Sends the specified data frame.
         /// </summary>
         /// <param name="dataFrame">The data.</param>
-        /// <param name="raw">Whether or not to send raw data</param>
-        /// <param name="close">if set to <c>true</c> [close].</param>
+        /// <param name="raw">if set to <c>true</c> do not add header and do not mask the buffer before sending.</param>
+        /// <param name="close">if set to <c>true</c> close the socket after sending.</param>
         public void Send(DataFrame dataFrame, bool raw = false, bool close = false)
         {
             Context.Handler.Send(dataFrame, Context, raw, close);
         }
 
         /// <summary>
-        /// Sends the specified data.
+        /// Sends the specified data string.
         /// </summary>
         /// <param name="aString">The data.</param>
-        /// <param name="raw">whether or not to send raw data</param>
-        /// <param name="close">if set to <c>true</c> [close].</param>
+        /// <param name="raw">if set to <c>true</c> do not add header and do not mask the buffer before sending.</param>
+        /// <param name="close">if set to <c>true</c> close the socket after sending.</param>
         public void Send(String aString, bool raw = false, bool close = false)
         {
             DataFrame dataFrame = DataFrame.CreateInstance();
@@ -191,16 +193,17 @@ namespace Alchemy.Classes
         }
 
         /// <summary>
-        /// Sends the specified data.
+        /// Sends the specified data buffer.
         /// </summary>
-        /// <param name="someBytes">The data.</param>
-        /// <param name="raw">whether or not to send raw data</param>
-        /// <param name="close">if set to <c>true</c> [close].</param>
-        public void Send(byte[] someBytes, bool raw = false, bool close = false)
+        /// <param name="buffer">The data.</param>
+        /// <param name="byteCount">Count of bytes from beginning of buffer. -1 = all bytes.</param>
+        /// <param name="raw">if set to <c>true</c> do not add header and do not mask the buffer before sending.</param>
+        /// <param name="close">if set to <c>true</c> close the socket after sending.</param>
+        public void Send(byte[] buffer, int byteCount = -1, bool raw = false, bool close = false)
         {
             DataFrame dataFrame = DataFrame.CreateInstance();
-            dataFrame.IsByte = true;
-            dataFrame.Append(someBytes);
+            dataFrame.IsBinary = true;
+            dataFrame.Append(buffer, byteCount);
             Context.Handler.Send(dataFrame, Context, raw, close);
         }
     }

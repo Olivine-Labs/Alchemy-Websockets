@@ -52,6 +52,13 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             }
             return Payload;
         }
+        
+
+        public override bool LengthCheck(long maxLength)
+        {
+            return InternalState != DataState.Receiving || (Length <= maxLength);
+        }
+
 
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
