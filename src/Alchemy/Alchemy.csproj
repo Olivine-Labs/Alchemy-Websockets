@@ -78,7 +78,6 @@
     <MonoDevelop>
       <Properties>
         <Policies>
-          <TextStylePolicy FileWidth="120" NoTabsAfterNonTabs="True" EolMarker="Windows" inheritsSet="VisualStudio" inheritsScope="text/plain" scope="text/plain" />
           <TextStylePolicy inheritsSet="null" scope="application/config+xml" />
           <XmlFormattingPolicy inheritsSet="null" scope="application/config+xml" />
           <TextStylePolicy inheritsSet="null" scope="application/xml" />
