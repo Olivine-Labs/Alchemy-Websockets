@@ -52,7 +52,7 @@ namespace Alchemy
         {
             if (_listener == null)
             {
-                _listener = new TcpListener(_listenAddress, _port);
+                _listener = new TcpListener(_listenAddress, _port);                
                 _listener.Start(10);
                 _listener.BeginAcceptTcpClient(RunClient, null);
             }

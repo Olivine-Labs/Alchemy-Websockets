@@ -107,15 +107,9 @@ namespace Alchemy.Handlers.WebSocket
         /// <param name="buffer">Contains data to be copied into this DataFrame.</param>
         /// <param name="byteCount">Count of bytes to be copied from buffer. -1 indicates whole buffer.</param>
         /// <param name="asFrame">Default=false: Raw data; True: For internal use inside alchemy.</param>
-        /// <returns>Count of bytes copied into the frame buffer.</returns>
-        public abstract int Append(byte[] buffer, int byteCount = -1, bool asFrame = false);
-
-        /// <summary>
-        /// Checks whether lenght is ok.
-        /// </summary>
-        /// <returns><c>true</c>, if length is ok, <c>false</c> otherwise.</returns>
-        /// <param name="maxLength">Max length.</param>
-        public abstract bool LengthCheck(long maxLength);
+        /// <param name="maxLength">Default=0: Raw data; Else: For internal use inside alchemy.</param>
+        /// <returns>Count of bytes copied into the frame buffer. 0=Header not ready; -1=Invalid data - disconnect.</returns>
+        public abstract int Append(byte[] buffer, int byteCount = -1, bool asFrame = false, long maxLength = 0);
 
         /// <summary>
         /// Returns the raw payload data as string (unmasked, without header) for the user.

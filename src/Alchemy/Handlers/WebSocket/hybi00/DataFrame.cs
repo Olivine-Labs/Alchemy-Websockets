@@ -54,19 +54,13 @@ namespace Alchemy.Handlers.WebSocket.hybi00
         }
         
 
-        public override bool LengthCheck(long maxLength)
-        {
-            return InternalState != DataState.Receiving || (Length <= maxLength);
-        }
-
-
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
         /// </summary>
         /// <param name="data">The data.</param>
         /// <param name="receivedByteCount">Count of available bytes in buffer. -1 indicates whole buffer.</param>
         /// <param name="asFrame">For internal Alchemy use.</param>
-        public override int Append(byte[] data, int receivedByteCount = -1, bool asFrame = false)
+        public override int Append(byte[] data, int receivedByteCount = -1, bool asFrame = false, long maxLength=0)
         {
             if (receivedByteCount < 0)
             {
@@ -111,6 +105,11 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                         var endBytes = new byte[1];
                         endBytes[0] = EndByte;
                         Payload.Add(new ArraySegment<byte>(endBytes));
+                    }
+                    
+                    if (Length > maxLength)
+                    {
+                        return -1; // invalid data
                     }
 
                     return Math.Min(end + 1, receivedByteCount);

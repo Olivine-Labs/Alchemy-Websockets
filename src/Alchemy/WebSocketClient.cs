@@ -249,8 +249,9 @@ namespace Alchemy
                 if (!authenticated)
                 {
                     Disconnect();
-                    _context.UserContext.LatestException = new Exception("could not authenticate web socket server");
+                    _context.UserContext.LatestException = new OperationCanceledException("could not authenticate web socket server");
                     _context.UserContext.OnDisconnect();
+                    throw _context.UserContext.LatestException;
                 }
             }
             else
@@ -259,8 +260,15 @@ namespace Alchemy
                 while (remaining > 0)
                 {
                     // add bytes to existing or empty frame
-                    int readCount = context.UserContext.DataFrame.Append(context.Buffer, remaining, true);
-                    if (readCount <= 0)
+                    int readCount = context.UserContext.DataFrame.Append(context.Buffer, remaining, true, context.MaxFrameSize);
+                    if (readCount < 0)
+                    {
+                        Disconnect();
+                        _context.UserContext.LatestException = new OperationCanceledException("received invalid or too long message from web socket server");
+                        _context.UserContext.OnDisconnect();
+                        throw _context.UserContext.LatestException;
+                    }
+                    else if (readCount == 0)
                     {
                         break; // partial header
                     }

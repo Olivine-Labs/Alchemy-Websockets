@@ -136,12 +136,10 @@ namespace Alchemy
 
         /// <summary>
         /// Enables or disables the Flash Access Policy Server(APServer).
-        /// When true, an additional TCPServer on port 843 is started. 
-        /// Make sure only one server is active on this port.
-        /// Set to false, when you would like your app to only listen on a single port rather than 2.
+        /// Set to false in the constructor, when you would like your app to only listen on a single port rather than 2.
         /// Warning, any flash socket connections will have an added delay on connection due to the client looking to port 843 first for the connection restrictions.
         /// </summary>
-        public bool FlashAccessPolicyEnabled = true;
+        public bool FlashAccessPolicyEnabled {get; private set;}
 
         /// <summary>
         /// Configuration for the above heartbeat setup.
@@ -162,7 +160,15 @@ namespace Alchemy
         /// <summary>
         /// Initializes a new instance of the <see cref="WebSocketServer"/> class.
         /// </summary>
-        public WebSocketServer(int listenPort = 0, IPAddress listenAddress = null) : base(listenPort, listenAddress) {}
+        /// <param name="flashAccessPolicyEnabled">When true, an additional TCPServer on port 843 is started.
+        ///     Make sure only one server instance is active on this port.</param>
+        /// <param name="listenPort">The server listens on this TCP port, defaults to 80.</param>
+        /// <param name="listenAddress">The local ethernet adapter. May be IPAddress.Any or IPAddress.Loopback.</param>
+        public WebSocketServer(bool flashAccessPolicyEnabled, int listenPort = 0, IPAddress listenAddress = null) 
+            : base (listenPort, listenAddress) 
+        {
+            FlashAccessPolicyEnabled = flashAccessPolicyEnabled;
+        }
 
         /// <summary>
         /// Gets or sets the origin host.
@@ -217,7 +223,8 @@ namespace Alchemy
                     }
                     catch (Exception ex)
                     {
-                    	throw new Exception("cannot start the AccessPolicyServer", ex);
+                        base.Stop();
+                    	throw new OperationCanceledException("cannot start the AccessPolicyServer", ex);
                     }
                 }
             }
@@ -240,7 +247,7 @@ namespace Alchemy
                 catch (Exception ex)
                 {
                 	AccessPolicyServer = null;
-                	throw new Exception("cannot stop the AccessPolicyServer", ex);
+                	throw new OperationCanceledException("cannot stop the AccessPolicyServer", ex);
                 }
             }
         }

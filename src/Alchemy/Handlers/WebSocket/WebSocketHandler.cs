@@ -20,16 +20,16 @@ namespace Alchemy.Handlers.WebSocket
                 {
                     count++;
                     // add bytes to existing or empty frame
-                    int readCount = context.UserContext.DataFrame.Append(context.Buffer, remaining, true);
+                    int readCount = context.UserContext.DataFrame.Append(context.Buffer, remaining, true, context.MaxFrameSize);
 
-                    if (readCount <= 0)
-                    {
-                        break; // partial header
-                    }
-                    else if (!context.UserContext.DataFrame.LengthCheck(context.MaxFrameSize))
+                    if (readCount < 0)
                     {
                         context.Disconnect(); //Disconnect if over MaxFrameSize
                         break;
+                    }
+                    else if (readCount == 0)
+                    {
+                        break; // partial header
                     }
                     else
                     {

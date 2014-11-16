@@ -32,10 +32,9 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
         }
 
         /// <summary>
-        /// Wraps the specified data in WebSocket Start/End Bytes.
-        /// Accepts a byte array.
+        /// Converts the Payload to a websocket frame with header and masked for network transfer.
         /// </summary>
-        /// <returns>The data array wrapped in WebSocket DataFrame Start/End qualifiers.</returns>
+        /// <returns>The data array for network transfer.</returns>
         public override List<ArraySegment<Byte>> AsFrame()
         {
             if (Format == DataFormat.Raw)
@@ -57,7 +56,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
         }
 
         /// <summary>
-        /// Returns the data as raw
+        /// Converts the Payload to raw data without header and unmasked for the user.
         /// </summary>
         public override List<ArraySegment<Byte>> AsRaw()
         {
@@ -98,13 +97,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
         }
         
         
-        public override bool LengthCheck(long maxLength)
-        {
-            return InternalState != DataState.Receiving || (_header.PayloadSize >= 0 && _header.PayloadSize <= maxLength);
-        }
-
-
-        public override int Append(byte[] someBytes, int receivedByteCount = -1, bool asFrame = false)
+        public override int Append(byte[] someBytes, int receivedByteCount = -1, bool asFrame = false, long maxLength = 0)
         {
             byte[] data = someBytes;
             if (receivedByteCount < 0)
@@ -115,6 +108,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
             int readCount;
             if (asFrame)
             {
+                // append data while receiving from network
                 int dataLength;
                 if (InternalState == DataState.Empty)
                 {
@@ -125,8 +119,13 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                         return 0; // not all header bytes received
                     }
 
+                    // header received
+                    if (_header.PayloadSize < 0 || _header.PayloadSize > maxLength)
+                    {
+                        return -1; // invalid data - disconnect
+                    }
                     Payload.Add(new ArraySegment<byte>(headerBytes));
-                    dataLength = Math.Min(Convert.ToInt32(_header.PayloadSizeRemaining), (receivedByteCount - dataStart));
+                    dataLength = Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, (long)(receivedByteCount - dataStart)));
                     data = new byte[dataLength];
                     Array.Copy(someBytes, dataStart, data, 0, dataLength);
                     Format = DataFormat.Frame;
@@ -134,7 +133,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                 }
                 else
                 {
-                    dataLength = Math.Min(Convert.ToInt32(_header.PayloadSizeRemaining), receivedByteCount);
+                    dataLength = Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, (long)receivedByteCount));
                     data = new byte[dataLength];
                     Array.Copy(someBytes, 0, data, 0, dataLength);
                     readCount = dataLength;
@@ -159,6 +158,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
             }
             else
             {
+                // append user data to send later on 
                 Format = DataFormat.Raw;
                 readCount = data.Length;
             }

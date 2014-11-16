@@ -21,10 +21,9 @@ namespace Alchemy
         [TestFixtureSetUp]
         public void SetUp()
         {
-            _server = new WebSocketServer(54321, IPAddress.Loopback) 
+            _server = new WebSocketServer(false, 54321, IPAddress.Loopback) 
             {
-            	OnReceive = OnServerReceive,
-            	FlashAccessPolicyEnabled = false,
+            	OnReceive = OnServerReceive
             };
             _server.Start();
             _client = new WebSocketClient("ws://127.0.0.1:54321/path") { Origin = "localhost", OnReceive = OnClientReceive };

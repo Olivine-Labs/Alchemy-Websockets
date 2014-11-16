@@ -13,7 +13,7 @@ namespace Alchemy.Handlers
     /// When the protocol has not yet been determined the system defaults to this request handler.
     /// Singleton, just like the other handlers.
     /// </summary>
-    public class Handler : IDisposable
+    public class Handler
     {
         private static Handler _instance;
 
@@ -243,15 +243,6 @@ namespace Alchemy.Handlers
             public Context Context { get; set;}
             public Boolean IsRaw { get; set;}
             public Boolean DoClose { get; set;}
-        }
-
-        /// <summary>
-        /// Dispose stops all send threads of this singleton.
-        /// Therefore, Dispose may only be used, when the application shuts down.
-        /// </summary>
-        public void Dispose()
-        {
-            Shutdown.Cancel();
         }
     }
 }
