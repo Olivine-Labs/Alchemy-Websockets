@@ -163,7 +163,8 @@ namespace Alchemy.Classes
                 return;
             }
 
-            UserContext.OnDisconnect();
+            _disposed = true;
+            UserContext.OnDisconnect(); // sets Connected=false
             
             // close client connection
             if (Connection != null)
@@ -183,7 +184,6 @@ namespace Alchemy.Classes
             Cancellation.Dispose();
             ReceiveReady.Dispose();
             SendReady.Dispose();
-            _disposed = true;
         }
 
         protected virtual void Dispose(bool disposing)

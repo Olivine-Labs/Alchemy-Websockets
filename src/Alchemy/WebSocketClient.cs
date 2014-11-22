@@ -111,9 +111,8 @@ namespace Alchemy
             }
             catch (Exception ex)
             {
-                Disconnect();
                 _context.UserContext.LatestException = ex;
-                _context.UserContext.OnDisconnect();
+                Disconnect();
             }
         }
 
@@ -129,9 +128,8 @@ namespace Alchemy
             }
             catch (Exception ex)
             {
-                Disconnect();
                 _context.UserContext.LatestException = ex;
-                _context.UserContext.OnDisconnect();
+                Disconnect();
                 return;
             }
 
@@ -262,9 +260,8 @@ namespace Alchemy
 
                 if (!authenticated)
                 {
-                    Disconnect();
                     _context.UserContext.LatestException = new OperationCanceledException("could not authenticate web socket server");
-                    _context.UserContext.OnDisconnect();
+                    Disconnect();
                     throw _context.UserContext.LatestException;
                 }
             }
@@ -343,11 +340,8 @@ namespace Alchemy
                     Thread.Sleep(30); // let the send thread do its work
                 }
 
-                //_context.Connected = false;
                 ReadyState = ReadyStates.CLOSING;
-                //_context.Cancellation.Cancel();
-                //_context.Connection = null;
-                _context.Dispose();
+                _context.Dispose(); // sets Connected=false and notifies UserContext
             }
 
             _client.Close();
