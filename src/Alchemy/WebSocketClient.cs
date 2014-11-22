@@ -11,7 +11,7 @@ using Alchemy.Handlers.WebSocket.rfc6455;
 
 namespace Alchemy
 {
-    public class WebSocketClient
+    public class WebSocketClient : IDisposable
     {
         public TimeSpan ConnectTimeout = new TimeSpan(0, 0, 0, 10);
         public bool IsAuthenticated;
@@ -236,6 +236,20 @@ namespace Alchemy
             return true;
         }
 
+        private static String GenerateKey()
+        {
+            var bytes = new byte[16];
+            var random = new Random();
+
+            for (var index = 0; index < bytes.Length; index++)
+            {
+                bytes[index] = (byte)random.Next(0, 255);
+            }
+
+            return Convert.ToBase64String(bytes);
+        }
+
+
         private void ReceiveData(Context context)
         {
             if (!IsAuthenticated)
@@ -289,18 +303,22 @@ namespace Alchemy
             }
         }
 
-        private static String GenerateKey()
+
+        public void Send(String data)
         {
-            var bytes = new byte[16];
-            var random = new Random();
-
-            for (var index = 0; index < bytes.Length; index++)
-            {
-                bytes[index] = (byte) random.Next(0, 255);
-            }
-
-            return Convert.ToBase64String(bytes);
+            _context.UserContext.Send(data);
         }
+
+        /// <summary>
+        /// Send byteCount bytes from buffer.
+        /// </summary>
+        /// <param name="buffer">Data.</param>
+        /// <param name="byteCount">Count of bytes from beginning of buffer. -1 = all bytes.</param>
+        public void Send(byte[] buffer, int byteCount = -1)
+        {
+            _context.UserContext.Send(buffer, byteCount);
+        }
+
 
         public void Disconnect()
         {
@@ -325,31 +343,17 @@ namespace Alchemy
                     Thread.Sleep(30); // let the send thread do its work
                 }
 
-                _context.Connected = false;
+                //_context.Connected = false;
                 ReadyState = ReadyStates.CLOSING;
-                _context.Cancellation.Cancel();
-                _context.Connection = null;
+                //_context.Cancellation.Cancel();
+                //_context.Connection = null;
+                _context.Dispose();
             }
 
             _client.Close();
             _client = null;
             IsAuthenticated = false;
             ReadyState = ReadyStates.CLOSED;
-        }
-
-        public void Send(String data)
-        {
-            _context.UserContext.Send(data);
-        }
-
-        /// <summary>
-        /// Send byteCount bytes from buffer.
-        /// </summary>
-        /// <param name="buffer">Data.</param>
-        /// <param name="byteCount">Count of bytes from beginning of buffer. -1 = all bytes.</param>
-        public void Send(byte[] buffer, int byteCount = -1)
-        {
-            _context.UserContext.Send(buffer, byteCount);
         }
 
         /// <summary>
@@ -360,5 +364,24 @@ namespace Alchemy
         {
             Handler.Shutdown.Cancel();
         }
+
+        #region IDisposable Support
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Disconnect();
+            }
+        }
+
+        /// <summary>
+        /// Disconnects the client.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+        #endregion
     }
 }

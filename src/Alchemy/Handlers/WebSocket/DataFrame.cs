@@ -163,6 +163,13 @@ namespace Alchemy.Handlers.WebSocket
 
             var seg = Payload[_segIndexRead];
             int remaining = seg.Count - seg.Offset - _segPosRead;
+            if (remaining <= 0) // zero segment size
+            {
+                _segIndexRead++;
+                _segPosRead = 0;
+                return Read(buffer, offset, count);
+            }
+
             if (remaining < count)
             {
                count = remaining;
@@ -182,6 +189,34 @@ namespace Alchemy.Handlers.WebSocket
 
             _streamReadPos += (long)count;
             return count;
+        }
+
+        public override int ReadByte()
+        {
+            List<ArraySegment<byte>> segments = AsRaw();
+            if (_segIndexRead >= segments.Count)
+            {
+                return -1; // end of stream
+            }
+
+            var seg = Payload[_segIndexRead];
+            int idx =  seg.Offset + _segPosRead;
+            if (idx >= seg.Count) // zero segment length
+            {
+                _segIndexRead++;
+                _segPosRead = 0;
+                return ReadByte();
+            }
+
+            _segPosRead++;
+            _streamReadPos++;
+            if (seg.Offset + _segPosRead >= seg.Count)
+            {
+                _segIndexRead++;
+                _segPosRead = 0;
+            }
+
+            return seg.Array[idx];
         }
 
 
@@ -225,7 +260,7 @@ namespace Alchemy.Handlers.WebSocket
 
         private long _streamReadPos;
         private int _segIndexRead;
-        private int _segPosRead;
+        private int _segPosRead; // this byte is the next to read
 
         public override long Position {
             get {

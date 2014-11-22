@@ -6,10 +6,10 @@ using Alchemy.Handlers.WebSocket;
 
 namespace Alchemy.Classes
 {
-/// <summary>
-/// This class contains the required data for each connection to the server.
-/// </summary>
-    public class Context// : IDisposable
+    /// <summary>
+    /// This class contains the required data for each connection to the server.
+    /// </summary>
+    public class Context : IDisposable
     {
         //private static readonly ILog logger = LogManager.GetLogger(MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -151,12 +151,18 @@ namespace Alchemy.Classes
 
         #region IDisposable Members
 
+        private bool _disposed;
+
         /// <summary>
-        /// Performs application-defined tasks associated with freeing, releasing, or resetting unmanaged resources.
+        /// Called from context cleanup thread (on the server) or when Disconnecting (on the client).
         /// </summary>
         public void Close()
         {
-            Connected = false;
+            if (_disposed)
+            {
+                return;
+            }
+
             UserContext.OnDisconnect();
             
             // close client connection
@@ -170,21 +176,48 @@ namespace Alchemy.Classes
                 {
                     // skip
                 }
+                Connection = null;
             }
             SendReady.Release();
             ReceiveReady.Release();            
+            Cancellation.Dispose();
+            ReceiveReady.Dispose();
+            SendReady.Dispose();
+            _disposed = true;
         }
 
-        #endregion
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Close();
+            }
+        }
 
         /// <summary>
-        /// Disconnects the client
+        /// Closes the connection.
+        /// </summary>
+        public void Dispose()
+        {
+            Dispose(true);
+        }
+
+        /// <summary>
+        /// Disconnects the client.
         /// </summary>
         public void Disconnect()
         {
             //logger.Debug("Disconnected in " + Environment.StackTrace);
-            Connected = false;
-            UserContext.OnDisconnect(); // 2014-01-16 added for Remact.Net
+            if (Server != null)
+            {
+                // On the server, this stops communication and the context cleanup thread will close the connection.
+                Connected = false;
+            }
+            else
+            {
+                // on the client we close the connection directly and notify the application.
+                Close();
+            }
         }
 
         /// <summary>
@@ -202,5 +235,6 @@ namespace Alchemy.Classes
             }
             ReceivedByteCount = 0;
         }
+        #endregion
     }
 }
