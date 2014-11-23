@@ -153,7 +153,12 @@ namespace Alchemy.Handlers.WebSocket
             }
         }
 
-        public override int Read (byte[] buffer, int offset, int count)
+        public override int Read(byte[] buffer, int offset, int count)
+        {
+            return Read(buffer, offset, count, 0);
+        }
+
+        private int Read (byte[] buffer, int offset, int count, int previouslyRead)
         {
             List<ArraySegment<byte>> segments = AsRaw();
             if (_segIndexRead >= segments.Count)
@@ -161,34 +166,37 @@ namespace Alchemy.Handlers.WebSocket
                 return 0; // end of stream
             }
 
-            var seg = Payload[_segIndexRead];
-            int remaining = seg.Count - seg.Offset - _segPosRead;
+            var src = Payload[_segIndexRead];
+            int srcPos = src.Offset + _segPosRead;
+            int remaining = src.Count - srcPos;
             if (remaining <= 0) // zero segment size
             {
                 _segIndexRead++;
                 _segPosRead = 0;
-                return Read(buffer, offset, count);
+                return Read(buffer, offset, count, previouslyRead);
             }
 
-            if (remaining < count)
+            int n = count;
+            if (n >= remaining)
             {
-               count = remaining;
-            }
- 
-            Array.Copy(seg.Array, _segPosRead+seg.Offset, buffer, offset, count);
-
-            if (count >= remaining)
-            {
-                _segIndexRead++;
+                n = remaining;
+                _segIndexRead++; // read from next segment next time
                 _segPosRead = 0;
             }
             else
             {
-                _segPosRead += count;
+                _segPosRead += n;
             }
 
-            _streamReadPos += (long)count;
-            return count;
+            _streamReadPos += (long)n;
+            Array.Copy(src.Array, srcPos, buffer, offset, n);
+
+            if (n < count)
+            {
+                return Read(buffer, offset + n, count - n, previouslyRead + n);
+            }
+
+            return previouslyRead + n;
         }
 
         public override int ReadByte()

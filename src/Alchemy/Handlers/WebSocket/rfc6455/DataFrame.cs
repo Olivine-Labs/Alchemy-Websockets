@@ -99,7 +99,6 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
         
         public override int Append(byte[] someBytes, int receivedByteCount = -1, bool asFrame = false, long maxLength = 0)
         {
-            byte[] data = someBytes;
             if (receivedByteCount < 0)
             {
                 receivedByteCount = someBytes.Length;
@@ -126,16 +125,18 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
                     }
                     Payload.Add(new ArraySegment<byte>(headerBytes));
                     dataLength = Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, (long)(receivedByteCount - dataStart)));
-                    data = new byte[dataLength];
+                    var data = new byte[dataLength];
                     Array.Copy(someBytes, dataStart, data, 0, dataLength);
                     Format = DataFormat.Frame;
+                    Payload.Add(new ArraySegment<byte>(data));
                     readCount = dataStart + dataLength;
                 }
                 else
                 {
                     dataLength = Convert.ToInt32(Math.Min(_header.PayloadSizeRemaining, (long)receivedByteCount));
-                    data = new byte[dataLength];
+                    var data = new byte[dataLength];
                     Array.Copy(someBytes, 0, data, 0, dataLength);
+                    Payload.Add(new ArraySegment<byte>(data));
                     readCount = dataLength;
                 }
 
@@ -160,10 +161,10 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
             {
                 // append user data to send later on 
                 Format = DataFormat.Raw;
-                readCount = data.Length;
+                Payload.Add(new ArraySegment<byte>(someBytes, 0, receivedByteCount));
+                readCount = receivedByteCount;
             }
 
-            Payload.Add(new ArraySegment<byte>(data));
             return readCount;
         }
     }
