@@ -55,7 +55,7 @@ namespace Alchemy.Handlers.WebSocket
         /// <summary>
         /// The internal byte buffer used to store data
         /// </summary>
-        internal List<ArraySegment<byte>> Payload = new List<ArraySegment<byte>>();
+        internal List<ArraySegment<byte>> Payload = new List<ArraySegment<byte>>(32);
 
         /// <summary>
         /// Gets the state.
@@ -90,6 +90,8 @@ namespace Alchemy.Handlers.WebSocket
             _streamReadPos = 0;
             _segIndexRead = 0;
             _segPosRead = 0;
+            _writeBuf = null;
+            _writeBufCount = 0;
         }
 
         /// <summary>
@@ -133,11 +135,12 @@ namespace Alchemy.Handlers.WebSocket
 
         #region implemented abstract members of Stream
 
-
-        public override void Flush ()
-        {
-            throw new NotImplementedException ();
-        }
+        private long _streamReadPos;
+        private int _segIndexRead;
+        private int _segPosRead; // this byte is the next to be read
+        private int _writeBufCount; // this byte is the next to be written
+        private int _writeBufSize = 64;
+        private byte[] _writeBuf = null;
 
 
         /// <summary>
@@ -242,9 +245,56 @@ namespace Alchemy.Handlers.WebSocket
 
         public override void Write (byte[] buffer, int offset, int count)
         {
-            throw new NotImplementedException ();
+            if (_writeBufCount + count > _writeBufSize)
+            {
+                Flush(); // resets _writeBufCount
+            }
+
+            if (_writeBufCount + count > _writeBufSize)
+            {
+                // add large buffers without copying
+                Payload.Add(new ArraySegment<byte>(buffer, offset, count));
+                return;
+            }
+
+            // copy small buffers to the intermediate buffer
+            if (_writeBuf == null)
+            {
+                _writeBuf = new byte[_writeBufSize];
+            }
+            Array.Copy(buffer, offset, _writeBuf, _writeBufCount, count);
+            _writeBufCount += count;
         }
 
+
+        public override void WriteByte(byte value)
+        {
+            if (_writeBufCount >= _writeBufSize)
+            {
+                Flush(); // resets _writeBufCount
+            }
+
+            // copy byte to the intermediate buffer
+            if (_writeBuf == null)
+            {
+                _writeBuf = new byte[_writeBufSize];
+            }
+
+            _writeBuf[_writeBufCount++] = value;
+        }
+
+
+        public override void Flush()
+        {
+            if (_writeBuf != null)
+            {
+                // add the intermediate buffer before sending all data
+                Payload.Add(new ArraySegment<byte>(_writeBuf, 0, _writeBufCount));
+                _writeBuf = null;
+                _writeBufCount = 0;
+            }
+            Format = DataFormat.Raw; // stream write is used for outgoing messages only
+        }
 
         public override bool CanRead {
             get {
@@ -252,23 +302,17 @@ namespace Alchemy.Handlers.WebSocket
             }
         }
 
-
         public override bool CanSeek {
             get {
                 return false;
             }
         }
 
-
         public override bool CanWrite {
             get {
                 return true;
             }
         }
-
-        private long _streamReadPos;
-        private int _segIndexRead;
-        private int _segPosRead; // this byte is the next to read
 
         public override long Position {
             get {
@@ -278,7 +322,6 @@ namespace Alchemy.Handlers.WebSocket
                 throw new NotImplementedException ();
             }
         }
-
 
         #endregion
     }
