@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -90,7 +89,6 @@ namespace Alchemy
             if (_client != null) return;
 
             _context = new Context(null, null);
-            _context.BufferSize = 512;
             _context.UserContext.DataFrame = new DataFrame();
             _context.UserContext.SetOnConnect(OnConnect);
             _context.UserContext.SetOnConnected(OnConnected);

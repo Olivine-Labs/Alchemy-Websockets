@@ -267,7 +267,6 @@ namespace Alchemy
             context.UserContext.SetOnDisconnect(OnDisconnect);
             context.UserContext.SetOnSend(OnSend);
             context.UserContext.SetOnReceive(OnReceive);
-            context.BufferSize = BufferSize;
             context.UserContext.OnConnect();
 
             if (context.Connected)

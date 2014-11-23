@@ -74,7 +74,7 @@ namespace Alchemy.Classes
         }
 
         /// <summary>
-        /// The maximum frame size
+        /// The maximum web socket message size (frame).
         /// </summary>
         public long MaxFrameSize
         {

@@ -49,11 +49,6 @@ namespace Alchemy.Classes
         public Boolean IsSetup;
 
         /// <summary>
-        /// The max frame that we will accept from the client
-        /// </summary>
-        public long MaxFrameSize = 102400; //100kb
-
-        /// <summary>
         /// Semaphore that limits receive operations to 1 at a time.
         /// </summary>
         public SemaphoreSlim ReceiveReady = new SemaphoreSlim(1);
@@ -79,7 +74,27 @@ namespace Alchemy.Classes
         /// </summary>
         public WebSocketServer Server;
 
-        private int _bufferSize = 512;
+        private int _bufferSize = 1500; // default: one ethernet frame
+
+        /// <summary>
+        /// Gets or sets the size of the buffer. The header must fit into one buffer. 
+        /// A webs socket message (frame) may consist of many buffer contents.
+        /// </summary>
+        /// <value>The size of the buffer.</value>
+        public int BufferSize
+        {
+            get { return _bufferSize; }
+            set
+            {
+                _bufferSize = value;
+                Buffer = new byte[_bufferSize];
+            }
+        }
+
+        /// <summary>
+        /// The maximum web socket message size (frame).
+        /// </summary>
+        public long MaxFrameSize = 1024*1024; // default 1 MB
 
 
         public SocketAsyncEventArgs ReceiveEventArgs { get; set; }
@@ -105,22 +120,6 @@ namespace Alchemy.Classes
             if (connection != null)
             {
                 UserContext.ClientAddress = connection.Client.RemoteEndPoint;
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the size of the buffer.
-        /// </summary>
-        /// <value>
-        /// The size of the buffer.
-        /// </value>
-        public int BufferSize
-        {
-            get { return _bufferSize; }
-            set
-            {
-                _bufferSize = value;
-                Buffer = new byte[_bufferSize];
             }
         }
 
@@ -181,9 +180,9 @@ namespace Alchemy.Classes
             }
             SendReady.Release();
             ReceiveReady.Release();            
-            Cancellation.Dispose();
-            ReceiveReady.Dispose();
-            SendReady.Dispose();
+            //Cancellation.Dispose();
+            //ReceiveReady.Dispose();
+            //SendReady.Dispose(); delay disposing until GC does it. Send thread will use the semaphore.
         }
 
         protected virtual void Dispose(bool disposing)

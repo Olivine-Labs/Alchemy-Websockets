@@ -114,16 +114,15 @@ namespace Alchemy.Handlers.WebSocket.hybi00
 
                     return Math.Min(end + 1, receivedByteCount);
                 }
+                return 0;
             }
             else
             {
+                // append user data to send later on - or append authentication header
                 Format = DataFormat.Raw;
-                var temp = new byte[receivedByteCount];
-                Array.Copy(data, 0, temp, 0, receivedByteCount);
-                Payload.Add(new ArraySegment<byte>(temp));
+                Payload.Add(new ArraySegment<byte>(data, 0, receivedByteCount));
+                return receivedByteCount;
             }
-
-            return data.Length;
         }
     }
 }

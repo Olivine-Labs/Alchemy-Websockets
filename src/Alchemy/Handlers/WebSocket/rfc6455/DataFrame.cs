@@ -159,7 +159,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
             }
             else
             {
-                // append user data to send later on 
+                // append user data to send later on - or append authentication header
                 Format = DataFormat.Raw;
                 Payload.Add(new ArraySegment<byte>(someBytes, 0, receivedByteCount));
                 readCount = receivedByteCount;

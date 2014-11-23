@@ -7,8 +7,6 @@ namespace Alchemy
 {
     public abstract class TcpServer
     {
-        protected int BufferSize = 512;
-
         private IPAddress _listenAddress = IPAddress.Any;
 
         private TcpListener _listener;
