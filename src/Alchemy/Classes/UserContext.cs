@@ -15,6 +15,12 @@ namespace Alchemy.Classes
         internal Context Context {get; private set;}
 
         /// <summary>
+        /// True indicates an underlying TCP connection that is ready to communicate. 
+        /// False indicates a connection that is closed or is about to be closed.
+        /// </summary>
+        public bool Connected { get { return Context.Connected; } }
+
+        /// <summary>
         /// The remote endpoint address.
         /// </summary>
         public EndPoint ClientAddress {get; internal set;}
@@ -205,6 +211,15 @@ namespace Alchemy.Classes
             dataFrame.IsBinary = true;
             dataFrame.Append(buffer, byteCount);
             Context.Handler.Send(dataFrame, Context, raw, close);
+        }
+
+        /// <summary>
+        /// Closes the underlying TCP connection, safe to be called on an already closed connection.
+        /// Does not send the web socket close packet currently. Use WebSocketClient.Disconnect() when possible.
+        /// </summary>
+        public void Disconnect()
+        {
+            Context.Disconnect();
         }
     }
 }

@@ -24,7 +24,8 @@ namespace Alchemy.Classes
         public byte[] Buffer;
 
         /// <summary>
-        /// Whether or not the TCPClient is still connected.
+        /// True indicates an underlying TCP connection that is ready to communicate. 
+        /// False indicates a connection that is closed or is about to be closed.
         /// </summary>
         public bool Connected = true;
 

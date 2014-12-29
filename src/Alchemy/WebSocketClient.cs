@@ -342,8 +342,12 @@ namespace Alchemy
                 _context.Dispose(); // sets Connected=false and notifies UserContext
             }
 
-            _client.Close();
-            _client = null;
+            if (_client != null)
+            {
+                var temp = _client;
+                _client = null;
+                temp.Close();
+            }
             IsAuthenticated = false;
             ReadyState = ReadyStates.CLOSED;
         }
@@ -355,6 +359,7 @@ namespace Alchemy
         public static void Shutdown()
         {
             Handler.Shutdown.Cancel();
+            Thread.Sleep(200); // let the cleanup thread check the shutdown cancellation token
         }
 
         #region IDisposable Support

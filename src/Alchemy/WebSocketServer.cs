@@ -336,6 +336,7 @@ namespace Alchemy
         public static void Shutdown()
         {
             Handler.Shutdown.Cancel();
+            Thread.Sleep(200); // let the cleanup thread check the shutdown cancellation token
         }
     }
 }
