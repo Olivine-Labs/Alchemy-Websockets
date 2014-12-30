@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Specialized;
 using System.Text.RegularExpressions;
-using System.Web;
+using System.Net;
 
 namespace Alchemy.Classes
 {
@@ -37,7 +37,7 @@ namespace Alchemy.Classes
         /// <summary>
         /// Any cookies sent with the header.
         /// </summary>
-        public HttpCookieCollection Cookies {get; internal set;}
+        public CookieCollection Cookies {get; internal set;}
 
         /// <summary>
         /// The HTTP Method (GET/POST/PUT, etc.)
@@ -67,7 +67,7 @@ namespace Alchemy.Classes
         /// <param name="data">The data.</param>
         public Header(string data)
         {
-            Cookies = new HttpCookieCollection();
+            Cookies = new CookieCollection();
             Method = String.Empty;
             Protocol = Protocol.None;
             RequestPath = string.Empty;
@@ -102,7 +102,7 @@ namespace Alchemy.Classes
                                 var cookieValue = cookie.Substring(cookieIndex + 1);
                                 if (cookieName != string.Empty)
                                 {
-                                    Cookies.Add(new HttpCookie(cookieName, cookieValue));
+                                    Cookies.Add(new Cookie(cookieName, cookieValue));
                                 }
                             }
                             break;

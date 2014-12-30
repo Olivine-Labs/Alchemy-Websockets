@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web;
+using System.Net;
 using Alchemy.Classes;
 
 namespace Alchemy.Handlers.WebSocket.hybi00
@@ -52,7 +52,7 @@ namespace Alchemy.Handlers.WebSocket.hybi00
         }
 
         public ArraySegment<byte> ChallengeBytes { get; set; }
-        public HttpCookieCollection Cookies { get; set; }
+        public CookieCollection Cookies { get; set; }
         public string[] SubProtocols { get; set; }
         public Dictionary<string, string> AdditionalFields { get; set; }
 
