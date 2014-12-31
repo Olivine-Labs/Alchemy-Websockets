@@ -1,3 +1,4 @@
+*~
 *ReSharper*
 [Bb]in/
 [Oo]bj/
@@ -11,5 +12,4 @@ _site
 *.bak
 *.VisualState.xml
 TestResult.xml
-*~
-
+*.sln.ide/*

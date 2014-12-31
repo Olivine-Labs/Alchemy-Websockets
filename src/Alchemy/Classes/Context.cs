@@ -139,7 +139,7 @@ namespace Alchemy.Classes
             try
             {
                 ReceiveReady.Wait(Cancellation.Token);
-                started = Connection.Client.ReceiveAsync(ReceiveEventArgs);
+                started = _disposed || Connection.Client.ReceiveAsync(ReceiveEventArgs);
             }
             finally
             {

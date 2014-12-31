@@ -99,7 +99,7 @@ namespace Alchemy.Handlers
         {
             string data = Encoding.UTF8.GetString(context.Buffer, 0, context.ReceivedByteCount);
             //Check first to see if this is a flash socket XML request.
-            if (data == "<policy-file-request/>\0")
+            if (data == "<policy-file-request/>\0" && context.Server != null && context.Server.AccessPolicyServer != null)
             {
                 //if it is, we access the Access Policy Server instance to send the appropriate response.
                 context.Server.AccessPolicyServer.SendResponse(context.Connection);
