@@ -36,7 +36,7 @@ namespace Alchemy.Handlers
         ///
         /// When FastDirectSendingMode is set to true before any Handlers are started up, the send-threads are not started.
         /// Messages are then sent directly from the multithreaded application to the underlaying socket buffer.
-        /// The Send method may block a short time until the previous send operation has copied its data do the socket buffer.
+        /// The Send method may block a short time until the previous send operation has copied its data to the socket buffer.
         /// There is a considerable speed increase for applications needing fast roundtrip times and have a small number of clients:
         ///    FastDirectSendingMode = false:   33 request+responses per second - caused by a delay of 10ms in every dequeue operation.
         ///    FastDirectSendingMode = true:  5000 request+responses per second
