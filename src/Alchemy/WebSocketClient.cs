@@ -106,6 +106,7 @@ namespace Alchemy
                 _context.Connection = _client;
                 _connecting = true;
                 _client.BeginConnect(_host, _port, OnClientConnected, null);
+                _context.UserContext.ClientAddress = _client.Client.RemoteEndPoint;
             }
             catch (Exception ex)
             {
