@@ -14,19 +14,18 @@ namespace Alchemy
     /// <summary>
     /// The Main WebSocket Server
     /// </summary>
-    public class WebSocketServer : TcpServer, IDisposable
+    public class WebSocketServer : TcpServer
     {
 
         private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
         private static Thread CleanupThread;
-
-        private static CancellationTokenSource cancellation = new CancellationTokenSource();
 
         private static ConcurrentQueue<Context> ContextQueue { get; set; }
         private static Dictionary<Context, WebSocketServer> ContextMapping { get; set; }
 
         private static List<Context> CurrentConnections { get; set; }
 
+        // static constructor
         static WebSocketServer()
         {
             ContextQueue = new ConcurrentQueue<Context>();
@@ -46,14 +45,14 @@ namespace Alchemy
 
         private static void HandleClientThread()
         {
-            while (!cancellation.Token.IsCancellationRequested)
+            while (!Handler.Shutdown.Token.IsCancellationRequested)
             {
                 Context context;
 
                 while (ContextQueue.Count == 0)
                 {
                     Thread.Sleep(10);
-                    if (cancellation.Token.IsCancellationRequested) return;
+                    if (Handler.Shutdown.IsCancellationRequested) return;
                 }
 
                 if (!ContextQueue.TryDequeue(out context))
@@ -63,8 +62,8 @@ namespace Alchemy
 
                 lock (ContextMapping)
                 {
-                    WebSocketServer client = ContextMapping[context];
-                    client.SetupContext(context);
+                    WebSocketServer server = ContextMapping[context];
+                    server.SetupContext(context);
                 }
 
                 lock(CurrentConnections){
@@ -75,7 +74,7 @@ namespace Alchemy
 
         private static void HandleContextCleanupThread()
         {
-            while (!cancellation.IsCancellationRequested)
+            while (!Handler.Shutdown.IsCancellationRequested)
             {
                 Thread.Sleep(100);
 
@@ -88,8 +87,8 @@ namespace Alchemy
 
                 foreach (var connection in currentConnections)
                 {
-                    if (cancellation.IsCancellationRequested) break;
-                    
+                    if (Handler.Shutdown.IsCancellationRequested) break;
+
                     if (!connection.Connected)
                     {
                         lock (CurrentConnections)
@@ -104,10 +103,18 @@ namespace Alchemy
 
                         connection.Handler.UnregisterContext(connection);
 
-                        connection.Dispose();
+                        connection.Close();
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Gets the client count of all servers.
+        /// </summary>
+        public static int ClientCount
+        {
+            get { return CurrentConnections.Count; }
         }
 
         /// <summary>
@@ -129,10 +136,10 @@ namespace Alchemy
 
         /// <summary>
         /// Enables or disables the Flash Access Policy Server(APServer).
-        /// This is used when you would like your app to only listen on a single port rather than 2.
+        /// Set to false in the constructor, when you would like your app to only listen on a single port rather than 2.
         /// Warning, any flash socket connections will have an added delay on connection due to the client looking to port 843 first for the connection restrictions.
         /// </summary>
-        public bool FlashAccessPolicyEnabled = true;
+        public bool FlashAccessPolicyEnabled {get; private set;}
 
         /// <summary>
         /// Configuration for the above heartbeat setup.
@@ -153,7 +160,15 @@ namespace Alchemy
         /// <summary>
         /// Initializes a new instance of the <see cref="WebSocketServer"/> class.
         /// </summary>
-        public WebSocketServer(int listenPort = 0, IPAddress listenAddress = null) : base(listenPort, listenAddress) {}
+        /// <param name="flashAccessPolicyEnabled">When true, an additional TCPServer on port 843 is started.
+        ///     Make sure only one server instance is active on this port.</param>
+        /// <param name="listenPort">The server listens on this TCP port, defaults to 80.</param>
+        /// <param name="listenAddress">The local ethernet adapter. May be IPAddress.Any or IPAddress.Loopback.</param>
+        public WebSocketServer(bool flashAccessPolicyEnabled, int listenPort = 0, IPAddress listenAddress = null) 
+            : base (listenPort, listenAddress) 
+        {
+            FlashAccessPolicyEnabled = flashAccessPolicyEnabled;
+        }
 
         /// <summary>
         /// Gets or sets the origin host.
@@ -188,33 +203,53 @@ namespace Alchemy
         }
 
         /// <summary>
-        /// Starts this instance.
+        /// Starts this WebSocketServer on the given listenPort.
+        /// When enabled, starts also the FlashAccessPolicy-server on port 843.
         /// </summary>
         public override void Start()
         {
             base.Start();
             if (AccessPolicyServer == null)
             {
+                // every server needs an instance for its clients to send AccessPolicy requests to a remote server
                 AccessPolicyServer = new AccessPolicyServer(ListenAddress, Origin, Port);
-
+                
+                // at most one instance may be enabled
                 if (FlashAccessPolicyEnabled)
                 {
-                    AccessPolicyServer.Start();
+                    try
+                    {
+                    	AccessPolicyServer.Start();
+                    }
+                    catch (Exception ex)
+                    {
+                        base.Stop();
+                    	throw new OperationCanceledException("cannot start the AccessPolicyServer", ex);
+                    }
                 }
             }
         }
 
         /// <summary>
-        /// Stops this instance.
+        /// Stops this WebSocketServer.
+        /// When enabled, stops also the FlashAccessPolicy-server.
         /// </summary>
         public override void Stop()
         {
-            if ((AccessPolicyServer != null) && (FlashAccessPolicyEnabled))
-            {
-                AccessPolicyServer.Stop();
-                AccessPolicyServer = null;
-            }
             base.Stop();
+            if (AccessPolicyServer != null && FlashAccessPolicyEnabled)
+            {
+                try
+                {
+                	AccessPolicyServer.Stop();
+               		AccessPolicyServer = null;
+                }
+                catch (Exception ex)
+                {
+                	AccessPolicyServer = null;
+                	throw new OperationCanceledException("cannot stop the AccessPolicyServer", ex);
+                }
+            }
         }
 
         /// <summary>
@@ -232,7 +267,6 @@ namespace Alchemy
             context.UserContext.SetOnDisconnect(OnDisconnect);
             context.UserContext.SetOnSend(OnSend);
             context.UserContext.SetOnReceive(OnReceive);
-            context.BufferSize = BufferSize;
             context.UserContext.OnConnect();
 
             if (context.Connected)
@@ -246,34 +280,6 @@ namespace Alchemy
             }
         }
 
-        /// <summary>
-        /// The root receive event for each client. Executes in it's own thread.
-        /// </summary>
-        /// <param name="result">The Async result.</param>
-        private void DoReceive(IAsyncResult result)
-        {
-            var context = (Context) result.AsyncState;
-            context.Reset();
-            try
-            {
-                context.ReceivedByteCount = context.Connection.Client.EndReceive(result);
-            }
-            catch
-            {
-                context.ReceivedByteCount = 0;
-            }
-
-            if (context.ReceivedByteCount > 0)
-            {
-                context.Handler.HandleRequest(context);
-                context.ReceiveReady.Release();
-            }
-            else
-            {
-                context.Disconnect();
-                context.ReceiveReady.Release();
-            }
-        }
         private void SetupContext(Context _context)
         {
             _context.ReceiveEventArgs.UserToken = _context;
@@ -282,40 +288,32 @@ namespace Alchemy
 
             StartReceive(_context);
         }
+
         private void StartReceive(Context _context)
         {
             try
             {
-                if (_context.ReceiveReady.Wait(TimeOut, cancellation.Token))
+                if (!_context.ReceiveEventArgs_StartAsync())
                 {
-                    try
-                    {
-                        if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
-                        {
-                            ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
-                        }
-                    }
-                    catch (SocketException ex)
-                    {
-                        //logger.Error("SocketException in ReceieveAsync", ex);
-                        _context.Disconnect();
-                    }
-                }
-                else
-                {
-                    //logger.Error("Timeout waiting for ReceiveReady");
-                    _context.Disconnect();
+                    ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                 }
             }
             catch (OperationCanceledException) { }
+            catch (SocketException ex)
+            {
+                //logger.Error("SocketException in StartReceive", ex);
+                _context.UserContext.LatestException = ex;
+                _context.Disconnect();
+            }
         }
+
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
             var context = (Context)e.UserToken;
             context.Reset();
             if (e.SocketError != SocketError.Success)
             {
-            //logger.Error("Socket Error: " + e.SocketError.ToString());
+                //logger.Error("Socket Error: " + e.SocketError.ToString());
                 context.ReceivedByteCount = 0;
             } else {
                 context.ReceivedByteCount = e.BytesTransferred;
@@ -324,19 +322,21 @@ namespace Alchemy
             if (context.ReceivedByteCount > 0)
             {
                 context.Handler.HandleRequest(context);
-                context.ReceiveReady.Release();
                 StartReceive(context);
             } else {
                 context.Disconnect();
-                context.ReceiveReady.Release();
             }
         }
-        
-        public void Dispose()
+
+        /// <summary>
+        /// Shutdown stops all static allocated receive- and send threads.
+        /// Therefore, Shutdown may only be called, when the application shuts down.
+        /// Use 'Stop' to just end one WebSocketServer instance.
+        /// </summary>
+        public static void Shutdown()
         {
-            cancellation.Cancel();
-            base.Dispose();
-            Handler.Instance.Dispose();
-        }        
+            Handler.Shutdown.Cancel();
+            Thread.Sleep(200); // let the cleanup thread check the shutdown cancellation token
+        }
     }
 }

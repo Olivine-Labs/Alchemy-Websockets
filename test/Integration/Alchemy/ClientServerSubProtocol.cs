@@ -10,16 +10,8 @@ namespace Alchemy
     {
         private WebSocketServer _server;
         private WebSocketClient _client;
-        private bool _forever;
-        private bool _clientDataPass = true;
 
-        [TestFixtureSetUp]
-        public void SetUp()
-        {
-
-        }
-
-        [TestFixtureTearDown]
+        [TearDown]
         public void TearDown()
         {
             _client.Disconnect();
@@ -31,7 +23,7 @@ namespace Alchemy
         [Test]
         public void ClientShouldNotConnectWithInvalidProtocol()
         {
-            _server = new WebSocketServer(54321, IPAddress.Loopback);
+            _server = new WebSocketServer(false, 54321, IPAddress.Loopback);
             _server.Start();
             _client = new WebSocketClient("ws://127.0.0.1:54321/path")
                           {Origin = "localhost", SubProtocols = new[] {"test", "test2"}};
@@ -44,9 +36,9 @@ namespace Alchemy
         }
 
         [Test]
-        public void ClientShoulConnectWithValidProtocol()
+        public void ClientShouldConnectWithValidProtocol()
         {
-            _server = new WebSocketServer(54321, IPAddress.Loopback) { SubProtocols = new[] { "test" }};
+            _server = new WebSocketServer(false, 54321, IPAddress.Loopback) { SubProtocols = new[] { "test" }};
             _server.Start();
             _client = new WebSocketClient("ws://127.0.0.1:54321/path") { Origin = "localhost", SubProtocols = new[] { "test", "test2" } };
 
@@ -57,9 +49,9 @@ namespace Alchemy
         }
 
         [Test]
-        public void ClientShoulConnectWithSecondaryValidProtocol()
+        public void ClientShouldConnectWithSecondaryValidProtocol()
         {
-            _server = new WebSocketServer(54321, IPAddress.Loopback) { SubProtocols = new[] { "test2" } };
+            _server = new WebSocketServer(false, 54321, IPAddress.Loopback) { SubProtocols = new[] { "test2" } };
             _server.Start();
             _client = new WebSocketClient("ws://127.0.0.1:54321/path") { Origin = "localhost", SubProtocols = new[] { "test", "test2" } };
 

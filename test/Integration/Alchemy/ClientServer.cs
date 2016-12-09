@@ -12,11 +12,19 @@ namespace Alchemy
         private WebSocketClient _client;
         private bool _forever;
         private bool _clientDataPass = true;
+        private static int _requestId;
+        private static int _requestId2;
+        private static int _responseId;
+        private static int _responseId2;
+        private static int _expectedLength;
 
         [TestFixtureSetUp]
         public void SetUp()
         {
-            _server = new WebSocketServer(54321, IPAddress.Loopback) {OnReceive = OnServerReceive};
+            _server = new WebSocketServer(false, 54321, IPAddress.Loopback) 
+            {
+            	OnReceive = OnServerReceive
+            };
             _server.Start();
             _client = new WebSocketClient("ws://127.0.0.1:54321/path") { Origin = "localhost", OnReceive = OnClientReceive };
             _client.Connect();
@@ -33,18 +41,46 @@ namespace Alchemy
 
         private static void OnServerReceive(UserContext context)
         {
+            Thread.Sleep(1);
             var data = context.DataFrame.ToString();
+            if (data.StartsWith("Test" + _requestId.ToString()) && _expectedLength == data.Length)
+            {
+                _requestId++;
+            }
+            else if (data.StartsWith("Halo" + _requestId2.ToString()) && _expectedLength == data.Length)
+            {
+                _requestId2++;
+            }
+
             context.Send(data);
         }
 
         private void OnClientReceive(UserContext context)
         {
             var data = context.DataFrame.ToString();
-            if (data == "Test")
+            if (data.StartsWith("Test" + _responseId.ToString()) && _expectedLength == data.Length)
             {
+                _responseId++;
                 if (_forever && _clientDataPass)
                 {
-                    context.Send(data);
+                    context.Send("Test" + _responseId.ToString());
+                }
+            }
+            else
+            {
+                _clientDataPass = false;
+            }
+        }
+
+        private void OnClientReceive2(UserContext context)
+        {
+            var data = context.DataFrame.ToString();
+            if (data.StartsWith("Halo" + _responseId2.ToString()) && _expectedLength == data.Length)
+            {
+                _responseId2++;
+                if (_forever && _clientDataPass)
+                {
+                    context.Send("Halo" + _responseId2.ToString());
                 }
             }
             else
@@ -63,27 +99,41 @@ namespace Alchemy
         public void ClientSendData()
         {
             _forever = false;
+            _clientDataPass = true;
+            Alchemy.Handlers.Handler.FastDirectSendingMode = false;
+            _requestId = 1;
+            _responseId = 1;
+            _expectedLength = 5;
             if (_client.Connected)
             {
-                _client.Send("Test");
-                Thread.Sleep(1000);
+                _client.Send("Test1");
+                Thread.Sleep(200);
             }
             Assert.IsTrue(_clientDataPass);
+            Assert.AreEqual(2, _requestId);
+            Assert.AreEqual(2, _responseId);
         }
 
         [Test]
         public void ClientSendDataConcurrent()
         {
             _forever = true;
+            _clientDataPass = true;
+            Alchemy.Handlers.Handler.FastDirectSendingMode = false;
+            _requestId = 1000;
+            _responseId = 1000;
+            _requestId2 = 2000;
+            _responseId2 = 2000;
+            _expectedLength = 8;
+            var client2 = new WebSocketClient("ws://127.0.0.1:54321/path") { OnReceive = OnClientReceive2 };
             if (_client.Connected)
             {
-                var client2 = new WebSocketClient("ws://127.0.0.1:54321/path") { OnReceive = OnClientReceive };
                 client2.Connect();
 
                 if (client2.Connected)
                 {
-                    _client.Send("Test");
-                    client2.Send("Test");
+                    _client.Send("Test1000");
+                    client2.Send("Halo2000");
                 }
                 else
                 {
@@ -96,6 +146,55 @@ namespace Alchemy
                 _clientDataPass = false;
             }
             Assert.IsTrue(_clientDataPass);
+            Assert.IsTrue(_requestId == _responseId || _requestId - 1 == _responseId);
+            Assert.IsTrue(_requestId2 == _responseId2 || _requestId2 - 1 == _responseId2);
+            Assert.IsTrue(_responseId > 1010);
+            Assert.IsTrue(_responseId2 > 2010);
+
+            _client.Disconnect();
+            client2.Disconnect();
+            Assert.IsFalse(_client.Connected);
+            Assert.IsFalse(client2.Connected);
+
+            _client.Connect();
+            Assert.IsTrue(_client.Connected);
+        }
+
+        [Test]
+        public void ClientSendMultipleMessages()
+        {
+            _forever = false;
+            _clientDataPass = true;
+            Alchemy.Handlers.Handler.FastDirectSendingMode = true;
+            _requestId = 10;
+            _responseId = 10;
+            Assert.IsTrue(_client.Connected);
+            var longstring = " ".PadRight(500, '*'); // splitted header when 500 bytes !
+            _expectedLength = 6 + longstring.Length;
+
+            for (int i = 10; i < 20; i++)
+            {
+                _client.Send("Test" + i.ToString() + longstring);
+            }
+            Thread.Sleep(200);
+
+            Assert.IsTrue(_clientDataPass);
+            Assert.AreEqual(20, _requestId);
+            Assert.AreEqual(20, _responseId);
+
+
+            longstring = longstring.PadRight(400, 'X'); // 800 bytes ( > buffersize)
+            _expectedLength = 6 + longstring.Length;
+
+            for (int i = 20; i < 30; i++)
+            {
+                _client.Send("Test" + i.ToString() + longstring);
+            }
+            Thread.Sleep(200);
+
+            Assert.IsTrue(_clientDataPass);
+            Assert.AreEqual(30, _requestId);
+            Assert.AreEqual(30, _responseId);
         }
     }
 }

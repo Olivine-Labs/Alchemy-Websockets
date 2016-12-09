@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Web;
+using System.Net;
 using Alchemy.Classes;
 
 namespace Alchemy.Handlers.WebSocket.rfc6455
@@ -52,7 +52,7 @@ namespace Alchemy.Handlers.WebSocket.rfc6455
             Cookies = header.Cookies;
         }
 
-        public HttpCookieCollection Cookies { get; set; }
+        public CookieCollection Cookies { get; set; }
         public string[] SubProtocols { get; set; }
         public string Version { get; set; }
         public Dictionary<string, string> AdditionalFields { get; set; }

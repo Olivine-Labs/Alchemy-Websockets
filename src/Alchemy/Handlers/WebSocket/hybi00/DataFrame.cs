@@ -52,31 +52,38 @@ namespace Alchemy.Handlers.WebSocket.hybi00
             }
             return Payload;
         }
+        
 
         /// <summary>
         /// Appends the specified data to the internal byte buffer.
         /// </summary>
         /// <param name="data">The data.</param>
-        /// /// <param name="asFrame">For internal Alchemy use.</param>
-        public override void Append(byte[] data, bool asFrame = false)
+        /// <param name="receivedByteCount">Count of available bytes in buffer. -1 indicates whole buffer.</param>
+        /// <param name="asFrame">For internal Alchemy use.</param>
+        public override int Append(byte[] data, int receivedByteCount = -1, bool asFrame = false, long maxLength=0)
         {
+            if (receivedByteCount < 0)
+            {
+                receivedByteCount = data.Length;
+            }
+
             if (asFrame)
             {
                 Format = DataFormat.Frame;
                 if (data.Length > 0)
                 {
-                    int end = Array.IndexOf(data, EndByte);
+                    int end = Array.IndexOf(data, EndByte, 0, receivedByteCount);
                     if (end != -1)
                     {
                         InternalState = DataState.Complete;
                     }
                     else //If no match found, default.
                     {
-                        end = data.Length;
+                        end = receivedByteCount;
                         InternalState = DataState.Receiving;
                     }
 
-                    int start = Array.IndexOf(data, StartByte);
+                    int start = Array.IndexOf(data, StartByte, 0, receivedByteCount);
                     if ((start != -1) && (start < end))
                         // Make sure the start is before the end and that we actually found a match.
                     {
@@ -99,14 +106,22 @@ namespace Alchemy.Handlers.WebSocket.hybi00
                         endBytes[0] = EndByte;
                         Payload.Add(new ArraySegment<byte>(endBytes));
                     }
+                    
+                    if (Length > maxLength)
+                    {
+                        return -1; // invalid data
+                    }
+
+                    return Math.Min(end + 1, receivedByteCount);
                 }
+                return 0;
             }
             else
             {
+                // append user data to send later on - or append authentication header
                 Format = DataFormat.Raw;
-                var temp = new byte[data.Length];
-                Array.Copy(data, 0, temp, 0, data.Length);
-                Payload.Add(new ArraySegment<byte>(temp));
+                Payload.Add(new ArraySegment<byte>(data, 0, receivedByteCount));
+                return receivedByteCount;
             }
         }
     }

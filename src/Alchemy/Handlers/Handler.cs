@@ -13,7 +13,7 @@ namespace Alchemy.Handlers
     /// When the protocol has not yet been determined the system defaults to this request handler.
     /// Singleton, just like the other handlers.
     /// </summary>
-    public class Handler : IDisposable
+    public class Handler
     {
         private static Handler _instance;
 
@@ -27,13 +27,28 @@ namespace Alchemy.Handlers
         /// <summary>
         /// Cancellation of threads if disposing
         /// </summary>
-        private static CancellationTokenSource cancellation = new CancellationTokenSource();
+        public static CancellationTokenSource Shutdown = new CancellationTokenSource();
+
+        /// <summary>
+        /// The default behaviour for Alchemy clients and servers is to start one send-thread per CPU.
+        /// These threads will dequeue messages from a single queue and send it to the sockets opened for each WebSocket partner.
+        /// This scales good for a large number of clients ( > 1000), see issue #52.
+        ///
+        /// When FastDirectSendingMode is set to true before any Handlers are started up, the send-threads are not started.
+        /// Messages are then sent directly from the multithreaded application to the underlaying socket buffer.
+        /// The Send method may block a short time until the previous send operation has copied its data to the socket buffer.
+        /// There is a considerable speed increase for applications needing fast roundtrip times and have a small number of clients:
+        ///    FastDirectSendingMode = false:   33 request+responses per second - caused by a delay of 10ms in every dequeue operation.
+        ///    FastDirectSendingMode = true:  5000 request+responses per second
+        /// </summary>
+        public static bool FastDirectSendingMode;
 
         protected Handler() {
 
             MessageQueue = new ConcurrentQueue<HandlerMessage>();
 
-            for (int i = 0; i < ProcessSendThreads.Length; i++)
+            int n = FastDirectSendingMode ? 0 : ProcessSendThreads.Length;
+            for (int i = 0; i < n; i++)
             {
                 ProcessSendThreads[i] = new Thread(ProcessSend);
                 ProcessSendThreads[i].Name = "Alchemy Send Handler Thread " + (i + 1);
@@ -59,7 +74,7 @@ namespace Alchemy.Handlers
         }
 
         /// <summary>
-        /// Handles the initial request.
+        /// Handles the initial request on the service side.
         /// Attempts to process the header that should have been sent.
         /// Otherwise, through magic and wizardry, the client gets disconnected.
         /// </summary>
@@ -84,7 +99,7 @@ namespace Alchemy.Handlers
         {
             string data = Encoding.UTF8.GetString(context.Buffer, 0, context.ReceivedByteCount);
             //Check first to see if this is a flash socket XML request.
-            if (data == "<policy-file-request/>\0")
+            if (data == "<policy-file-request/>\0" && context.Server != null && context.Server.AccessPolicyServer != null)
             {
                 //if it is, we access the Access Policy Server instance to send the appropriate response.
                 context.Server.AccessPolicyServer.SendResponse(context.Connection);
@@ -124,12 +139,12 @@ namespace Alchemy.Handlers
 
         private void ProcessSend()
         {
-            while (!cancellation.IsCancellationRequested)
+            while (!Shutdown.IsCancellationRequested)
             {
                 while (MessageQueue.IsEmpty)
                 {
                     Thread.Sleep(10);
-                    if (cancellation.IsCancellationRequested) return;
+                    if (Shutdown.IsCancellationRequested) return;
                 }
 
                 HandlerMessage message;
@@ -145,11 +160,9 @@ namespace Alchemy.Handlers
 
         private void Send(HandlerMessage message)
         {
-            message.Context.SendEventArgs.UserToken = message;
-            
             try
             {
-              message.Context.SendReady.Wait(cancellation.Token);
+              message.Context.SendReady.Wait(message.Context.Cancellation.Token); // block until previous message is in the socket buffer
             }
             catch (OperationCanceledException)
             {
@@ -158,9 +171,13 @@ namespace Alchemy.Handlers
 
             try
             {
-                List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
-                message.Context.SendEventArgs.BufferList = data;
-                message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
+                if (message.Context.Connected)
+                {
+                    List<ArraySegment<byte>> data = message.IsRaw ? message.DataFrame.AsRaw() : message.DataFrame.AsFrame();
+                    message.Context.SendEventArgs.UserToken = message; // 2014-02-04 moved here from beginning of method. When SendEventArgs_Completed is called the message must correspond to the one that was sent!
+                    message.Context.SendEventArgs.BufferList = data;
+                    message.Context.Connection.Client.SendAsync(message.Context.SendEventArgs);
+                }
             }
             catch
             {
@@ -180,7 +197,14 @@ namespace Alchemy.Handlers
             if (context.Connected)
             {
                 HandlerMessage message = new HandlerMessage { DataFrame = dataFrame, Context = context, IsRaw = raw, DoClose = close };
-                MessageQueue.Enqueue(message);
+                if (FastDirectSendingMode)
+                {
+                    Send(message);
+                }
+                else
+                {
+                    MessageQueue.Enqueue(message);
+                }
             }
         }
 
@@ -193,7 +217,7 @@ namespace Alchemy.Handlers
                 message.Context.Disconnect();
                 return;
             }
-           
+
             message.Context.SendReady.Release();
             message.Context.UserContext.OnSend();
 
@@ -220,11 +244,5 @@ namespace Alchemy.Handlers
             public Boolean IsRaw { get; set;}
             public Boolean DoClose { get; set;}
         }
-        
-        public void Dispose()
-        {
-          cancellation.Cancel();      
-        }
-        
     }
 }

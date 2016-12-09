@@ -1,10 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
+using System.Diagnostics;
 using Alchemy.Classes;
 using Alchemy.Handlers.WebSocket.rfc6455;
 
@@ -34,11 +34,6 @@ namespace Alchemy
         private readonly int _port;
         private readonly string _host;
 
-        private static Thread[] ClientThreads = new Thread[Environment.ProcessorCount];
-        private static CancellationTokenSource cancellation = new CancellationTokenSource();
-        private static Queue<Context> NewClients { get; set; }
-        private static Dictionary<Context, WebSocketClient> ContextMapping { get; set; }
-
         public enum ReadyStates
         {
             CONNECTING,
@@ -55,46 +50,11 @@ namespace Alchemy
             }
         }
 
-        static WebSocketClient()
+        public static void Log (string text)
         {
-            NewClients = new Queue<Context>();
-            ContextMapping = new Dictionary<Context, WebSocketClient>();
-
-            for(int i = 0; i < ClientThreads.Length; i++){
-                ClientThreads[i] = new Thread(HandleClientThread);
-                ClientThreads[i].Start();
-            }
+            Trace.Write(string.Format ("--{0:HH:mm:ss.fff}, {1}\r\n", DateTime.Now, text));
         }
 
-        private static void HandleClientThread()
-        {
-            while (!cancellation.IsCancellationRequested)
-            {
-                Context context = null;
-
-                while (NewClients.Count == 0)
-                {
-                    Thread.Sleep(10);
-                    if (cancellation.IsCancellationRequested) return;
-                }
-
-                lock (NewClients)
-                {
-                    if (NewClients.Count == 0)
-                    {
-                        continue;
-                    }
-
-                    context = NewClients.Dequeue();
-                }
-
-                lock (ContextMapping)
-                {
-                    WebSocketClient client = ContextMapping[context];
-                    client.SetupContext(context);
-                }
-            }
-        }
         public WebSocketClient(string path)
         {
             var r = new Regex("^(wss?)://(.*)\\:([0-9]*)/(.*)$");
@@ -107,26 +67,50 @@ namespace Alchemy
 
         public void Connect()
         {
+            BeginConnect(null);
+
+            var waiting = new TimeSpan();
+            while (_connecting && waiting < ConnectTimeout)
+            {
+                var timeSpan = new TimeSpan(0, 0, 0, 0, 100);
+                waiting = waiting.Add(timeSpan);
+                Thread.Sleep(timeSpan.Milliseconds);
+            }
+        }
+
+        ///<summary>
+        /// Starts the asynchronous connection process.
+        /// User callbacks are: OnConnected() when successful - or OnDisconnect() in case of failure.
+        /// UserContext.Data will contain the data object passed here.
+        /// Timeout is defined by the TCP stack.
+        ///</summary>
+        public void BeginConnect(object data)
+        {
             if (_client != null) return;
-            
+
+            _context = new Context(null, null);
+            _context.UserContext.DataFrame = new DataFrame();
+            _context.UserContext.SetOnConnect(OnConnect);
+            _context.UserContext.SetOnConnected(OnConnected);
+            _context.UserContext.SetOnDisconnect(OnDisconnect);
+            _context.UserContext.SetOnSend(OnSend);
+            _context.UserContext.SetOnReceive(OnReceive);
+            _context.UserContext.Data = data;
+
             try
             {
                 ReadyState = ReadyStates.CONNECTING;
+                _context.UserContext.OnConnect();
 
                 _client = new TcpClient();
+                _context.Connection = _client;
                 _connecting = true;
-                _client.BeginConnect(_host, _port, OnRunClient, null);
-
-                var waiting = new TimeSpan();
-                while (_connecting && waiting < ConnectTimeout)
-                {
-                    var timeSpan = new TimeSpan(0, 0, 0, 0, 100);
-                    waiting = waiting.Add(timeSpan);
-                    Thread.Sleep(timeSpan.Milliseconds);
-                }
+                _client.BeginConnect(_host, _port, OnClientConnected, null);
+                _context.UserContext.ClientAddress = _client.Client.RemoteEndPoint;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                _context.UserContext.LatestException = ex;
                 Disconnect();
             }
         }
@@ -134,69 +118,40 @@ namespace Alchemy
         /// <summary>
         /// Fires when a client connects.
         /// </summary>
-        /// <param name="result">null</param>
-        protected void OnRunClient(IAsyncResult result)
+        protected void OnClientConnected(IAsyncResult result)
         {
-            bool connectError = false;
+            if (_client == null) return;
             try
             {
                 _client.EndConnect(result);
             }
             catch (Exception ex)
             {
+                _context.UserContext.LatestException = ex;
                 Disconnect();
-                connectError = true;
+                return;
             }
 
-            using (_context = new Context(null, _client))
-            {
-                _context = new Context(null, _client);
-                _context.BufferSize = 512;
-                _context.UserContext.DataFrame = new DataFrame();
-                _context.UserContext.SetOnConnect(OnConnect);
-                _context.UserContext.SetOnConnected(OnConnected);
-                _context.UserContext.SetOnDisconnect(OnDisconnect);
-                _context.UserContext.SetOnSend(OnSend);
-                _context.UserContext.SetOnReceive(OnReceive);
-                _context.UserContext.OnConnect();
-
-                if (connectError)
-                {
-                    _context.UserContext.OnDisconnect();
-                    return;
-                }
-
-                lock (ContextMapping)
-                {
-                    ContextMapping[_context] = this;
-                }
-
-                lock (NewClients)
-                {
-                    NewClients.Enqueue(_context);
-                }
-            }
+            SetupContext();
         }
 
-        private void SetupContext(Context context)
+        private void SetupContext()
         {
             _context.ReceiveEventArgs.UserToken = _context;
             _context.ReceiveEventArgs.Completed += ReceiveEventArgs_Completed;
             _context.ReceiveEventArgs.SetBuffer(_context.Buffer, 0, _context.Buffer.Length);
+            IsAuthenticated = false;
 
             if (_context.Connection != null && _context.Connection.Connected)
             {
-                _context.ReceiveReady.Wait();
-
-                if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                _context.Connected = true;
+                if (!_context.ReceiveEventArgs_StartAsync())
                 {
                     ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                 }
- 
 
                 if (!IsAuthenticated)
                 {
-
                     Authenticate();
                 }
             }
@@ -204,34 +159,35 @@ namespace Alchemy
 
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
-            var context = (Context)e.UserToken;
-            context.Reset();
+            try
+            {
+                var context = (Context)e.UserToken;
+                context.Reset(); // only one ReceiveEventArgs exist for this context. Therefore, no concurrency.
 
-            if (e.SocketError != SocketError.Success)
-            {
-                context.ReceivedByteCount = 0;
-            }
-            else
-            {
-                context.ReceivedByteCount = e.BytesTransferred;
-            }
+                if (e.SocketError != SocketError.Success)
+                {
+                    context.ReceivedByteCount = 0;
+                }
+                else
+                {
+                    context.ReceivedByteCount = e.BytesTransferred;
+                }
 
-            if (context.ReceivedByteCount > 0)
-            {
-                ReceiveData(context);
-                context.ReceiveReady.Release();
-            }
-            else
-            {
-                context.Disconnect();
-            }
+                if (context.ReceivedByteCount > 0)
+                {
+                    ReceiveData(context); // process data
 
-            _context.ReceiveReady.Wait();
-
-            if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
-            {
-                ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                    if (!_context.ReceiveEventArgs_StartAsync())
+                    {
+                        ReceiveEventArgs_Completed(sender, e);
+                    }
+                }
+                else
+                {
+                    context.Disconnect();
+                }
             }
+            catch (OperationCanceledException) {}
         }
 
         private void Authenticate()
@@ -277,6 +233,20 @@ namespace Alchemy
             return true;
         }
 
+        private static String GenerateKey()
+        {
+            var bytes = new byte[16];
+            var random = new Random();
+
+            for (var index = 0; index < bytes.Length; index++)
+            {
+                bytes[index] = (byte)random.Next(0, 255);
+            }
+
+            return Convert.ToBase64String(bytes);
+        }
+
+
         private void ReceiveData(Context context)
         {
             if (!IsAuthenticated)
@@ -289,92 +259,127 @@ namespace Alchemy
 
                 if (!authenticated)
                 {
+                    _context.UserContext.LatestException = new OperationCanceledException("could not authenticate web socket server");
                     Disconnect();
+                    throw _context.UserContext.LatestException;
                 }
             }
             else
             {
-                context.UserContext.DataFrame.Append(context.Buffer, true);
-                if (context.UserContext.DataFrame.State == Handlers.WebSocket.DataFrame.DataState.Complete)
+                int remaining = context.ReceivedByteCount;
+                while (remaining > 0)
                 {
-                    context.UserContext.OnReceive();
-                    context.UserContext.DataFrame.Reset();
+                    // add bytes to existing or empty frame
+                    int readCount = context.UserContext.DataFrame.Append(context.Buffer, remaining, true, context.MaxFrameSize);
+                    if (readCount < 0)
+                    {
+                        Disconnect();
+                        _context.UserContext.LatestException = new OperationCanceledException("received invalid or too long message from web socket server");
+                        _context.UserContext.OnDisconnect();
+                        throw _context.UserContext.LatestException;
+                    }
+                    else if (readCount == 0)
+                    {
+                        break; // partial header
+                    }
+                    else if (context.UserContext.DataFrame.State == Handlers.WebSocket.DataFrame.DataState.Complete)
+                    {
+                        // pass frame to user code and start new frame
+                        context.UserContext.OnReceive();
+                        context.UserContext.DataFrame.Reset();
+                    }
+
+                    remaining -= readCount; // process rest of received bytes
+                    if (remaining > 0)
+                    {
+                        // move remaining bytes to beginning of array
+                        Array.Copy(context.Buffer, readCount, context.Buffer, 0, remaining);
+                    }
                 }
             }
         }
 
-        private void DoReceive(IAsyncResult result)
-        {
-            var context = (Context) result.AsyncState;
-            context.Reset();
-
-            try
-            {
-                context.ReceivedByteCount = context.Connection.Client.EndReceive(result);
-            }
-            catch (Exception)
-            {
-                context.ReceivedByteCount = 0;
-            }
-
-            if (context.ReceivedByteCount > 0)
-            {
-                ReceiveData(context);
-                context.ReceiveReady.Release();
-            }
-            else
-            {
-                context.Disconnect();
-            }
-        }
-
-        private static String GenerateKey()
-        {
-            var bytes = new byte[16];
-            var random = new Random();
-
-            for (var index = 0; index < bytes.Length; index++)
-            {
-                bytes[index] = (byte) random.Next(0, 255);
-            }
-
-            return Convert.ToBase64String(bytes);
-        }
-
-        public void Disconnect()
-        {
-            _connecting = false;
-
-            if (_client == null) return;
-            var dataFrame = new DataFrame();
-            dataFrame.Append(new byte[0]);
-
-            var bytes = dataFrame.AsFrame()[0].Array;
-
-            ReadyState = ReadyStates.CLOSING;
-
-            bytes[0] = 0x88;
-            _context.UserContext.Send(bytes);
-            _client.Close();
-            _client = null;
-            ReadyState = ReadyStates.CLOSED;
-        }
 
         public void Send(String data)
         {
             _context.UserContext.Send(data);
         }
 
-        public void Send(byte[] data)
+        /// <summary>
+        /// Send byteCount bytes from buffer.
+        /// </summary>
+        /// <param name="buffer">Data.</param>
+        /// <param name="byteCount">Count of bytes from beginning of buffer. -1 = all bytes.</param>
+        public void Send(byte[] buffer, int byteCount = -1)
         {
-            _context.UserContext.Send(data);
+            _context.UserContext.Send(buffer, byteCount);
         }
-        
+
+
+        public void Disconnect()
+        {
+            _connecting = false;
+
+            if (_client == null) return;
+
+            if (_context != null)
+            {
+                if (ReadyState == ReadyStates.OPEN)
+                {
+                    ReadyState = ReadyStates.CLOSING;
+                    // see http://stackoverflow.com/questions/17176827/websocket-close-packet
+                    var bytes = new byte[6];
+                    bytes[0] = 0x88; // Fin + Close
+                    bytes[1] = 0x80; // Mask = 1, Len = 0
+                    bytes[2] = 0;
+                    bytes[3] = 0;
+                    bytes[4] = 0; // Mask = 0
+                    bytes[5] = 0; // Mask = 0
+                    _context.UserContext.Send(bytes, raw: true);
+                    Thread.Sleep(30); // let the send thread do its work
+                }
+
+                ReadyState = ReadyStates.CLOSING;
+                _context.Dispose(); // sets Connected=false and notifies UserContext
+            }
+
+            if (_client != null)
+            {
+                var temp = _client;
+                _client = null;
+                temp.Close();
+            }
+            IsAuthenticated = false;
+            ReadyState = ReadyStates.CLOSED;
+        }
+
+        /// <summary>
+        /// Stops all static allocated receive- and send threads.
+        /// Therefore, Shutdown may only be called, when the application shuts down.
+        /// </summary>
+        public static void Shutdown()
+        {
+            Handler.Shutdown.Cancel();
+            Thread.Sleep(200); // let the cleanup thread check the shutdown cancellation token
+        }
+
+        #region IDisposable Support
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (disposing)
+            {
+                Disconnect();
+            }
+        }
+
+        /// <summary>
+        /// Disconnects the client.
+        /// </summary>
         public void Dispose()
         {
-            cancellation.Cancel();
-            Handler.Instance.Dispose();
+            Dispose(true);
         }
-        
+        #endregion
     }
 }
