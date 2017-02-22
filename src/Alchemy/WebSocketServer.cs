@@ -285,33 +285,36 @@ namespace Alchemy
 
             StartReceive(_context);
         }
-        
+
         private void StartReceive(Context _context)
         {
-            try
+            if (_context.Connected)
             {
-                if (_context.ReceiveReady.Wait(TimeOut, cancellation.Token))
+                try
                 {
-                    try
+                    if (_context.ReceiveReady.Wait(TimeOut, cancellation.Token))
                     {
-                        if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                        try
                         {
-                            ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                            if (!_context.Connection.Client.ReceiveAsync(_context.ReceiveEventArgs))
+                            {
+                                ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
+                            }
+                        }
+                        catch (SocketException)
+                        {
+                            //logger.Error("SocketException in ReceieveAsync", ex);
+                            _context.Disconnect();
                         }
                     }
-                    catch (SocketException)
+                    else
                     {
-                        //logger.Error("SocketException in ReceieveAsync", ex);
+                        //logger.Error("Timeout waiting for ReceiveReady");
                         _context.Disconnect();
                     }
                 }
-                else
-                {
-                    //logger.Error("Timeout waiting for ReceiveReady");
-                    _context.Disconnect();
-                }
+                catch (OperationCanceledException) { }
             }
-            catch (OperationCanceledException) { }
         }
 
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
@@ -341,7 +344,7 @@ namespace Alchemy
             }
         }
 
-        public new void Dispose()
+        public void Dispose()
         {
             cancellation.Cancel();
             base.Dispose();
