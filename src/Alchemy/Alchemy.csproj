@@ -80,7 +80,7 @@
     <Compile Include="Handlers\WebSocket\rfc6455\Handshakes.cs" />
     <Compile Include="Handlers\WebSocket\rfc6455\Handler.cs" />
     <Compile Include="Handlers\WebSocket\WebSocketHandler.cs" />
-    <Compile Include="TcpServer.cs" />
+    <Compile Include="TCPServer.cs" />
     <Compile Include="WebSocketClient.cs" />
     <Compile Include="WebSocketServer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
