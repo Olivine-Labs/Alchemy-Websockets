@@ -37,7 +37,8 @@ namespace Alchemy
             CleanupThread.Name = "WebSocketServer Cleanup Thread";
             CleanupThread.Start();
 
-            for(int i = 0; i < ClientThreads.Length; i++){
+            for (int i = 0; i < ClientThreads.Length; i++)
+            {
                 ClientThreads[i] = new Thread(HandleClientThread);
                 ClientThreads[i].Name = "WebSocketServer Client Thread #" + (i + 1);
                 ClientThreads[i].Start();
@@ -67,7 +68,8 @@ namespace Alchemy
                     client.SetupContext(context);
                 }
 
-                lock(CurrentConnections){
+                lock (CurrentConnections)
+                {
                     CurrentConnections.Add(context);
                 }
             }
@@ -89,7 +91,7 @@ namespace Alchemy
                 foreach (var connection in currentConnections)
                 {
                     if (cancellation.IsCancellationRequested) break;
-                    
+
                     if (!connection.Connected)
                     {
                         lock (CurrentConnections)
@@ -153,7 +155,7 @@ namespace Alchemy
         /// <summary>
         /// Initializes a new instance of the <see cref="WebSocketServer"/> class.
         /// </summary>
-        public WebSocketServer(int listenPort = 0, IPAddress listenAddress = null) : base(listenPort, listenAddress) {}
+        public WebSocketServer(int listenPort = 0, IPAddress listenAddress = null) : base(listenPort, listenAddress) { }
 
         /// <summary>
         /// Gets or sets the origin host.
@@ -252,7 +254,7 @@ namespace Alchemy
         /// <param name="result">The Async result.</param>
         private void DoReceive(IAsyncResult result)
         {
-            var context = (Context) result.AsyncState;
+            var context = (Context)result.AsyncState;
             context.Reset();
             try
             {
@@ -274,6 +276,7 @@ namespace Alchemy
                 context.ReceiveReady.Release();
             }
         }
+
         private void SetupContext(Context _context)
         {
             _context.ReceiveEventArgs.UserToken = _context;
@@ -282,6 +285,7 @@ namespace Alchemy
 
             StartReceive(_context);
         }
+        
         private void StartReceive(Context _context)
         {
             try
@@ -295,7 +299,7 @@ namespace Alchemy
                             ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                         }
                     }
-                    catch (SocketException ex)
+                    catch (SocketException)
                     {
                         //logger.Error("SocketException in ReceieveAsync", ex);
                         _context.Disconnect();
@@ -309,15 +313,18 @@ namespace Alchemy
             }
             catch (OperationCanceledException) { }
         }
+
         void ReceiveEventArgs_Completed(object sender, SocketAsyncEventArgs e)
         {
             var context = (Context)e.UserToken;
             context.Reset();
             if (e.SocketError != SocketError.Success)
             {
-            //logger.Error("Socket Error: " + e.SocketError.ToString());
+                //logger.Error("Socket Error: " + e.SocketError.ToString());
                 context.ReceivedByteCount = 0;
-            } else {
+            }
+            else
+            {
                 context.ReceivedByteCount = e.BytesTransferred;
             }
 
@@ -326,17 +333,19 @@ namespace Alchemy
                 context.Handler.HandleRequest(context);
                 context.ReceiveReady.Release();
                 StartReceive(context);
-            } else {
+            }
+            else
+            {
                 context.Disconnect();
                 context.ReceiveReady.Release();
             }
         }
-        
-        public void Dispose()
+
+        public new void Dispose()
         {
             cancellation.Cancel();
             base.Dispose();
             Handler.Instance.Dispose();
-        }        
+        }
     }
 }
