@@ -98,8 +98,11 @@ namespace Alchemy
         }
         public WebSocketClient(string path)
         {
-            var r = new Regex("^(wss?)://(.*)\\:([0-9]*)/(.*)$");
+            var r = new Regex("^(\\w+)://(.*)\\:([0-9]*)/(.*)$");
             var matches = r.Match(path);
+
+            if (matches.Groups[1].Value != "ws" || matches.Groups[1].Value != "wss")
+                SubProtocols = new string[] {matches.Groups[1].Value};
 
             _host = matches.Groups[2].Value;
             _port = Int32.Parse(matches.Groups[3].Value);

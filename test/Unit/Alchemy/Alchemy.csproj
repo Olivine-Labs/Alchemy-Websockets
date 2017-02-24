@@ -40,6 +40,8 @@
     <CodeAnalysisIgnoreBuiltInRuleSets>true</CodeAnalysisIgnoreBuiltInRuleSets>
     <CodeAnalysisIgnoreBuiltInRules>true</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <WarningLevel>4</WarningLevel>
+    <Optimize>false</Optimize>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -50,17 +52,12 @@
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisIgnoreBuiltInRules>false</CodeAnalysisIgnoreBuiltInRules>
     <CodeAnalysisFailOnMissingRules>false</CodeAnalysisFailOnMissingRules>
+    <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Handlers\WebSocket\hybi00\DataFrame.cs" />
     <Compile Include="Handlers\WebSocket\hybi10\DataFrame.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Alchemy\Alchemy.csproj">
-      <Project>{45486CDE-86A3-4769-952F-E0821BF79493}</Project>
-      <Name>Alchemy %28src\Alchemy%29</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <Reference Include="nunit.framework">
@@ -84,4 +81,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="..\..\Integration\Alchemy\Alchemy.csproj">
+      <Project>{D7B6AB15-5986-4FDC-ADA8-9EF14DF8F26D}</Project>
+      <Name>Alchemy</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>

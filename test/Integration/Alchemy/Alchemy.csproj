@@ -54,12 +54,6 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Alchemy\Alchemy.csproj">
-      <Project>{45486CDE-86A3-4769-952F-E0821BF79493}</Project>
-      <Name>Alchemy %28src\Alchemy%29</Name>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
@@ -70,4 +64,10 @@
   <Target Name="AfterBuild">
   </Target>
   -->
+  <ItemGroup>
+    <ProjectReference Include="Alchemy.csproj">
+      <Project>{D7B6AB15-5986-4FDC-ADA8-9EF14DF8F26D}</Project>
+      <Name>Alchemy</Name>
+    </ProjectReference>
+  </ItemGroup>
 </Project>
