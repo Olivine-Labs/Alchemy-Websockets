@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Net;
+using System.Text.RegularExpressions;
 using System.Net.Sockets;
 using System.Threading;
 using Alchemy.Classes;
@@ -120,14 +122,20 @@ namespace Alchemy
 
         /// <summary>
         /// These are the default OnEvent delegates for the server. By default, all new UserContexts will use these events.
-        /// It is up to you whether you want to replace them at runtime or even manually set the events differently per connection in OnReceive.
         /// </summary>
         public OnEventDelegate OnConnect = x => { };
-
         public OnEventDelegate OnConnected = x => { };
         public OnEventDelegate OnDisconnect = x => { };
         public OnEventDelegate OnReceive = x => { };
         public OnEventDelegate OnSend = x => { };
+
+        /// <summary>
+        /// These are events passed to the context to manage server behaviours.
+        /// </summary>
+        private OnEventDelegate _onConnected = x => { };
+        private OnEventDelegate _onDisconnect = x => { };
+        private OnEventDelegate _onReceive = x => { };
+        private OnEventDelegate _onSend = x => { };
 
         /// <summary>
         /// Enables or disables the Flash Access Policy Server(APServer).
@@ -152,10 +160,65 @@ namespace Alchemy
         private string _destination = String.Empty;
         private string _origin = String.Empty;
 
+        private Dictionary<string, ServerBehaviour> _behaviours = new Dictionary<string, ServerBehaviour>();
+
         /// <summary>
         /// Initializes a new instance of the <see cref="WebSocketServer"/> class.
         /// </summary>
-        public WebSocketServer(int listenPort = 0, IPAddress listenAddress = null) : base(listenPort, listenAddress) { }
+        public WebSocketServer(int listenPort = 0, IPAddress listenAddress = null) : base(listenPort, listenAddress)
+        {
+            _onConnected = (context) =>
+            {
+                OnConnected(context);
+                var keys = _behaviours.Keys.Where(k => Regex.IsMatch(context.RequestPath, $"^{k}$"));
+                if (keys.Count() > 0)
+                {
+                    foreach (var k in keys)
+                    {
+                        _behaviours[k].OnConnected(context);
+                    }
+                }
+            };
+
+            _onReceive = (context) =>
+            {
+                OnReceive(context);
+                var keys = _behaviours.Keys.Where(k => Regex.IsMatch(context.RequestPath, $"^{k}$"));
+                if (keys.Count() > 0)
+                {
+                    foreach (var k in keys)
+                    {
+                        _behaviours[k].OnReceive(context);
+                    }
+                }
+            };
+
+            _onSend = (context) =>
+            {
+                OnSend(context);
+                var keys = _behaviours.Keys.Where(k => Regex.IsMatch(context.RequestPath, $"^{k}$"));
+                if (keys.Count() > 0)
+                {
+                    foreach (var k in keys)
+                    {
+                        _behaviours[k].OnSend(context);
+                    }
+                }
+            };
+
+            _onDisconnect = (context) =>
+            {
+                OnDisconnect(context);
+                var keys = _behaviours.Keys.Where(k => Regex.IsMatch(context.RequestPath, $"^{k}$"));
+                if (keys.Count() > 0)
+                {
+                    foreach (var k in keys)
+                    {
+                        _behaviours[k].OnDisconnect(context);
+                    }
+                }
+            };
+        }
 
         /// <summary>
         /// Gets or sets the origin host.
@@ -186,6 +249,21 @@ namespace Alchemy
             {
                 _destination = value;
                 Authentication.Destination = value;
+            }
+        }
+
+        /// <summary>
+        /// Add a new server behaviour.
+        /// </summary>
+        /// <param name="path">The request path to apply the behaviour. Can be a <see cref="Regex"/>.</param>
+        /// <param name="behaviour">The <see cref="ServerBehaviour"/> to use when the user connect using the <paramref name="path"/></param>
+        public void AddServerBehaviour(string path, ServerBehaviour behaviour)
+        {
+            string key = path.TrimEnd('/');
+
+            if (!_behaviours.ContainsKey(key))
+            {
+                _behaviours.Add(path, behaviour);
             }
         }
 
@@ -230,10 +308,10 @@ namespace Alchemy
 
             context.UserContext.ClientAddress = context.Connection.Client.RemoteEndPoint;
             context.UserContext.SetOnConnect(OnConnect);
-            context.UserContext.SetOnConnected(OnConnected);
-            context.UserContext.SetOnDisconnect(OnDisconnect);
-            context.UserContext.SetOnSend(OnSend);
-            context.UserContext.SetOnReceive(OnReceive);
+            context.UserContext.SetOnConnected(_onConnected);
+            context.UserContext.SetOnDisconnect(_onDisconnect);
+            context.UserContext.SetOnSend(_onSend);
+            context.UserContext.SetOnReceive(_onReceive);
             context.BufferSize = BufferSize;
             context.UserContext.OnConnect();
 
@@ -344,7 +422,7 @@ namespace Alchemy
             }
         }
 
-        public void Dispose()
+        public new void Dispose()
         {
             cancellation.Cancel();
             base.Dispose();

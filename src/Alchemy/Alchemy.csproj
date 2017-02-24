@@ -71,6 +71,7 @@
     <Compile Include="Classes\Header.cs" />
     <Compile Include="Classes\Response.cs" />
     <Compile Include="Classes\UserContext.cs" />
+    <Compile Include="Classes\ServerBehaviour.cs" />
     <Compile Include="Handlers\Handler.cs" />
     <Compile Include="Handlers\WebSocket\hybi00\Handler.cs" />
     <Compile Include="Handlers\WebSocket\hybi00\Handshakes.cs" />
