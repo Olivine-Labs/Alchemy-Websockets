@@ -60,7 +60,8 @@ namespace Alchemy
             NewClients = new Queue<Context>();
             ContextMapping = new Dictionary<Context, WebSocketClient>();
 
-            for(int i = 0; i < ClientThreads.Length; i++){
+            for (int i = 0; i < ClientThreads.Length; i++)
+            {
                 ClientThreads[i] = new Thread(HandleClientThread);
                 ClientThreads[i].Start();
             }
@@ -97,8 +98,11 @@ namespace Alchemy
         }
         public WebSocketClient(string path)
         {
-            var r = new Regex("^(wss?)://(.*)\\:([0-9]*)/(.*)$");
+            var r = new Regex("^(\\w+)://(.*)\\:([0-9]*)/(.*)$");
             var matches = r.Match(path);
+
+            if (matches.Groups[1].Value != "ws" || matches.Groups[1].Value != "wss")
+                SubProtocols = new string[] {matches.Groups[1].Value};
 
             _host = matches.Groups[2].Value;
             _port = Int32.Parse(matches.Groups[3].Value);
@@ -108,7 +112,7 @@ namespace Alchemy
         public void Connect()
         {
             if (_client != null) return;
-            
+
             try
             {
                 ReadyState = ReadyStates.CONNECTING;
@@ -142,7 +146,7 @@ namespace Alchemy
             {
                 _client.EndConnect(result);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 Disconnect();
                 connectError = true;
@@ -192,7 +196,7 @@ namespace Alchemy
                 {
                     ReceiveEventArgs_Completed(_context.Connection.Client, _context.ReceiveEventArgs);
                 }
- 
+
 
                 if (!IsAuthenticated)
                 {
@@ -236,7 +240,7 @@ namespace Alchemy
 
         private void Authenticate()
         {
-            _handshake = new ClientHandshake { Version = "8", Origin = Origin, Host = _host, Key = GenerateKey(), ResourcePath = _path, SubProtocols = SubProtocols};
+            _handshake = new ClientHandshake { Version = "8", Origin = Origin, Host = _host, Key = GenerateKey(), ResourcePath = _path, SubProtocols = SubProtocols };
 
             _client.Client.Send(Encoding.UTF8.GetBytes(_handshake.ToString()));
         }
@@ -264,7 +268,7 @@ namespace Alchemy
                     }
 
                 }
-                if(String.IsNullOrEmpty(CurrentProtocol))
+                if (String.IsNullOrEmpty(CurrentProtocol))
                 {
                     return false;
                 }
@@ -305,7 +309,7 @@ namespace Alchemy
 
         private void DoReceive(IAsyncResult result)
         {
-            var context = (Context) result.AsyncState;
+            var context = (Context)result.AsyncState;
             context.Reset();
 
             try
@@ -335,7 +339,7 @@ namespace Alchemy
 
             for (var index = 0; index < bytes.Length; index++)
             {
-                bytes[index] = (byte) random.Next(0, 255);
+                bytes[index] = (byte)random.Next(0, 255);
             }
 
             return Convert.ToBase64String(bytes);
@@ -369,12 +373,12 @@ namespace Alchemy
         {
             _context.UserContext.Send(data);
         }
-        
+
         public void Dispose()
         {
             cancellation.Cancel();
             Handler.Instance.Dispose();
         }
-        
+
     }
 }
