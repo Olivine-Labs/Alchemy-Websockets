@@ -14,7 +14,7 @@ Alchemy websockets supports:
 
 An extremely efficient C# WebSocket server.
 
-You can download the client javascript library at [alchemy-websockets-client-library](https://github.com/Olivine-Labs/Alchemy-Websockets-Client-Library)
+You can download the client javascript library from here [alchemy-websockets-client-library](https://github.com/Olivine-Labs/Alchemy-Websockets-Client-Library)
 
 Documentation: [olivinelabs.com/Alchemy-Websockets/](http://olivinelabs.com/Alchemy-Websockets/)
 
