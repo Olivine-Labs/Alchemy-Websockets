@@ -59,7 +59,7 @@ static void OnConnected(UserContext aContext)
 //...etc
 ```
 
-## Documentation
+## Documentations
 Check out our documentation at [http://olivinelabs.com/Alchemy-Websockets](http://olivinelabs.com/Alchemy-Websockets)
 
 
