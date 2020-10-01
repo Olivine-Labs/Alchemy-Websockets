@@ -11,7 +11,7 @@ Alchemy websockets supports:
 * (✓) hybi-10
 * (✓) hybi-17 (official protocol)
 
-
+All major protocols supported. 
 An extremely efficient C# WebSocket server.
 
 You can download the client javascript library at [alchemy-websockets-client-library](https://github.com/Olivine-Labs/Alchemy-Websockets-Client-Library)
